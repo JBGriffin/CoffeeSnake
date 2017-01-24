@@ -1,11 +1,6 @@
 
 package havabol;
 
-/**
- * 
- * @author Garrett
- *
- */
 public class Token
 {
     public String tokenStr = "";
