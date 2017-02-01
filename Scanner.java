@@ -168,6 +168,11 @@ public class Scanner {
 				nextTokStr = currentLine.substring(iColPos, index + 1);
 			}
 		}
+
+		// Check to see if we still have anything in the file
+		if(iSourceLineNr +1 < sourceFileM.size())
+			return;		// If we hit this statement, we missed tokens
+
 		// If we reach this point, we're at the end of the file.
 		nextToken = new Token();
 		nextToken.primClassif = Token.EOF;
