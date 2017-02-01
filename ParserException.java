@@ -15,6 +15,7 @@ public class ParserException extends Exception
         this.iLineNr = iLineNr;
         this.diagnostic = diagnostic;
         this.sourceFileName = sourceFileName;
+        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
     }
 
     // Exceptions are required to provide tosString()
