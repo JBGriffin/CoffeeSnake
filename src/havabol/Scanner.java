@@ -12,7 +12,7 @@ import java.util.ArrayList;
  * <p>
  * Note: If an error is encountered, will throw an exception to main to kill the program immediately.
  * <p>
- * @author Garrett Griffin
+ * @author Garrett Griffin, Myka Hancevic, and Justin Hooge
  *
  */
 public class Scanner {
