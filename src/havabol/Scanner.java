@@ -14,9 +14,6 @@ import java.util.ArrayList;
  * <p>
  * @author Garrett Griffin, Myka Hancevic, and Justin Hooge
  *
- * 
- * //Adding comments to test branches and pull requests
- * 
  */
 public class Scanner {
 	
