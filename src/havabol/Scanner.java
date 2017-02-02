@@ -326,7 +326,7 @@ public class Scanner {
 
 	/**
 	 * Exits program and gives meaningful information at where and why the program
-	 * ended.
+	 * ended.   --
 	 * </p>
 	 * @param diagnosticTxt Text for the user to be able to debug program
 	 * @throws Exception Will show stack trace of where, when, and why the program ended.
