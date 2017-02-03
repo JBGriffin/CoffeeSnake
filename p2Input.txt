@@ -5,6 +5,8 @@ String yStr;
 // Do math
 x = 11;
 x = x + 1; // Complex Math equation
+String yStr = "Testing // Comments."
+x and y;
 pi = 3.14;
 print ("x=", x);
 print ("pi=", pi);

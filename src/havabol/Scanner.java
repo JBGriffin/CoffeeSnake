@@ -133,11 +133,36 @@ public class Scanner {
 			{
 				// If the build string is not empty, create the token and 
 				// advance the column position
+                // Check if it's a special typing or not
 				if(! nextTokStr.isEmpty())
 				{
+					// Construct a new token
 					constructToken(index, nextTokStr);
-					nextToken.primClassif = Token.OPERAND;
-					setSubClass();
+
+					// Todo: Clean up and modularize.
+					// Check to see if it's a special operator
+					switch(nextTokStr)
+					{
+                        // Set operators: 'and', 'or', 'not', etc.
+						case "and":case "not":case "in":case "or":case "notin":
+							System.out.println("OH MAN, WE IS GETTIN' REAL");
+							break;
+                        // Flow control keywords: 'if', 'endif', 'while', etc.
+                        case "if":case "else":case "endif":case "while":
+                        case "endwhile":case "for":case "endfor":
+                            System.out.println("We are in control");
+                            break;
+                        // Declaration constants(Int, Bool, etc)
+                        case "Int":case "Float":case "Bool":case "String":
+                        case "Date":case "Void":
+                            System.out.println("Set up");
+                            break;
+                        default:
+                            //Default case?
+                            nextToken.primClassif = Token.OPERAND;
+                            setSubClass();
+					}
+
 					nextTokStr = "";
 					return;
 				}
@@ -174,6 +199,9 @@ public class Scanner {
 				case '\'':
 					buildStringLiteral(textCharM[index], index + 1);
 					return;
+				// Boolean constants
+                // TODO: Set this token up.
+                case 'T':case 'F':
 				// Must be an operand. Check for sub classification
 				default:
 					nextTokStr = currentLine.substring(iColPos, index + 1);
