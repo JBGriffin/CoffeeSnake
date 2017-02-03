@@ -8,7 +8,7 @@ import java.util.HashMap;
 public class SymbolTable {
     
     
-    private HashMap<String,STEntry> ht; 
+    private HashMap<String,STEntry> ht; //Symbol Table [String:Entry]
     
 	public SymbolTable()
 	{
@@ -17,12 +17,27 @@ public class SymbolTable {
             
 	}
         
+        /**
+         * 
+         * getSymbol will check the hash table for symbol, if it exists
+         * method will return Symbol.
+         * 
+         * @param symbol
+         * @return Associated STEntry for symbol
+         */
         public STEntry getSymbol(String symbol) {
             
             return this.ht.get(symbol);
             
         }
         
+        /**
+         * 
+         * putSymbol will place the STEntry into the table under the symbol name
+         * 
+         * @param symbol to search for
+         * @param entry to put in table
+         */
         public void putSymbol(String symbol, STEntry entry){
             
             this.ht.put(symbol, entry);

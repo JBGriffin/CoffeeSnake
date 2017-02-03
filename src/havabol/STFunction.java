@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package havabol;
 
 import java.util.ArrayList;
@@ -10,7 +6,10 @@ import java.util.Arrays;
 
 /**
  *
- * @author wimbotexan23
+ * STFunction extends STEntry and adds fields iType (return type)
+ * , iStruct (BuiltIn or user function), and String array of arguments
+ * 
+ * @author Justin Hooge
  */
 public class STFunction extends STEntry {
     
@@ -26,6 +25,8 @@ public class STFunction extends STEntry {
     public STFunction(String symbol, int iPrimClassif, int iType, int iStruct, String... szArgsM) {
         
         super(symbol, iPrimClassif);
+        
+        this.iType = iType; // add return type
         
         this.ArgsM.addAll(Arrays.asList(szArgsM)); //add all args to arraylist
         

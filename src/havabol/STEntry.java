@@ -1,12 +1,13 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package havabol;
 
 /**
  *
+ * The entry contains the symbol itself and the primary classification,
+ * such as Operator, Operand, Control, etc.
+ * 
+ * NOTE: This is the super class to STControl, STFunction, and STIdentifier
+ * 
  * @author Justin Hooge
  */
 public class STEntry {

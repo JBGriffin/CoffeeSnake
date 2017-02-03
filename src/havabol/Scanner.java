@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Reads in the source file from the user, as well as the symbol table (which will not be
@@ -82,7 +83,27 @@ public class Scanner {
 		currentLine = sourceFileM.get(iSourceLineNr - 1);
 		System.out.println("  " + iSourceLineNr + " " + currentLine);
 		
-		// If the line is empty, try again.
+                //remove comments
+                if (currentLine.contains("//"))
+                {     
+                    StringBuilder sb = new StringBuilder();                  
+                    for (int i = 0; i < currentLine.length()-2; i++)
+                    {   
+                        if (currentLine.charAt(i) == '/' && currentLine.charAt(i+1) == '/')
+                        {
+                            currentLine = sb.toString();
+                            break;
+                        } else
+                        {
+                        sb.append(currentLine.charAt(i));
+                        }    
+                        
+                    }
+                    
+                }
+		
+
+                // If the line is empty, try again.
 		if(sourceFileM.get(iSourceLineNr - 1).isEmpty())
 		{
 			advanceLine();

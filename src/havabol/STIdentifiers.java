@@ -1,12 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package havabol;
 
 /**
  *
+ * STIdentifiers extends STEntry and adds iDclType ('int' x),
+ * iStruct (type of data structure like fixed array or unbound array),
+ * iParmType - if it is a parameter, is it by reference of value
+ * 
  * @author Justin Hooge
  */
 public class STIdentifiers extends STEntry {
