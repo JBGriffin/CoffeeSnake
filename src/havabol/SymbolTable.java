@@ -15,6 +15,8 @@ public class SymbolTable {
 	
             this.ht = new HashMap<>();
             
+            this.initGlobal();
+                        
 	}
         
         /**
@@ -81,8 +83,12 @@ public class SymbolTable {
             
             
             //STFunctions ???? HOW DO WE DO THE ARGS
-            //this.ht.put("print", new STFunction("print", Token.FUNCTION
-            //        , Token.VOID, Token.BUILTIN, ""));
+            Object[] argsM = new Object[3];
+            argsM[0] = "x equals";
+            argsM[1] = 2;
+            argsM[2] = (float) 3.14;
+            this.ht.put("print", new STFunction("print", Token.FUNCTION
+                    , Token.VOID, Token.BUILTIN, argsM));
             
             //"LENGTH"
             //"MAXLENGTH"

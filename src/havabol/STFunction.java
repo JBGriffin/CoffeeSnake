@@ -19,17 +19,31 @@ public class STFunction extends STEntry {
     
     int iType;
     
-    ArrayList<String> ArgsM = new ArrayList<>();
+    ArrayList<Object> argsM = new ArrayList<>();
     
     //need to probably changes string... to string[]
-    public STFunction(String symbol, int iPrimClassif, int iType, int iStruct, String... szArgsM) {
+    public STFunction(String symbol, int iPrimClassif, int iType, int iStruct, Object[] argsM) {
         
         super(symbol, iPrimClassif);
-        
         this.iType = iType; // add return type
         
-        this.ArgsM.addAll(Arrays.asList(szArgsM)); //add all args to arraylist
-        
+        for (Object o : argsM) //add all args to arraylist
+        {
+            
+            if (o instanceof Integer)
+            {
+                this.argsM.add((int) o);     
+            } else if (o instanceof String)
+            {
+                this.argsM.add((String) o);
+            } else if (o instanceof Float)
+            {
+                this.argsM.add((Float) o); 
+            } else { 
+                this.argsM.add( o);
+            }
+            
+        }
     }
     
 }
