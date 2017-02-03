@@ -8,7 +8,7 @@ import java.util.Arrays;
  *
  * STFunction extends STEntry and adds fields iType (return type)
  * , iStruct (BuiltIn or user function), and String array of arguments
- * 
+ * Push test
  * @author Justin Hooge
  */
 public class STFunction extends STEntry {
