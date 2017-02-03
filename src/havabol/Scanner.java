@@ -92,7 +92,7 @@ public class Scanner {
                         if (currentLine.charAt(i) == '/' && currentLine.charAt(i+1) == '/')
                         {
                             currentLine = sb.toString();
-                            break;
+                            advanceLine();
                         } else
                         {
                         sb.append(currentLine.charAt(i));
