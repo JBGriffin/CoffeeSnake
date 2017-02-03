@@ -145,20 +145,45 @@ public class Scanner {
 					{
                         // Set operators: 'and', 'or', 'not', etc.
 						case "and":case "not":case "in":case "or":case "notin":
-							System.out.println("OH MAN, WE IS GETTIN' REAL");
+							nextToken.primClassif = Token.OPERATOR;
 							break;
                         // Flow control keywords: 'if', 'endif', 'while', etc.
-                        case "if":case "else":case "endif":case "while":
-                        case "endwhile":case "for":case "endfor":
-                            System.out.println("We are in control");
+                        case "if":case "def":case "for":case "while":
+                        	nextToken.primClassif = Token.CONTROL;
+                        	nextToken.subClassif = Token.FLOW;
+                        	break;
+                        case "endwhile":case "endif":case "endfor":
+						case "else":case "enddef":
+                            nextToken.primClassif = Token.CONTROL;
+                            nextToken.subClassif = Token.END;
                             break;
                         // Declaration constants(Int, Bool, etc)
                         case "Int":case "Float":case "Bool":case "String":
-                        case "Date":case "Void":
-                            System.out.println("Set up");
+                        	nextToken.primClassif = Token.CONTROL;
+                        	nextToken.subClassif = Token.DECLARE;
+                        	break;
+						// Functions:
+						case "LENGTH":case "MAXLENGTH":case "SPACES":
+						case "ELEM":case "MAXELEM":
+							nextToken.primClassif = Token.FUNCTION;
+							nextToken.subClassif = Token.BUILTIN;
+							break;
+						case "Date":
+							nextToken.primClassif = Token.CONTROL;
+							nextToken.subClassif = Token.DATE;
+							break;
+						case "Void":
+							nextToken.primClassif = Token.CONTROL;
+							nextToken.subClassif = Token.VOID;
                             break;
+						case "print":
+							nextToken.primClassif = Token.FUNCTION;
+							nextToken.subClassif = Token.BUILTIN;
+							break;
                         default:
-                            //Default case?
+                            // For now, we know it's an operand and
+							// need to find it's subclassif. Later on,
+							// for user functions, we'll have to revisit this
                             nextToken.primClassif = Token.OPERAND;
                             setSubClass();
 					}
