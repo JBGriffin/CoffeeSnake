@@ -13,7 +13,7 @@ Assignment 2 Due February 21st:
         ∂ STIdentifier
         ∂ STFunction
         ∂ STControl
-    • Scanner Features - By: ____________
+    • Scanner Features - By: Garrett Griffin
         ∂ ≤ ≥ != ^ ==
         ∂ ect..
     • Other Utilies - By: ______________
