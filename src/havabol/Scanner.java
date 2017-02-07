@@ -206,7 +206,7 @@ public class Scanner {
 					iColPos = index + 1; 
 					break;
 				// Operator tokens: + - * / < > = ! 
-				case '+': case '-':	case '*': case '/':
+				case '+': case '-':	case '*': case '/':case '^':
 				case '!': case '=': case '<': case '>':
 					nextTokStr = currentLine.substring(iColPos, index + 1);
 					// Check to see if we need to combine operators
