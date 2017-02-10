@@ -83,12 +83,24 @@ public class SymbolTable {
             
             
             //STFunctions ???? HOW DO WE DO THE ARGS
+            /*
             Object[] argsM = new Object[3];
             argsM[0] = "x equals";
             argsM[1] = 2;
             argsM[2] = (float) 3.14;
+            */
             this.ht.put("print", new STFunction("print", Token.FUNCTION
-                    , Token.VOID, Token.BUILTIN, argsM));
+                    , Token.VOID, Token.BUILTIN));
+            this.ht.put("LENGTH", new STFunction("LENGTH", Token.FUNCTION
+                    , Token.INTEGER, Token.BUILTIN));
+            this.ht.put("MAXLENGTH", new STFunction("MAXLENGTH", Token.FUNCTION
+                    , Token.INTEGER, Token.BUILTIN));
+            this.ht.put("SPACES", new STFunction("SPACES", Token.FUNCTION
+                    , Token.INTEGER, Token.BUILTIN));
+            this.ht.put("ELEM", new STFunction("ELEM", Token.FUNCTION
+                    , Token.INTEGER, Token.BUILTIN));
+            this.ht.put("MAXELEM", new STFunction("MAXELEM", Token.FUNCTION
+                    , Token.INTEGER, Token.BUILTIN));
             
             //"LENGTH"
             //"MAXLENGTH"

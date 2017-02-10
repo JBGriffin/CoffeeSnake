@@ -45,5 +45,12 @@ public class STFunction extends STEntry {
             
         }
     }
+    //if it has no arg list
+    public STFunction(String symbol, int iPrimClassif, int iType, int iStruct) {
+        
+        super(symbol, iPrimClassif);
+        this.iType = iType; // add return type
+        
+    }
     
 }
