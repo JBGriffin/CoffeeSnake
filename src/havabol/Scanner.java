@@ -206,6 +206,7 @@ public class Scanner {
 				// Whitespace
 				case ' ': 
 				case '\t':
+				case '\n':
 					if(! nextTokStr.isEmpty()) // At white space, but I still have things to print
 					{					
 						constructToken(index + 1, nextTokStr);
@@ -262,8 +263,11 @@ public class Scanner {
 		}
 
 		// Check to see if we still have anything in the file
-		if(iSourceLineNr +1 < sourceFileM.size())
-			return;		// If we hit this statement, we missed tokens
+		if(iSourceLineNr < sourceFileM.size())
+		{
+			advanceLine();
+			return;        // If we hit this statement, we missed tokens
+		}
 
 		// If we reach this point, we're at the end of the file.
 		nextToken = new Token();
