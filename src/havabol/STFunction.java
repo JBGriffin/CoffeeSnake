@@ -22,7 +22,7 @@ public class STFunction extends STEntry {
     ArrayList<Object> argsM = new ArrayList<>();
     
     //need to probably changes string... to string[]
-    public STFunction(String symbol, int iPrimClassif, int iType, int iStruct, Object[] argsM) {
+    public STFunction(String symbol, int iPrimClassif, int iType, int iStruct, Object... argsM) {
         
         super(symbol, iPrimClassif);
         this.iType = iType; // add return type
