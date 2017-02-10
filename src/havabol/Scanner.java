@@ -72,12 +72,13 @@ public class Scanner {
 	private void advanceLine() throws IOException
 	{
 		iSourceLineNr += 1;
-		
+		iColPos = 0;
 		// Check if we're at the end of the file
 		// If we are, head home.
 		if(iSourceLineNr > sourceFileM.size()) 
 		{
-			return;
+                    currentLine = "";
+                    return;
 		}
 		
 		currentLine = sourceFileM.get(iSourceLineNr - 1);
@@ -104,7 +105,15 @@ public class Scanner {
 		
 
                 // If the line is empty, try again.
-		if(sourceFileM.get(iSourceLineNr - 1).isEmpty())
+		/*if(sourceFileM.get(iSourceLineNr - 1).isEmpty())
+		{
+			advanceLine();
+		}*/
+                
+                //got rid of ^that because it is a little slower than the one 
+                //below, since you already read into current line at the top
+                
+                if(currentLine.isEmpty())
 		{
 			advanceLine();
 		}
@@ -398,13 +407,27 @@ public class Scanner {
 	 */
 	public String getNext() throws Exception
 	{
-		if(iColPos == currentLine.length())
-			advanceLine();
+            
+            
+            
+            if(iColPos == currentLine.length())
+		advanceLine();
+            if(currentLine.isEmpty())
+                return "";
+            while(currentLine.charAt(iColPos) == ' ')
+            {
+                iColPos++;
+                if(iColPos == currentLine.length())
+                {
+                    advanceLine();
+                    break;
+                }
+            }
 		
-		setNextToken();
-		currentToken = nextToken;
+            setNextToken();
+            currentToken = nextToken;
 
-		return currentToken.tokenStr;
+            return currentToken.tokenStr;
 	}
 
 	/**
