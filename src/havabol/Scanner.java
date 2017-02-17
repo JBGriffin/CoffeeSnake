@@ -77,15 +77,15 @@ public class Scanner {
 		// If we are, head home.
 		if(iSourceLineNr > sourceFileM.size()) 
 		{
-                    currentLine = "";
-                    return;
+           currentLine = "";
+           return;
 		}
 		
 		currentLine = sourceFileM.get(iSourceLineNr - 1);
 		System.out.println("  " + iSourceLineNr + " " + currentLine);
 		
                 //remove comments
-                if (currentLine.contains("//"))
+               /* if (currentLine.contains("//"))
                 {     
                     StringBuilder sb = new StringBuilder();                  
                     for (int i = 0; i < currentLine.length()-2; i++)
@@ -101,7 +101,7 @@ public class Scanner {
                         
                     }
                     
-                }
+                }*/
 		
 
                 // If the line is empty, try again.
@@ -113,7 +113,7 @@ public class Scanner {
                 //got rid of ^that because it is a little slower than the one 
                 //below, since you already read into current line at the top
                 
-                if(currentLine.isEmpty())
+		if(currentLine.isEmpty())
 		{
 			advanceLine();
 		}
@@ -191,7 +191,7 @@ public class Scanner {
 							break;
                         default:
                             // For now, we know it's an operand and
-							// need to find it's subclassif. Later on,
+							// need to find its subclassif. Later on,
 							// for user functions, we'll have to revisit this
                             nextToken.primClassif = Token.OPERAND;
                             setSubClass();
@@ -222,6 +222,11 @@ public class Scanner {
 					// Check to see if we need to combine operators
                     // If it is, add it to the token string and increment positions
                     // Todo: Need to get clarification on how to handle ^.
+					if(textCharM[iColPos + 1] == '/' && textCharM[iColPos] == '/')
+					{
+						advanceLine();
+						return;
+					}
 					if(textCharM[iColPos + 1] == '=')
 					{
 					    iColPos += 1;
@@ -236,16 +241,22 @@ public class Scanner {
 				case ';': case '[': case ']':
 					nextTokStr = currentLine.substring(iColPos, index + 1);
 					constructToken(index + 1, nextTokStr);
+					index += 1;
 					nextToken.primClassif = Token.SEPARATOR;
 					return;
 				// String literal tokens
-				case '"': 
+				case '\"':
 				case '\'':
 					buildStringLiteral(textCharM[index], index + 1);
 					return;
 				// Boolean constants
                 // TODO: Set this token up.
                 case 'T':case 'F':
+					nextTokStr = currentLine.substring(iColPos, index + 1);
+					constructToken(index + 1, nextTokStr);
+					nextToken.primClassif = Token.OPERAND;
+					nextToken.subClassif = Token.BOOLEAN;
+					return;
 				// Must be an operand. Check for sub classification
 				default:
 					nextTokStr = currentLine.substring(iColPos, index + 1);
@@ -261,7 +272,16 @@ public class Scanner {
 				nextTokStr = currentLine.substring(iColPos, index + 1);
 			}
 		}
-
+		if(!nextTokStr.isEmpty())
+		{
+			//System.out.println("********** Tok String == " + nextTokStr);
+			nextTokStr = currentLine.substring(iColPos, textCharM.length);
+			constructToken(textCharM.length, nextTokStr);
+			nextToken.primClassif = Token.OPERAND;
+			setSubClass();
+			//advanceLine();
+			return;
+		}
 		// Check to see if we still have anything in the file
 		if(iSourceLineNr < sourceFileM.size())
 		{
@@ -411,27 +431,24 @@ public class Scanner {
 	 */
 	public String getNext() throws Exception
 	{
-            
-            
-            
+    	if(iColPos == currentLine.length())
+			advanceLine();
+		if(currentLine.isEmpty())
+            return "";
+        /*while(currentLine.charAt(iColPos) == ' ')
+        {
+            iColPos++;
             if(iColPos == currentLine.length())
-		advanceLine();
-            if(currentLine.isEmpty())
-                return "";
-            while(currentLine.charAt(iColPos) == ' ')
             {
-                iColPos++;
-                if(iColPos == currentLine.length())
-                {
-                    advanceLine();
-                    break;
-                }
+                advanceLine();
+                break;
             }
+        }*/
 		
-            setNextToken();
-            currentToken = nextToken;
+        setNextToken();
+        currentToken = nextToken;
 
-            return currentToken.tokenStr;
+        return currentToken.tokenStr;
 	}
 
 	/**
