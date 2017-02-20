@@ -78,6 +78,9 @@ public class Scanner {
 		if(iSourceLineNr > sourceFileM.size()) 
 		{
            currentLine = "";
+           nextToken = new Token();
+           nextToken.primClassif = Token.EOF;
+           nextToken.tokenStr = "";
            return;
 		}
 		
@@ -143,6 +146,10 @@ public class Scanner {
                         	nextToken.primClassif = Token.CONTROL;
                         	nextToken.subClassif = Token.DECLARE;
                         	break;
+						case "T": case "F":
+							nextToken.primClassif = Token.OPERAND;
+							nextToken.subClassif = Token.BOOLEAN;
+						return;
 						// Functions:
 						case "LENGTH":case "MAXLENGTH":case "SPACES":
 						case "ELEM":case "MAXELEM":
@@ -196,6 +203,7 @@ public class Scanner {
                     // Todo: Need to get clarification on how to handle ^.
 					if(textCharM[iColPos + 1] == '/' && textCharM[iColPos] == '/')
 					{
+						nextTokStr = "";
 						advanceLine();
 						return;
 					}
@@ -223,12 +231,12 @@ public class Scanner {
 					return;
 				// Boolean constants
                 // TODO: Set this token up.
-                case 'T':case 'F':
+               /* case 'T':case 'F':
 					nextTokStr = currentLine.substring(iColPos, index + 1);
 					constructToken(index + 1, nextTokStr);
 					nextToken.primClassif = Token.OPERAND;
 					nextToken.subClassif = Token.BOOLEAN;
-					return;
+					return;*/
 				// Must be an operand. Check for sub classification
 				default:
 					nextTokStr = currentLine.substring(iColPos, index + 1);
@@ -411,8 +419,11 @@ public class Scanner {
 	{
     	if(iColPos == currentLine.length())
 			advanceLine();
-		if(currentLine.isEmpty())
-            return "";
+		if(currentToken.primClassif == Token.EOF)
+		{
+			currentToken = nextToken;
+			return "";
+		}
 
         setNextToken();
         currentToken = nextToken;
