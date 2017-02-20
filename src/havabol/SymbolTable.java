@@ -82,13 +82,6 @@ public class SymbolTable {
             this.ht.put("notin", new STEntry("notin", Token.OPERATOR));
             
             
-            //STFunctions ???? HOW DO WE DO THE ARGS
-            /*
-            Object[] argsM = new Object[3];
-            argsM[0] = "x equals";
-            argsM[1] = 2;
-            argsM[2] = (float) 3.14;
-            */
             this.ht.put("print", new STFunction("print", Token.FUNCTION
                     , Token.VOID, Token.BUILTIN));
             this.ht.put("LENGTH", new STFunction("LENGTH", Token.FUNCTION
@@ -101,12 +94,7 @@ public class SymbolTable {
                     , Token.INTEGER, Token.BUILTIN));
             this.ht.put("MAXELEM", new STFunction("MAXELEM", Token.FUNCTION
                     , Token.INTEGER, Token.BUILTIN));
-            
-            //"LENGTH"
-            //"MAXLENGTH"
-            //"SPACES"        /*   TO DO    */
-            //"ELEM"
-            //"MAXELEM"
+
             
             //STIdentifiers
             
