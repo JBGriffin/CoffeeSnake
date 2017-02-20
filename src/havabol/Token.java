@@ -31,9 +31,9 @@ public class Token
     // Constants for FUNCTION's subClassif (definedby)
     public static final int BUILTIN    = 13;// builtin function (e.g., print)
     public static final int USER       = 14;// user defined
-    
+
     // array of primClassif string values for the constants
-    public static final String[] strPrimClassifM = 
+    public static final String[] strPrimClassifM =
         {"Undefined"
             , "OPERAND"     // 1
             , "OPERATOR"    // 2
@@ -44,7 +44,7 @@ public class Token
         };
     public static final int PRIM_CLASS_MAX = 6;
     // array of subClassif string values for the constants
-    public static final String[] strSubClassifM = 
+    public static final String[] strSubClassifM =
         {"Undefined"
             , "IDENTFIER"   // 1
             , "INTEGER"     // 2
@@ -54,16 +54,16 @@ public class Token
             , "DATE"        // 6
             , "Void"        // 7
             , "**not used**"// 8
-            , "**not used**"// 9 
+            , "**not used**"// 9
             , "FLOW"        //10
             , "END"         //11
             , "DECLARE"     //12
-        }; 
+        };
     public static final int OPERAND_SUB_CLASS_MIN = 1;
     public static final int OPERAND_SUB_CLASS_MAX = 7;
     public static final int CONTROL_SUB_CLASS_MIN = 10;
     public static final int CONTROL_SUB_CLASS_MAX = 12;
- 
+
     public Token(String value)
     {
         this.tokenStr = value;
@@ -73,13 +73,13 @@ public class Token
     {
         this("");   // invoke the other constructor
     }
-    
+
     public void printToken()
     {
         String primClassifStr;
         String subClassifStr;
         // convert the primClassif to a string
-        if (primClassif >= 0 
+        if (primClassif >= 0
             && primClassif <= PRIM_CLASS_MAX)
             primClassifStr = strPrimClassifM[primClassif];
         else
@@ -89,17 +89,17 @@ public class Token
         switch(primClassif)
         {
             case Token.OPERAND:
-                if (subClassif >= OPERAND_SUB_CLASS_MIN 
+                if (subClassif >= OPERAND_SUB_CLASS_MIN
                         && subClassif <= OPERAND_SUB_CLASS_MAX)
                     subClassifStr = strSubClassifM[subClassif];
-                else    
+                else
                     subClassifStr = "**garbage**";
                 break;
             case Token.CONTROL:
-                if (subClassif >= CONTROL_SUB_CLASS_MIN 
+                if (subClassif >= CONTROL_SUB_CLASS_MIN
                         && subClassif <= CONTROL_SUB_CLASS_MAX)
                     subClassifStr = strSubClassifM[subClassif];
-                else    
+                else
                     subClassifStr = "**garbage**";
                 break;
             case Token.FUNCTION:
@@ -109,7 +109,7 @@ public class Token
                     subClassifStr = "USER";
                 else
                     subClassifStr = "**garbage**";
-                break;    
+                break;
             default:
                 subClassifStr = "-";
         }
@@ -118,13 +118,13 @@ public class Token
         {
             System.out.printf("%-11s %-12s ", primClassifStr, subClassifStr);
             hexPrint(25, tokenStr);
-            return;
+        } else {
+
+            System.out.printf("%-11s %-12s %s\n"
+                    , primClassifStr
+                    , subClassifStr
+                    , tokenStr);
         }
-    
-        System.out.printf("%-11s %-12s %s\n"
-            , primClassifStr
-            , subClassifStr
-            , tokenStr);
     }
 
     /**
@@ -164,7 +164,7 @@ public class Token
                 System.out.printf("%c", ch);
             else
                 System.out.printf(". ");
-        }
+            }
         System.out.printf("\n");
         // indent the second line to the number of specified spaces
         for (int i = 0; i < indent; i++)

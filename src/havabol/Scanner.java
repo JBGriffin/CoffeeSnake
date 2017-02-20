@@ -84,35 +84,7 @@ public class Scanner {
 		currentLine = sourceFileM.get(iSourceLineNr - 1);
 		System.out.println("  " + iSourceLineNr + " " + currentLine);
 		
-                //remove comments
-               /* if (currentLine.contains("//"))
-                {     
-                    StringBuilder sb = new StringBuilder();                  
-                    for (int i = 0; i < currentLine.length()-2; i++)
-                    {   
-                        if (currentLine.charAt(i) == '/' && currentLine.charAt(i+1) == '/')
-                        {
-                            currentLine = sb.toString();
-                            advanceLine();
-                        } else
-                        {
-                        sb.append(currentLine.charAt(i));
-                        }    
-                        
-                    }
-                    
-                }*/
-		
 
-                // If the line is empty, try again.
-		/*if(sourceFileM.get(iSourceLineNr - 1).isEmpty())
-		{
-			advanceLine();
-		}*/
-                
-                //got rid of ^that because it is a little slower than the one 
-                //below, since you already read into current line at the top
-                
 		if(currentLine.isEmpty())
 		{
 			advanceLine();
@@ -328,8 +300,6 @@ public class Scanner {
 			{
 				if(! Character.isDigit(checkDigits[i]) && checkDigits[i] != '.')
 				{
-					/*throw new IllegalArgumentException("Items starting with a digit can only contain"
-							+ " digits, or periods. Usage: " + nextToken.tokenStr);*/
 					String err = "Numeric constants may contain only ONE period," +
 							" or can only contain digits. Usage: " + nextToken.tokenStr;
 					error(err);
@@ -342,8 +312,6 @@ public class Scanner {
 				// Found a second period. Kill it!
 				else if(checkDigits[i] == '.' && validFloat)
 				{
-					/*throw new IllegalArgumentException("Items can only contain ONE period. Usage: "
-							+ nextToken.tokenStr);*/
 					String err = "Numeric float constants must contain only ONE period," +
 							" and can only contain digits. Usage: " + nextToken.tokenStr;
 					error(err);
@@ -358,8 +326,6 @@ public class Scanner {
 		// Does not start with an digit or a character, so it must be invalid
 		else
 		{
-			/*throw new IllegalArgumentException("Operands must start with a digit or character. Usage: "
-					+ nextToken.tokenStr);*/
 			String err = "Numeric constants must start with a digit. Usage: " + nextToken.tokenStr;
 			error(err);
 		}
@@ -391,16 +357,28 @@ public class Scanner {
 				//newTokStr += Character.toString(textCharM[i]);
 				break;
 			}
+
+			if(textCharM[i] == '\\')
+            {
+                if(textCharM[i + 1] == 'a')
+                    textCharM[i + 1] = 0x07;
+                if(textCharM[i + 1] == 't')
+                    textCharM[i +1] = 0x09;
+                if(textCharM[i + 1] == 'n')
+                    textCharM[i + 1] = 0x0A;
+                i += 1;
+            }
+
+
 			newTokStr += Character.toString(textCharM[i]);
 		}
 		
 		if(quoteOpen)
 		{
-			/*throw new IllegalArgumentException("Unclosed quote found at position " + strStart
-					+ ", line " + iSourceLineNr);*/
 			String err = "Unclosed quote found. Last quote opened at position " + strStart;
 			error(err);
 		}
+		//newTokStr = String.valueOf(textCharM, strStart, strEnd - 1);
 		constructToken(strEnd + 1, newTokStr);
 		nextToken.primClassif = Token.OPERAND;
 		nextToken.subClassif = Token.STRING;
@@ -435,16 +413,7 @@ public class Scanner {
 			advanceLine();
 		if(currentLine.isEmpty())
             return "";
-        /*while(currentLine.charAt(iColPos) == ' ')
-        {
-            iColPos++;
-            if(iColPos == currentLine.length())
-            {
-                advanceLine();
-                break;
-            }
-        }*/
-		
+
         setNextToken();
         currentToken = nextToken;
 
