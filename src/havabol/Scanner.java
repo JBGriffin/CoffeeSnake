@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+
 
 /**
  * Reads in the source file from the user, as well as the symbol table (which will not be

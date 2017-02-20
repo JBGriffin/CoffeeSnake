@@ -156,16 +156,23 @@ public class Token
         int len = str.length();
         char [] charray = str.toCharArray();
         char ch;
+        boolean lineFeed = false;   // Boolean to check if we need to print hex chars.
         // print each character in the string
-        for (int i = 0; i < len; i++)
-        {
+        for (int i = 0; i < len; i++) {
             ch = charray[i];
             if (ch > 31 && ch < 127)   // ASCII printable characters
                 System.out.printf("%c", ch);
             else
+            {
                 System.out.printf(". ");
+                lineFeed = true;
             }
+        }
         System.out.printf("\n");
+
+        // If true, we need to print hex characters and continue
+        if(! lineFeed)
+            return;
         // indent the second line to the number of specified spaces
         for (int i = 0; i < indent; i++)
         {
