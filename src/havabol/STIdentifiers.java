@@ -15,7 +15,7 @@ public class STIdentifiers extends STEntry {
     
     int iStruct; //primitive, fixed array, unbound array
     
-    int iParmType; //not a parm, by refernece, or by value
+    int iParmType; //not a parm, by reference, or by value
     public STIdentifiers(String symbol, int iPrimClassif, int iDclType
             , int iStruct, int iParmType)
     {
