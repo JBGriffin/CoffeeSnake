@@ -192,7 +192,13 @@ public class Scanner {
 						nextTokStr = "";
 						return;
 					}
-					iColPos = index + 1; 
+					iColPos = index + 1;
+
+					if(iColPos == currentLine.length())
+					{
+						getNext();
+						return;
+					}
 					break;
 				// Operator tokens: + - * / < > = ! 
 				case '+': case '-':	case '*': case '/':case '^':
@@ -205,6 +211,7 @@ public class Scanner {
 					{
 						nextTokStr = "";
 						advanceLine();
+						getNext();
 						return;
 					}
 					if(textCharM[iColPos + 1] == '=')
