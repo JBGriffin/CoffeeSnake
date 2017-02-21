@@ -17,8 +17,7 @@ import java.util.ArrayList;
  *
  */
 public class Scanner {
-	
-	private BufferedReader fileRead;
+
 	public Token currentToken;
 	public Token nextToken;
 	private final static String delimiters = " \t,;:()\'\"=!<>+-*/[]#^\n"; // terminate a token
@@ -36,16 +35,16 @@ public class Scanner {
 	 * <p>
 	 * @param sourceFileNm Name of the file user uploads
 	 * @param symbolTable Symbol table to be generated at a later date
-	 * @throws IOException
+	 * @throws IOException Exception to be thrown if bad file is read in
 	 */
 	public Scanner(String sourceFileNm, SymbolTable symbolTable) throws IOException
 	{
 		this.sourceFileName = sourceFileNm;
 		// Init a new array list for the lines
-		sourceFileM = new ArrayList<String>();
+		sourceFileM = new ArrayList<>();
 		
 		// Open file and read first line into an array list of strings.
-		this.fileRead = new BufferedReader(new FileReader(sourceFileNm));
+		BufferedReader fileRead = new BufferedReader(new FileReader(sourceFileNm));
 		
 		while((currentLine = fileRead.readLine()) != null)
 		{
@@ -64,12 +63,11 @@ public class Scanner {
 	}
 
 	/**
-	 * Advances through the source code, reseting the column position, and setting
+	 * Advances through the source code, resetting the column position, and setting
 	 * currentLine to the next line of the code. Once the file size is met, will break to return EoF.
 	 * <p>
-	 * @throws IOException
 	 */
-	private void advanceLine() throws IOException
+	private void advanceLine()
 	{
 		iSourceLineNr += 1;
 		iColPos = 0;
@@ -123,50 +121,42 @@ public class Scanner {
 					// Construct a new token
 					constructToken(index, nextTokStr);
 
-					// Todo: Clean up and modularize.
 					// Check to see if it's a special operator
 					switch(nextTokStr)
 					{
                         // Set operators: 'and', 'or', 'not', etc.
 						case "and":case "not":case "in":case "or":case "notin":
-							nextToken.primClassif = Token.OPERATOR;
+							// subClassIf set to 0 to indicate no sub class
+							setAllClassIf(Token.OPERATOR, 0);
 							break;
                         // Flow control keywords: 'if', 'endif', 'while', etc.
                         case "if":case "def":case "for":case "while":
-                        	nextToken.primClassif = Token.CONTROL;
-                        	nextToken.subClassif = Token.FLOW;
+							setAllClassIf(Token.CONTROL, Token.FLOW);
                         	break;
                         case "endwhile":case "endif":case "endfor":
 						case "else":case "enddef":
-                            nextToken.primClassif = Token.CONTROL;
-                            nextToken.subClassif = Token.END;
+							setAllClassIf(Token.CONTROL, Token.END);
                             break;
                         // Declaration constants(Int, Bool, etc)
                         case "Int":case "Float":case "Bool":case "String":
-                        	nextToken.primClassif = Token.CONTROL;
-                        	nextToken.subClassif = Token.DECLARE;
+							setAllClassIf(Token.CONTROL, Token.DECLARE);
                         	break;
 						case "T": case "F":
-							nextToken.primClassif = Token.OPERAND;
-							nextToken.subClassif = Token.BOOLEAN;
-						return;
+							setAllClassIf(Token.OPERAND, Token.BOOLEAN);
+							return;
 						// Functions:
 						case "LENGTH":case "MAXLENGTH":case "SPACES":
 						case "ELEM":case "MAXELEM":
-							nextToken.primClassif = Token.FUNCTION;
-							nextToken.subClassif = Token.BUILTIN;
+							setAllClassIf(Token.FUNCTION, Token.BUILTIN);
 							break;
 						case "Date":
-							nextToken.primClassif = Token.CONTROL;
-							nextToken.subClassif = Token.DATE;
+							setAllClassIf(Token.CONTROL, Token.DATE);
 							break;
 						case "Void":
-							nextToken.primClassif = Token.CONTROL;
-							nextToken.subClassif = Token.VOID;
+							setAllClassIf(Token.CONTROL, Token.VOID);
                             break;
 						case "print":
-							nextToken.primClassif = Token.FUNCTION;
-							nextToken.subClassif = Token.BUILTIN;
+							setAllClassIf(Token.FUNCTION, Token.BUILTIN);
 							break;
                         default:
                             // For now, we know it's an operand and
@@ -175,8 +165,6 @@ public class Scanner {
                             nextToken.primClassif = Token.OPERAND;
                             setSubClass();
 					}
-
-					nextTokStr = "";
 					return;
 				}
 
@@ -189,7 +177,6 @@ public class Scanner {
 					if(! nextTokStr.isEmpty()) // At white space, but I still have things to print
 					{					
 						constructToken(index + 1, nextTokStr);
-						nextTokStr = "";
 						return;
 					}
 					iColPos = index + 1;
@@ -205,11 +192,9 @@ public class Scanner {
 				case '!': case '=': case '<': case '>':
 					nextTokStr = currentLine.substring(iColPos, index + 1);
 					// Check to see if we need to combine operators
-                    // If it is, add it to the token string and increment positions
-                    // Todo: Need to get clarification on how to handle ^.
+                    // If it is, add it to the token string and increment position
 					if(textCharM[iColPos + 1] == '/' && textCharM[iColPos] == '/')
 					{
-						nextTokStr = "";
 						advanceLine();
 						getNext();
 						return;
@@ -228,7 +213,6 @@ public class Scanner {
 				case ';': case '[': case ']':
 					nextTokStr = currentLine.substring(iColPos, index + 1);
 					constructToken(index + 1, nextTokStr);
-					index += 1;
 					nextToken.primClassif = Token.SEPARATOR;
 					return;
 				// String literal tokens
@@ -236,14 +220,6 @@ public class Scanner {
 				case '\'':
 					buildStringLiteral(textCharM[index], index + 1);
 					return;
-				// Boolean constants
-                // TODO: Set this token up.
-               /* case 'T':case 'F':
-					nextTokStr = currentLine.substring(iColPos, index + 1);
-					constructToken(index + 1, nextTokStr);
-					nextToken.primClassif = Token.OPERAND;
-					nextToken.subClassif = Token.BOOLEAN;
-					return;*/
 				// Must be an operand. Check for sub classification
 				default:
 					nextTokStr = currentLine.substring(iColPos, index + 1);
@@ -259,14 +235,14 @@ public class Scanner {
 				nextTokStr = currentLine.substring(iColPos, index + 1);
 			}
 		}
-		if(!nextTokStr.isEmpty())
+
+		// Check if we missed a token to create.
+		if(! nextTokStr.isEmpty())
 		{
-			//System.out.println("********** Tok String == " + nextTokStr);
 			nextTokStr = currentLine.substring(iColPos, textCharM.length);
 			constructToken(textCharM.length, nextTokStr);
 			nextToken.primClassif = Token.OPERAND;
 			setSubClass();
-			//advanceLine();
 			return;
 		}
 		// Check to see if we still have anything in the file
@@ -279,6 +255,17 @@ public class Scanner {
 		// If we reach this point, we're at the end of the file.
 		nextToken = new Token();
 		nextToken.primClassif = Token.EOF;
+	}
+
+	/**
+	 * Sets prime and sub classifications for next token
+	 * @param primClassif Prime Classification to be set for next token
+	 * @param subClassif Sub Classification to be set for next token
+	 */
+	private void setAllClassIf(int primClassif, int subClassif)
+	{
+		nextToken.primClassif = primClassif;
+		nextToken.subClassif = subClassif;
 	}
 	
 	/**
@@ -369,10 +356,10 @@ public class Scanner {
 			{
 				quoteOpen = false;
 				strEnd = i;
-				//newTokStr += Character.toString(textCharM[i]);
 				break;
 			}
 
+			// Check for special characters, i.e. \t, \n.
 			if(textCharM[i] == '\\')
             {
                 if(textCharM[i + 1] == 'a')
@@ -381,10 +368,8 @@ public class Scanner {
                     textCharM[i +1] = 0x09;
                 if(textCharM[i + 1] == 'n')
                     textCharM[i + 1] = 0x0A;
-                i += 1;
+                i += 1; // Increment index to skip escaped char
             }
-
-
 			newTokStr += Character.toString(textCharM[i]);
 		}
 		
@@ -393,7 +378,6 @@ public class Scanner {
 			String err = "Unclosed quote found. Last quote opened at position " + strStart;
 			error(err);
 		}
-		//newTokStr = String.valueOf(textCharM, strStart, strEnd - 1);
 		constructToken(strEnd + 1, newTokStr);
 		nextToken.primClassif = Token.OPERAND;
 		nextToken.subClassif = Token.STRING;
@@ -422,7 +406,7 @@ public class Scanner {
 	 * @return Functionally returns name of the next token. 
 	 * @throws Exception Throws an exception to main if found in one of the called methods
 	 */
-	public String getNext() throws Exception
+	String getNext() throws Exception
 	{
     	if(iColPos == currentLine.length())
 			advanceLine();
