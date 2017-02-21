@@ -46,7 +46,7 @@ print("\tradius=", radius, "twoPi=", twoPi, "circum=", circum);
 // Simple if
 i = 0;
 print(">>> First If");
-if loc == "TX": // check for TX
+if loc == "TX" or loc == TN: // check for TX
     // It is TX
     print("\tloc is", loc);
     // it is ok to have this statement on multiple lines.  
