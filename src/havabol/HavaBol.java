@@ -27,15 +27,16 @@ public class HavaBol
         try
         {
             // Print a column heading 
-            System.out.printf("%-11s %-12s %s\n"
+            /*System.out.printf("%-11s %-12s %s\n"
                     , "primClassif"
                     , "subClassif"
-                    , "tokenStr");
+                    , "tokenStr");*/
             
             Scanner scan = new Scanner(args[0], symbolTable);
             while (! scan.getNext().isEmpty())
             {
-                scan.currentToken.printToken();           
+                if(scan.bShowToken)
+                    scan.currentToken.printToken();
             }
         }
         catch (Exception e)

@@ -93,12 +93,21 @@ public class Scanner {
 		if(currentLine.startsWith("debug"))
 		{
 			setDebug();
-			iSourceLineNr += 1;
-			currentLine = sourceFileM.get(iSourceLineNr - 1);
 		}
 
-		System.out.println("  " + iSourceLineNr + " " + currentLine);
-		
+/*		// Not convinced this is needed, but it's here if you want
+		if(bShowToken)
+			System.out.printf("\n%-11s %-12s %s\n"
+					, "primClassif"
+					, "subClassif"
+					, "tokenStr");
+*/
+
+		if(bShowExpr)
+			System.out.println("  " + iSourceLineNr + " " + currentLine);
+
+		if(currentLine.contains("=") && bShowAssign)
+			System.out.println("I'm going to print something here, but I don't know what or how yet.");
 
 		if(currentLine.isEmpty())
 		{
@@ -443,32 +452,32 @@ public class Scanner {
 	private void setDebug()
 	{
 		String debugSplitM[] = currentLine.split(" ");
-		if(debugSplitM[2].matches("On"))
+		if(debugSplitM[2].toLowerCase().matches("on"))
 		{
-			switch (debugSplitM[1])
+			switch (debugSplitM[1].toLowerCase())
 			{
-				case("ShowToken"):
+				case("showtoken"):
 					bShowToken = true;
 					break;
-				case("ShowExpr"):
+				case("showexpr"):
 					bShowExpr = true;
 					break;
-				case("ShowAssign"):
+				case("showassign"):
 					bShowAssign = true;
 					break;
 			}
 		}
 		else
 		{
-			switch (debugSplitM[1])
+			switch (debugSplitM[1].toLowerCase())
 			{
-				case ("ShowToken"):
+				case ("showtoken"):
 					bShowToken = false;
 					break;
-				case ("ShowExpr"):
+				case ("showexpr"):
 					bShowExpr = false;
 					break;
-				case ("ShowAssign"):
+				case ("showassign"):
 					bShowAssign = false;
 					break;
 			}
