@@ -8,16 +8,24 @@ Assignment 1 Due January 31st:
     • Release 1.0 tagged before any assignment 2 work was done.
 
 Assignment 2 Due February 21st:
-    • Symbol Table - By: Justin Hooge
+    • Symbol Table
         ∂ STEntry
         ∂ STIdentifier
         ∂ STFunction
         ∂ STControl
-    • Scanner Features - By: Garrett Griffin
+    • Scanner Features
         ∂ ≤ ≥ != ^ ==
         ∂ ect..
-    • Other Utilies - By: ______________
+    • Other Utilies
         ∂ Skipping comments
         ∂ Numeric classes
         ∂ etc..
+
+    • Relase 2.0 tagged before beginning assignment 3
+
+
+Assignment 3 Due Thursday, March 23rd:
+    
+
+    //TO DO
 
