@@ -21,6 +21,11 @@ public class Scanner {
 	public Token currentToken;
 	public Token nextToken;
 	private final static String delimiters = " \t,;:()\'\"=!<>+-*/[]#^\n"; // terminate a token
+
+	// Debugging booleans
+	public boolean bShowToken = false;
+	public boolean bShowExpr = false;
+	public boolean bShowAssign = false;
 	
 	private String currentLine;
 	private String sourceFileName;
@@ -83,6 +88,15 @@ public class Scanner {
 		}
 		
 		currentLine = sourceFileM.get(iSourceLineNr - 1);
+
+		// Currently will not print the debug line
+		if(currentLine.startsWith("debug"))
+		{
+			setDebug();
+			iSourceLineNr += 1;
+			currentLine = sourceFileM.get(iSourceLineNr - 1);
+		}
+
 		System.out.println("  " + iSourceLineNr + " " + currentLine);
 		
 
@@ -127,43 +141,42 @@ public class Scanner {
                         // Set operators: 'and', 'or', 'not', etc.
 						case "and":case "not":case "in":case "or":case "notin":
 							// subClassIf set to 0 to indicate no sub class
-							setAllClassIf(Token.OPERATOR, 0);
+							setClassification(Token.OPERATOR, 0, true);
 							break;
                         // Flow control keywords: 'if', 'endif', 'while', etc.
                         case "if":case "def":case "for":case "while":
-							setAllClassIf(Token.CONTROL, Token.FLOW);
+							setClassification(Token.CONTROL, Token.FLOW, true);
                         	break;
                         case "endwhile":case "endif":case "endfor":
 						case "else":case "enddef":
-							setAllClassIf(Token.CONTROL, Token.END);
+							setClassification(Token.CONTROL, Token.END, true);
                             break;
                         // Declaration constants(Int, Bool, etc)
                         case "Int":case "Float":case "Bool":case "String":
-							setAllClassIf(Token.CONTROL, Token.DECLARE);
+							setClassification(Token.CONTROL, Token.DECLARE, true);
                         	break;
 						case "T": case "F":
-							setAllClassIf(Token.OPERAND, Token.BOOLEAN);
+							setClassification(Token.OPERAND, Token.BOOLEAN, true);
 							return;
 						// Functions:
 						case "LENGTH":case "MAXLENGTH":case "SPACES":
 						case "ELEM":case "MAXELEM":
-							setAllClassIf(Token.FUNCTION, Token.BUILTIN);
+							setClassification(Token.FUNCTION, Token.BUILTIN, true);
 							break;
 						case "Date":
-							setAllClassIf(Token.CONTROL, Token.DATE);
+							setClassification(Token.CONTROL, Token.DATE, true);
 							break;
 						case "Void":
-							setAllClassIf(Token.CONTROL, Token.VOID);
+							setClassification(Token.CONTROL, Token.VOID, true);
                             break;
 						case "print":
-							setAllClassIf(Token.FUNCTION, Token.BUILTIN);
+							setClassification(Token.FUNCTION, Token.BUILTIN, true);
 							break;
                         default:
                             // For now, we know it's an operand and
 							// need to find its subclassif. Later on,
 							// for user functions, we'll have to revisit this
-                            nextToken.primClassif = Token.OPERAND;
-                            setSubClass();
+                            setClassification(Token.OPERAND, 0, false);
 					}
 					return;
 				}
@@ -206,14 +219,14 @@ public class Scanner {
                         nextTokStr += textCharM[iColPos];
                     }
 					constructToken(index + 1, nextTokStr);
-					nextToken.primClassif = Token.OPERATOR;
+					setClassification(Token.OPERATOR, 0, true);
 					return;
 				// Seperator tokens: ( ) , : ; [ ]
 				case '(': case ')': case ',': case ':': 
 				case ';': case '[': case ']':
 					nextTokStr = currentLine.substring(iColPos, index + 1);
 					constructToken(index + 1, nextTokStr);
-					nextToken.primClassif = Token.SEPARATOR;
+					setClassification(Token.SEPARATOR, 0, true);
 					return;
 				// String literal tokens
 				case '\"':
@@ -224,8 +237,7 @@ public class Scanner {
 				default:
 					nextTokStr = currentLine.substring(iColPos, index + 1);
 					constructToken(index + 1, nextTokStr);
-					nextToken.primClassif = Token.OPERAND;
-					setSubClass();
+					setClassification(Token.OPERAND, 0, false);
 					return;
 				}
 			}
@@ -241,8 +253,7 @@ public class Scanner {
 		{
 			nextTokStr = currentLine.substring(iColPos, textCharM.length);
 			constructToken(textCharM.length, nextTokStr);
-			nextToken.primClassif = Token.OPERAND;
-			setSubClass();
+			setClassification(Token.OPERAND, 0, false);
 			return;
 		}
 		// Check to see if we still have anything in the file
@@ -254,32 +265,35 @@ public class Scanner {
 
 		// If we reach this point, we're at the end of the file.
 		nextToken = new Token();
-		nextToken.primClassif = Token.EOF;
+		setClassification(Token.EOF, 0, true);
 	}
 
 	/**
-	 * Sets prime and sub classifications for next token
-	 * @param primClassif Prime Classification to be set for next token
-	 * @param subClassif Sub Classification to be set for next token
-	 */
-	private void setAllClassIf(int primClassif, int subClassif)
-	{
-		nextToken.primClassif = primClassif;
-		nextToken.subClassif = subClassif;
-	}
-	
-	/**
-	 * Sets the subclass of the next token. Will only be run on operands.
-	 * Checks the first digit to see if it is a number or not. If it isn't a digit,
+	 * Sets the primary and subclass of the next token.
+	 * <p>
+	 * For operands, it will check the first digit to see if it is a number or not. If it isn't a digit,
 	 * it must be an identifier. If it is, checks to see if it is a valid integer
 	 * or float.
 	 * <p>
 	 * Note: If the string literal is not valid, it will call the error method which
 	 * will display the error message, and throw an exception.
      * <p>
+	 * @param primClassif Primary classification for the token
+	 * @param subClassif Subclassification for the token. If the token does not have a subclassification,
+	 *                   it will be passed in a 0.
+	 * @param classifComplete Boolean showing whether or not the token needs the subclass to be set.
      * @throws Exception Throws an exception if the subclass is not valid
 	 */
-	private void setSubClass() throws Exception {
+	private void setClassification(int primClassif, int subClassif, boolean classifComplete) throws Exception {
+		nextToken.primClassif = primClassif;
+
+		if(classifComplete)
+		{
+			nextToken.subClassif = subClassif;
+			return;
+		}
+
+
 		// Variables to check number string
 		boolean validFloat = false;
 		char[] checkDigits = nextToken.tokenStr.toCharArray();
@@ -420,6 +434,45 @@ public class Scanner {
         currentToken = nextToken;
 
         return currentToken.tokenStr;
+	}
+
+	/**
+	 * Method that turns on or off the debugging setup for displaying
+	 * tokens, expressions, and assignments.
+	 */
+	private void setDebug()
+	{
+		String debugSplitM[] = currentLine.split(" ");
+		if(debugSplitM[2].matches("On"))
+		{
+			switch (debugSplitM[1])
+			{
+				case("ShowToken"):
+					bShowToken = true;
+					break;
+				case("ShowExpr"):
+					bShowExpr = true;
+					break;
+				case("ShowAssign"):
+					bShowAssign = true;
+					break;
+			}
+		}
+		else
+		{
+			switch (debugSplitM[1])
+			{
+				case ("ShowToken"):
+					bShowToken = false;
+					break;
+				case ("ShowExpr"):
+					bShowExpr = false;
+					break;
+				case ("ShowAssign"):
+					bShowAssign = false;
+					break;
+			}
+		}
 	}
 
 	/**
