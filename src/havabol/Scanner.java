@@ -17,11 +17,15 @@ import java.util.ArrayList;
  *
  */
 public class Scanner {
-	
-	private BufferedReader fileRead;
+
 	public Token currentToken;
 	public Token nextToken;
 	private final static String delimiters = " \t,;:()\'\"=!<>+-*/[]#^\n"; // terminate a token
+
+	// Debugging booleans
+	public boolean bShowToken = false;
+	public boolean bShowExpr = false;
+	public boolean bShowAssign = false;
 	
 	private String currentLine;
 	private String sourceFileName;
@@ -38,7 +42,7 @@ public class Scanner {
 	 * <p>
 	 * @param sourceFileNm Name of the file user uploads
 	 * @param symbolTable Symbol table to be generated at a later date
-	 * @throws IOException
+	 * @throws IOException Exception to be thrown if bad file is read in
 	 */
 	public Scanner(String sourceFileNm, SymbolTable symbolTable) throws IOException
 	{
@@ -47,10 +51,10 @@ public class Scanner {
                 this.st = symbolTable;
                 
 		// Init a new array list for the lines
-		sourceFileM = new ArrayList<String>();
+		sourceFileM = new ArrayList<>();
 		
 		// Open file and read first line into an array list of strings.
-		this.fileRead = new BufferedReader(new FileReader(sourceFileNm));
+		BufferedReader fileRead = new BufferedReader(new FileReader(sourceFileNm));
 		
 		while((currentLine = fileRead.readLine()) != null)
 		{
@@ -69,12 +73,11 @@ public class Scanner {
 	}
 
 	/**
-	 * Advances through the source code, reseting the column position, and setting
+	 * Advances through the source code, resetting the column position, and setting
 	 * currentLine to the next line of the code. Once the file size is met, will break to return EoF.
 	 * <p>
-	 * @throws IOException
 	 */
-	private void advanceLine() throws IOException
+	private void advanceLine()
 	{
 		iSourceLineNr += 1;
 		iColPos = 0;
@@ -90,8 +93,26 @@ public class Scanner {
 		}
 		
 		currentLine = sourceFileM.get(iSourceLineNr - 1);
-		System.out.println("  " + iSourceLineNr + " " + currentLine);
-		
+
+		// Currently will not print the debug line
+		if(currentLine.startsWith("debug"))
+		{
+			setDebug();
+		}
+
+/*		// Not convinced this is needed, but it's here if you want
+		if(bShowToken)
+			System.out.printf("\n%-11s %-12s %s\n"
+					, "primClassif"
+					, "subClassif"
+					, "tokenStr");
+*/
+
+		if(bShowExpr)
+			System.out.println("  " + iSourceLineNr + " " + currentLine);
+
+		if(currentLine.contains("=") && bShowAssign)
+			System.out.println("I'm going to print something here, but I don't know what or how yet.");
 
 		if(currentLine.isEmpty())
 		{
@@ -132,60 +153,49 @@ public class Scanner {
 					// Construct a new token
 					constructToken(index, nextTokStr);
 
-					// Todo: Clean up and modularize.
 					// Check to see if it's a special operator
 					switch(nextTokStr)
 					{
                         // Set operators: 'and', 'or', 'not', etc.
 						case "and":case "not":case "in":case "or":case "notin":
-							nextToken.primClassif = Token.OPERATOR;
+							// subClassIf set to 0 to indicate no sub class
+							setClassification(Token.OPERATOR, 0, true);
 							break;
                         // Flow control keywords: 'if', 'endif', 'while', etc.
                         case "if":case "def":case "for":case "while":
-                        	nextToken.primClassif = Token.CONTROL;
-                        	nextToken.subClassif = Token.FLOW;
+							setClassification(Token.CONTROL, Token.FLOW, true);
                         	break;
                         case "endwhile":case "endif":case "endfor":
 						case "else":case "enddef":
-                            nextToken.primClassif = Token.CONTROL;
-                            nextToken.subClassif = Token.END;
+							setClassification(Token.CONTROL, Token.END, true);
                             break;
                         // Declaration constants(Int, Bool, etc)
                         case "Int":case "Float":case "Bool":case "String":
-                        	nextToken.primClassif = Token.CONTROL;
-                        	nextToken.subClassif = Token.DECLARE;
+							setClassification(Token.CONTROL, Token.DECLARE, true);
                         	break;
 						case "T": case "F":
-							nextToken.primClassif = Token.OPERAND;
-							nextToken.subClassif = Token.BOOLEAN;
-						return;
+							setClassification(Token.OPERAND, Token.BOOLEAN, true);
+							return;
 						// Functions:
 						case "LENGTH":case "MAXLENGTH":case "SPACES":
 						case "ELEM":case "MAXELEM":
-							nextToken.primClassif = Token.FUNCTION;
-							nextToken.subClassif = Token.BUILTIN;
+							setClassification(Token.FUNCTION, Token.BUILTIN, true);
 							break;
 						case "Date":
-							nextToken.primClassif = Token.CONTROL;
-							nextToken.subClassif = Token.DATE;
+							setClassification(Token.CONTROL, Token.DATE, true);
 							break;
 						case "Void":
-							nextToken.primClassif = Token.CONTROL;
-							nextToken.subClassif = Token.VOID;
+							setClassification(Token.CONTROL, Token.VOID, true);
                             break;
 						case "print":
-							nextToken.primClassif = Token.FUNCTION;
-							nextToken.subClassif = Token.BUILTIN;
+							setClassification(Token.FUNCTION, Token.BUILTIN, true);
 							break;
                         default:
                             // For now, we know it's an operand and
 							// need to find its subclassif. Later on,
 							// for user functions, we'll have to revisit this
-                            nextToken.primClassif = Token.OPERAND;
-                            setSubClass();
+                            setClassification(Token.OPERAND, 0, false);
 					}
-
-					nextTokStr = "";
 					return;
 				}
 
@@ -198,7 +208,6 @@ public class Scanner {
 					if(! nextTokStr.isEmpty()) // At white space, but I still have things to print
 					{					
 						constructToken(index + 1, nextTokStr);
-						nextTokStr = "";
 						return;
 					}
 					iColPos = index + 1;
@@ -214,11 +223,9 @@ public class Scanner {
 				case '!': case '=': case '<': case '>':
 					nextTokStr = currentLine.substring(iColPos, index + 1);
 					// Check to see if we need to combine operators
-                    // If it is, add it to the token string and increment positions
-                    // Todo: Need to get clarification on how to handle ^.
+                    // If it is, add it to the token string and increment position
 					if(textCharM[iColPos + 1] == '/' && textCharM[iColPos] == '/')
 					{
-						nextTokStr = "";
 						advanceLine();
 						getNext();
 						return;
@@ -230,35 +237,25 @@ public class Scanner {
                         nextTokStr += textCharM[iColPos];
                     }
 					constructToken(index + 1, nextTokStr);
-					nextToken.primClassif = Token.OPERATOR;
+					setClassification(Token.OPERATOR, 0, true);
 					return;
 				// Seperator tokens: ( ) , : ; [ ]
 				case '(': case ')': case ',': case ':': 
 				case ';': case '[': case ']':
 					nextTokStr = currentLine.substring(iColPos, index + 1);
 					constructToken(index + 1, nextTokStr);
-					index += 1;
-					nextToken.primClassif = Token.SEPARATOR;
+					setClassification(Token.SEPARATOR, 0, true);
 					return;
 				// String literal tokens
 				case '\"':
 				case '\'':
 					buildStringLiteral(textCharM[index], index + 1);
 					return;
-				// Boolean constants
-                // TODO: Set this token up.
-               /* case 'T':case 'F':
-					nextTokStr = currentLine.substring(iColPos, index + 1);
-					constructToken(index + 1, nextTokStr);
-					nextToken.primClassif = Token.OPERAND;
-					nextToken.subClassif = Token.BOOLEAN;
-					return;*/
 				// Must be an operand. Check for sub classification
 				default:
 					nextTokStr = currentLine.substring(iColPos, index + 1);
 					constructToken(index + 1, nextTokStr);
-					nextToken.primClassif = Token.OPERAND;
-					setSubClass();
+					setClassification(Token.OPERAND, 0, false);
 					return;
 				}
 			}
@@ -268,14 +265,13 @@ public class Scanner {
 				nextTokStr = currentLine.substring(iColPos, index + 1);
 			}
 		}
-		if(!nextTokStr.isEmpty())
+
+		// Check if we missed a token to create.
+		if(! nextTokStr.isEmpty())
 		{
-			//System.out.println("********** Tok String == " + nextTokStr);
 			nextTokStr = currentLine.substring(iColPos, textCharM.length);
 			constructToken(textCharM.length, nextTokStr);
-			nextToken.primClassif = Token.OPERAND;
-			setSubClass();
-			//advanceLine();
+			setClassification(Token.OPERAND, 0, false);
 			return;
 		}
 		// Check to see if we still have anything in the file
@@ -287,21 +283,35 @@ public class Scanner {
 
 		// If we reach this point, we're at the end of the file.
 		nextToken = new Token();
-		nextToken.primClassif = Token.EOF;
+		setClassification(Token.EOF, 0, true);
 	}
-	
+
 	/**
-	 * Sets the subclass of the next token. Will only be run on operands.
-	 * Checks the first digit to see if it is a number or not. If it isn't a digit,
+	 * Sets the primary and subclass of the next token.
+	 * <p>
+	 * For operands, it will check the first digit to see if it is a number or not. If it isn't a digit,
 	 * it must be an identifier. If it is, checks to see if it is a valid integer
 	 * or float.
 	 * <p>
 	 * Note: If the string literal is not valid, it will call the error method which
 	 * will display the error message, and throw an exception.
      * <p>
+	 * @param primClassif Primary classification for the token
+	 * @param subClassif Subclassification for the token. If the token does not have a subclassification,
+	 *                   it will be passed in a 0.
+	 * @param classifComplete Boolean showing whether or not the token needs the subclass to be set.
      * @throws Exception Throws an exception if the subclass is not valid
 	 */
-	private void setSubClass() throws Exception {
+	private void setClassification(int primClassif, int subClassif, boolean classifComplete) throws Exception {
+		nextToken.primClassif = primClassif;
+
+		if(classifComplete)
+		{
+			nextToken.subClassif = subClassif;
+			return;
+		}
+
+
 		// Variables to check number string
 		boolean validFloat = false;
 		char[] checkDigits = nextToken.tokenStr.toCharArray();
@@ -378,10 +388,10 @@ public class Scanner {
 			{
 				quoteOpen = false;
 				strEnd = i;
-				//newTokStr += Character.toString(textCharM[i]);
 				break;
 			}
 
+			// Check for special characters, i.e. \t, \n.
 			if(textCharM[i] == '\\')
             {
                 if(textCharM[i + 1] == 'a')
@@ -390,10 +400,8 @@ public class Scanner {
                     textCharM[i +1] = 0x09;
                 if(textCharM[i + 1] == 'n')
                     textCharM[i + 1] = 0x0A;
-                i += 1;
+                i += 1; // Increment index to skip escaped char
             }
-
-
 			newTokStr += Character.toString(textCharM[i]);
 		}
 		
@@ -402,7 +410,6 @@ public class Scanner {
 			String err = "Unclosed quote found. Last quote opened at position " + strStart;
 			error(err);
 		}
-		//newTokStr = String.valueOf(textCharM, strStart, strEnd - 1);
 		constructToken(strEnd + 1, newTokStr);
 		nextToken.primClassif = Token.OPERAND;
 		nextToken.subClassif = Token.STRING;
@@ -431,7 +438,7 @@ public class Scanner {
 	 * @return Functionally returns name of the next token. 
 	 * @throws Exception Throws an exception to main if found in one of the called methods
 	 */
-	public String getNext() throws Exception
+	String getNext() throws Exception
 	{
     	if(iColPos == currentLine.length())
 			advanceLine();
@@ -445,6 +452,45 @@ public class Scanner {
         currentToken = nextToken;
 
         return currentToken.tokenStr;
+	}
+
+	/**
+	 * Method that turns on or off the debugging setup for displaying
+	 * tokens, expressions, and assignments.
+	 */
+	private void setDebug()
+	{
+		String debugSplitM[] = currentLine.split(" ");
+		if(debugSplitM[2].toLowerCase().matches("on"))
+		{
+			switch (debugSplitM[1].toLowerCase())
+			{
+				case("showtoken"):
+					bShowToken = true;
+					break;
+				case("showexpr"):
+					bShowExpr = true;
+					break;
+				case("showassign"):
+					bShowAssign = true;
+					break;
+			}
+		}
+		else
+		{
+			switch (debugSplitM[1].toLowerCase())
+			{
+				case ("showtoken"):
+					bShowToken = false;
+					break;
+				case ("showexpr"):
+					bShowExpr = false;
+					break;
+				case ("showassign"):
+					bShowAssign = false;
+					break;
+			}
+		}
 	}
 
 	/**

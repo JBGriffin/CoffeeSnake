@@ -43,10 +43,25 @@ twoPi = 2 * pi;
 circum = twoPi * radius;
 print("\tradius=", radius, "twoPi=", twoPi, "circum=", circum);
 
+// Minus stuff
+
+Int A;
+Int B;
+Float D;
+A = 10;
+B = 6;
+D = 25;
+print(">> Minus test, A=", A, "B=", B, "D=", D);
+print("D-A=", D-A);
+print("-A=", -A);
+print("-D=", -D);
+A = -B;
+print("A=-B =", A);
+
 // Simple if
 i = 0;
 print(">>> First If");
-if loc == "TX" or loc == TN: // check for TX
+if loc == "TX": // check for TX
     // It is TX
     print("\tloc is", loc);
     // it is ok to have this statement on multiple lines.  
@@ -108,7 +123,7 @@ while i < 5:
         j = j + 1;
     endwhile;
     bFlag = F;
-    print("\tbottom of while, i=", i, "j=", j); // Did I break again?
+    print("\tbottom of while, i=", i, "j=", j);
     i = i + 1;
 endwhile;
-print("\tAfter outer while"); // Test mc Testy
+print("\tAfter outer while");

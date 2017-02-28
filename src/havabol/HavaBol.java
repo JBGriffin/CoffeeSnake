@@ -48,15 +48,10 @@ public class HavaBol
         try
         {
             // Print a column heading 
-            
-            
-            /*
-            while (! scan.getNext().isEmpty())
-            {
-                //scan.currentToken.printToken();
-                //parser.parse();
-               
-            }*/
+
+                if(scan.bShowToken)
+                    scan.currentToken.printToken();
+            }
         }
         catch (Exception e)
         {
