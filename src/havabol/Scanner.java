@@ -33,6 +33,8 @@ public class Scanner {
 	private int iColPos;
 	private int iSourceLineNr;
 	private char[] textCharM;
+        //Parser parser;
+        SymbolTable st;
 
 	/**
 	 * Constructor for the class. Verifies that the source file is viable, and creates two new tokens
@@ -45,6 +47,9 @@ public class Scanner {
 	public Scanner(String sourceFileNm, SymbolTable symbolTable) throws IOException
 	{
 		this.sourceFileName = sourceFileNm;
+                
+                this.st = symbolTable;
+                
 		// Init a new array list for the lines
 		sourceFileM = new ArrayList<>();
 		
@@ -113,9 +118,13 @@ public class Scanner {
 		{
 			advanceLine();
 		}
+                
+                
 		
 		// reset column position
 		iColPos = 0;
+                
+                
 	}
 	
 	/**

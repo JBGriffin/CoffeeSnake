@@ -17,24 +17,38 @@
  */
 package havabol;
 
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class HavaBol 
 {
     public static void main(String[] args) 
     {
         // Create the SymbolTable
         SymbolTable symbolTable = new SymbolTable();
+        Scanner scan;
+        Parser parser;
+        try {
+            System.out.printf("%-11s %-12s %s\n"
+                    , "primClassif"
+                    , "subClassif"
+                    , "tokenStr");
+            scan = new Scanner(args[0], symbolTable);
+            parser = new Parser(symbolTable, scan);
+            parser.parse();
+        } catch (IOException ex) {
+            Logger.getLogger(HavaBol.class.getName()).log(Level.SEVERE, null, ex);
+            System.exit(0);
+        } catch (Exception ex) {
+            Logger.getLogger(HavaBol.class.getName()).log(Level.SEVERE, null, ex);
+            System.exit(0);
+        }
         
         try
         {
             // Print a column heading 
-            /*System.out.printf("%-11s %-12s %s\n"
-                    , "primClassif"
-                    , "subClassif"
-                    , "tokenStr");*/
-            
-            Scanner scan = new Scanner(args[0], symbolTable);
-            while (! scan.getNext().isEmpty())
-            {
+
                 if(scan.bShowToken)
                     scan.currentToken.printToken();
             }
