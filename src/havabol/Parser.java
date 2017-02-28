@@ -43,7 +43,7 @@ public class Parser {
         String szTokenStr;
         
         while(!scanner.getNext().isEmpty()) {
-        
+        System.out.println("In statemnts with " + scanner.currentToken.tokenStr);
             switch (scanner.currentToken.primClassif) {
                 case Token.CONTROL:
                     rt = controlStatement(execute);
@@ -51,10 +51,9 @@ public class Parser {
                 case Token.OPERAND:
                     rt = operand(execute);
                     break;
-                
                 default:
                     return rt;
-        }
+            }
         
         }
         
@@ -94,13 +93,39 @@ public class Parser {
         
         System.out.println(scanner.currentToken.tokenStr);
         
-        scanner.getNext();
         
         Token workingToken = scanner.currentToken;
+        String sznewTokenStr = scanner.getNext();
+        switch (workingToken.tokenStr) {
+            
+            case "Int":
+                this.st.putSymbol(sznewTokenStr, new STIdentifiers(sznewTokenStr, Token.CONTROL, Token.INTEGER, Token.INTEGER, 0));
+                break;
+            case "Float":
+                this.st.putSymbol(sznewTokenStr, new STIdentifiers(sznewTokenStr, Token.CONTROL, Token.FLOAT, Token.FLOAT, 0));
+                break;
+            case "String":
+                this.st.putSymbol(sznewTokenStr, new STIdentifiers(sznewTokenStr, Token.CONTROL, Token.STRING, Token.STRING, 0));
+                break;
+            default:
+                return rt; //Throw Exception
+            
+            
+        }
+        //if separator, return
+        if (";".equals(scanner.getNext())) {
+            return rt;
+        } else if ("".equals(scanner.currentToken.tokenStr)) {
+            
+           //call expressions(); 
+        
+        }  
         
         return rt;
         
     }
+    
+    
     
     private ResultValue flowStatement(boolean execute) {
         
@@ -124,11 +149,75 @@ public class Parser {
     }
     
     
-    private ResultValue operand(boolean execute) {
+    private ResultValue operand(boolean execute) throws Exception {
         ResultValue rt = null;
                 
         System.out.println(scanner.currentToken.tokenStr);
         
+        
+        switch (scanner.currentToken.subClassif) {
+            
+            case Token.IDENTIFIER:
+                //recall identifier
+                STEntry ste = (STIdentifiers) st.getSymbol(scanner.currentToken.tokenStr);
+                if (ste == null) {
+                    
+                    System.err.println("Error!");
+                    return rt;
+                   
+                    
+                } else {
+                    
+                    System.out.println("Success so far!");
+                    rt = expressions(execute);
+                    return rt;
+                    
+                }
+                //if it exists, continue, otherwise break
+            case Token.INTEGER:
+            case Token.FLOAT:
+            case Token.STRING:
+            
+        }
+        
+        return rt;
+        
+    }
+    
+    
+    private ResultValue expressions(boolean execute) throws Exception {
+        
+        ResultValue rt = null;
+        
+        Token firstToken = scanner.currentToken;
+        
+        scanner.getNext();
+        
+        if ("=".equals(scanner.currentToken.tokenStr)) {
+            
+            System.out.println("Found '='");
+            
+            scanner.getNext();
+            
+            switch (scanner.currentToken.subClassif) {
+                
+                case Token.INTEGER:
+                    Token currentToken = scanner.currentToken;
+                    scanner.getNext();
+                    if (!";".equals(scanner.currentToken.tokenStr))
+                        return rt; //for now, throw error (Assign3)
+                    this.storage.put(firstToken.tokenStr, scanner.currentToken.tokenStr);
+                    System.out.println("Successfully put " + scanner.currentToken.tokenStr + " into " + firstToken.tokenStr);
+                    return new ResultValue(scanner.currentToken.tokenStr);
+                
+            }
+            
+        } else {
+            
+            System.err.println("Found " + scanner.currentToken.tokenStr);
+            
+        }
+                
         return rt;
         
     }

@@ -11,11 +11,11 @@ package havabol;
  */
 public class ResultValue {
     
+    String szValue;
     
-    
-    public ResultValue() {
+    public ResultValue(String value) {
         
-        
+        this.szValue = value;
         
     }
     
