@@ -28,11 +28,13 @@ public class StorageManager {
     
     public void put(String key, String value) {
         
+        //System.out.println(key + " --- " + value);
+        
         ht.put(key, value);
         
     }
     
-    public String get(String key) {
+    public String get(Parser parser, String key) {
         
         return ht.get(key);
         

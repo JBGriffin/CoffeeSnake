@@ -43,13 +43,16 @@ public class Parser {
         String szTokenStr;
         
         while(!scanner.getNext().isEmpty()) {
-        System.out.println("In statemnts with " + scanner.currentToken.tokenStr);
+        //System.out.println("In statemnts with " + scanner.currentToken.tokenStr);
             switch (scanner.currentToken.primClassif) {
                 case Token.CONTROL:
                     rt = controlStatement(execute);
                     break;
                 case Token.OPERAND:
                     rt = operand(execute);
+                    break;
+                case Token.FUNCTION:
+                    rt = function(execute);
                     break;
                 default:
                     return rt;
@@ -91,7 +94,7 @@ public class Parser {
         
         ResultValue rt = null;
         
-        System.out.println(scanner.currentToken.tokenStr);
+        //System.out.println(scanner.currentToken.tokenStr);
         
         
         Token workingToken = scanner.currentToken;
@@ -131,7 +134,7 @@ public class Parser {
         
         ResultValue rt = null;
         
-        System.out.println(scanner.currentToken.tokenStr);
+        //System.out.println(scanner.currentToken.tokenStr);
         
         return rt;
         
@@ -142,7 +145,54 @@ public class Parser {
         
         ResultValue rt = null;
         
-        System.out.println(scanner.currentToken.tokenStr);
+        //System.out.println(scanner.currentToken.tokenStr);
+        
+        return rt;
+        
+    }
+    
+    private ResultValue function(boolean execute) throws Exception {
+        
+        ResultValue rt = null;
+        
+        //System.out.println(scanner.currentToken.tokenStr);
+        
+        if (scanner.currentToken.subClassif == Token.BUILTIN) {
+            
+            if(((STFunction) this.st.getSymbol(scanner.currentToken.tokenStr)) != null) {
+                
+                STFunction stf = (STFunction) this.st.getSymbol(scanner.currentToken.tokenStr);
+                
+                switch (stf.symbol) {
+                    
+                    case "print":
+                        //handle print (TEMPORARY)
+                        StringBuilder sb = new StringBuilder();
+                        while(!";".equals(scanner.getNext())) {
+                            switch (scanner.currentToken.subClassif) {
+                                
+                                case Token.IDENTIFIER:
+                                    sb.append(this.storage.get(this, scanner.currentToken.tokenStr));
+                                    break;
+                                case Token.STRING:
+                                    sb.append(scanner.currentToken.tokenStr);
+                                    break;
+                                case Token.SEPARATOR:
+                                    break;
+                                default:
+                                    break;
+                                
+                            }
+                            
+                        } 
+                        
+                        System.out.println(sb.toString());
+                    
+                }
+                
+            }
+            
+        }
         
         return rt;
         
@@ -152,7 +202,7 @@ public class Parser {
     private ResultValue operand(boolean execute) throws Exception {
         ResultValue rt = null;
                 
-        System.out.println(scanner.currentToken.tokenStr);
+        //System.out.println(scanner.currentToken.tokenStr);
         
         
         switch (scanner.currentToken.subClassif) {
@@ -168,7 +218,7 @@ public class Parser {
                     
                 } else {
                     
-                    System.out.println("Success so far!");
+                    //System.out.println("Success so far!");
                     rt = expressions(execute);
                     return rt;
                     
@@ -195,7 +245,7 @@ public class Parser {
         
         if ("=".equals(scanner.currentToken.tokenStr)) {
             
-            System.out.println("Found '='");
+            //System.out.println("Found '='");
             
             scanner.getNext();
             
@@ -206,8 +256,8 @@ public class Parser {
                     scanner.getNext();
                     if (!";".equals(scanner.currentToken.tokenStr))
                         return rt; //for now, throw error (Assign3)
-                    this.storage.put(firstToken.tokenStr, scanner.currentToken.tokenStr);
-                    System.out.println("Successfully put " + scanner.currentToken.tokenStr + " into " + firstToken.tokenStr);
+                    this.storage.put(firstToken.tokenStr, currentToken.tokenStr);
+                    //System.out.println("Successfully put " + scanner.currentToken.tokenStr + " into " + firstToken.tokenStr);
                     return new ResultValue(scanner.currentToken.tokenStr);
                 
             }
