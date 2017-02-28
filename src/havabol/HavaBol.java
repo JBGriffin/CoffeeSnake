@@ -23,6 +23,7 @@ public class HavaBol
     {
         // Create the SymbolTable
         SymbolTable symbolTable = new SymbolTable();
+        Parser parser = new Parser(symbolTable);
         
         try
         {

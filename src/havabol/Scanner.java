@@ -92,9 +92,13 @@ public class Scanner {
 		{
 			advanceLine();
 		}
+                
+                
 		
 		// reset column position
 		iColPos = 0;
+                
+                
 	}
 	
 	/**
