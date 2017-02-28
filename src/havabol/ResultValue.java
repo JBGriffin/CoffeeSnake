@@ -11,7 +11,11 @@ package havabol;
  */
 public class ResultValue {
     
-    String szValue;
+    public String type;             // Data type of result
+    public String szValue;          // Data in string representation 
+    public String structure;        // Primitive, fixed array, unbounded array
+    public String terminatingStr;   // Used for end of lists of things (e.g.,
+                                    // list of starter terminated by "endwhile"
     
     public ResultValue(String value) {
         
