@@ -44,18 +44,13 @@ public class HavaBol
             Logger.getLogger(HavaBol.class.getName()).log(Level.SEVERE, null, ex);
             System.exit(0);
         }
-        
-        try
-        {
-            // Print a column heading 
 
-                if(scan.bShowToken)
-                    scan.currentToken.printToken();
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
     }
 }
+
+
+
+/*
+if(scan.bShowToken)
+   scan.currentToken.printToken();
+*/
