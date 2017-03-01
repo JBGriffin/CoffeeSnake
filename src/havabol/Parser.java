@@ -390,10 +390,10 @@ public class Parser {
                 //save simple integer (Assign 3)
                 case Token.INTEGER:
                     Token currentToken = scanner.currentToken;
-                    scanner.getNext();
-                    if (!";".equals(scanner.currentToken.tokenStr))
-                        return rt; //for now, throw error (Assign3)
-                    this.storage.put(firstToken.tokenStr, currentToken.tokenStr);
+                    //scanner.getNext();
+                    //if (!";".equals(scanner.currentToken.tokenStr))
+                    rt = expressions(execute);
+                    this.storage.put(firstToken.tokenStr, rt.szValue);
                     //System.out.println("Successfully put " + scanner.currentToken.tokenStr + " into " + firstToken.tokenStr);
                     return new ResultValue(scanner.currentToken.tokenStr);
                 //save simple float (Assign 3)
@@ -450,6 +450,8 @@ public class Parser {
  */
     private ResultValue expressions(boolean execute) throws Exception {
 
+        
+        
         ResultValue rt = null;
         //save off current token
         Token firstToken = scanner.currentToken;
@@ -461,6 +463,17 @@ public class Parser {
             
             return rt;
 
+        } else if ("+".equals(scanner.currentToken.tokenStr)) {
+            
+            System.out.println("Found the plus");
+            
+            switch (firstToken.subClassif) {
+                case Token.INTEGER:
+                    Integer.parseInt(firstToken.tokenStr);
+            }
+            
+            return rt;
+            
         }
 
         //
