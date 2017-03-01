@@ -428,10 +428,16 @@ public class Parser {
                         return rt; //for now, throw error (Assign3)
                     this.storage.put(firstToken.tokenStr, currentStringToken.tokenStr);
                     //System.out.println("Successfully put " + scanner.currentToken.tokenStr + " into " + firstToken.tokenStr);
-                return new ResultValue(scanner.currentToken.tokenStr);
+                default:
+                    Token newToken = scanner.currentToken;
+                    rt = expressions(execute);
+                    System.out.println(rt.szValue);
+                    this.storage.put(firstToken.tokenStr, rt.szValue);
+                    return new ResultValue(scanner.currentToken.tokenStr);
+                //return new ResultValue(scanner.currentToken.tokenStr);
 
             } 
-                break;
+            //break;
             //to come soon
             case "+=":
                 //will need to call Utility.add
@@ -470,10 +476,24 @@ public class Parser {
         ResultValue rt = null;
         //save off current token
         Token firstToken = scanner.currentToken;
-
+        
+        boolean firstIsNegative = false;
+        
+        //get all negative signs (Unary -)
+        while("-".equals(scanner.currentToken.tokenStr)) {
+            
+            firstIsNegative = !firstIsNegative;
+            scanner.getNext();
+            firstToken = scanner.currentToken;
+            
+        }
+        
+        //if negative, make negative
+        if (firstIsNegative)
+            firstToken.tokenStr = (Integer.parseInt(firstToken.tokenStr) * -1) + "";
+        
         //means it was a simple assignment
         if (";".equals(scanner.getNext())) {
-
             rt = new ResultValue(firstToken.tokenStr);
             
             return rt;
@@ -481,62 +501,58 @@ public class Parser {
         } else if ("+".equals(scanner.currentToken.tokenStr)) {
             
             System.out.println("Found the plus");
-            
+            scanner.getNext();
             switch (firstToken.subClassif) {
                 case Token.INTEGER:
-                    Integer.parseInt(firstToken.tokenStr);
+                    int x = Integer.parseInt(firstToken.tokenStr);
+                    x = x + Integer.parseInt(expressions(execute).szValue);
+                    rt = new ResultValue(x + "");
+            }
+            
+            return rt;
+            
+        } else if ("-".equals(scanner.currentToken.tokenStr)) {
+            
+            System.out.println("Found the plus");
+            scanner.getNext();
+            switch (firstToken.subClassif) {
+                case Token.INTEGER:
+                    int x = Integer.parseInt(firstToken.tokenStr);
+                    x = x - Integer.parseInt(expressions(execute).szValue);
+                    rt = new ResultValue(x + "");
+            }
+            
+            return rt;
+            
+        } else if ("*".equals(scanner.currentToken.tokenStr)) {
+            
+            System.out.println("Found the plus");
+            scanner.getNext();
+            switch (firstToken.subClassif) {
+                case Token.INTEGER:
+                    int x = Integer.parseInt(firstToken.tokenStr);
+                    x = x * Integer.parseInt(expressions(execute).szValue);
+                    rt = new ResultValue(x + "");
+            }
+            
+            return rt;
+            
+        } else if ("/".equals(scanner.currentToken.tokenStr)) {
+            
+            System.out.println("Found the plus");
+            scanner.getNext();
+            switch (firstToken.subClassif) {
+                case Token.INTEGER:
+                    int x = Integer.parseInt(firstToken.tokenStr);
+                    x = x / Integer.parseInt(expressions(execute).szValue);
+                    rt = new ResultValue(x + "");
             }
             
             return rt;
             
         }
-
-        //
-        if (!"=".equals(scanner.currentToken.tokenStr)) {
-            scanner.getNext();
-        }
-
-        if ("=".equals(scanner.currentToken.tokenStr)) {
-
-            //System.out.println("Found '='");
-
-            scanner.getNext();
-
-            switch (scanner.currentToken.subClassif) {
-
-                case Token.INTEGER:
-                    Token currentToken = scanner.currentToken;
-                    scanner.getNext();
-                    if (!";".equals(scanner.currentToken.tokenStr))
-                        return rt; //for now, throw error (Assign3)
-                    this.storage.put(firstToken.tokenStr, currentToken.tokenStr);
-                    //System.out.println("Successfully put " + scanner.currentToken.tokenStr + " into " + firstToken.tokenStr);
-                    return new ResultValue(scanner.currentToken.tokenStr);
-                case Token.FLOAT:
-                    Token currentFloatToken = scanner.currentToken;
-                    scanner.getNext(); //for assign3 should be ; only
-                    if (!";".equals(scanner.currentToken.tokenStr))
-                        return rt; //for now, throw error (Assign3)
-                    this.storage.put(firstToken.tokenStr, currentFloatToken.tokenStr);
-                    //System.out.println("Successfully put " + scanner.currentToken.tokenStr + " into " + firstToken.tokenStr);
-                    return new ResultValue(scanner.currentToken.tokenStr);
-                case Token.STRING:
-                    Token currentStringToken = scanner.currentToken;
-                    scanner.getNext(); //for assign3 should be ; only
-                    if (!";".equals(scanner.currentToken.tokenStr))
-                        return rt; //for now, throw error (Assign3)
-                    this.storage.put(firstToken.tokenStr, currentStringToken.tokenStr);
-                    //System.out.println("Successfully put " + scanner.currentToken.tokenStr + " into " + firstToken.tokenStr);
-                    return new ResultValue(scanner.currentToken.tokenStr);
-
-            }
-
-        } else {
-
-            /*System.err.println("Found " + scanner.currentToken.tokenStr);*/
-            errorWithContext("Found " + scanner.currentToken.tokenStr);
-
-        }
+        
+        System.err.println(scanner.currentToken.tokenStr);
 
         return rt;
 
