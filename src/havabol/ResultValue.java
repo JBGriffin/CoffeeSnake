@@ -11,7 +11,7 @@ package havabol;
  */
 public class ResultValue {
     
-    public String type;             // Data type of result
+    public int type;             // Data type of result
     public String szValue;          // Data in string representation 
     public String structure;        // Primitive, fixed array, unbounded array
     public String terminatingStr;   // Used for end of lists of things (e.g.,
@@ -20,6 +20,16 @@ public class ResultValue {
     public ResultValue(String value) {
         
         this.szValue = value;
+
+        switch(szValue)
+        {
+            case "INTEGER":
+                this.type = Token.INTEGER;
+                break;
+            case "FLOAT":
+                this.type = Token.FLOAT;
+                break;
+        }
         
     }
     
