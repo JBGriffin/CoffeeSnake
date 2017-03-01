@@ -205,18 +205,73 @@ public class Parser {
 
     /**
      *
-     * NEEDS CODE
+     * NEEDS CODE - would be called for if,while, etc.
      *
      * @param execute
      * @return ResultValue
      */
-    private ResultValue flowStatement(boolean execute) {
+    private ResultValue flowStatement(boolean execute) throws Exception {
 
         ResultValue rt = null;
 
-        //System.out.println(scanner.currentToken.tokenStr);
+        switch(scanner.currentToken.tokenStr) {
+            case "if":
+                ifStatement(execute);
+            case "while":
+                whileStatement(execute);
+                
+            
+            
+        }
+        
         return rt;
 
+    }
+    
+    
+    private ResultValue ifStatement(boolean execute) throws Exception {
+        
+        ResultValue rt = null;
+        
+        scanner.getNext();
+        switch(scanner.currentToken.subClassif) {
+            case Token.IDENTIFIER:
+                break;
+            case Token.INTEGER:
+                break;
+            case Token.FLOAT:
+                break;
+            case Token.STRING:
+                break;
+                    
+                    
+        }
+        
+        return rt;
+        
+    }
+    
+    
+    private ResultValue whileStatement(boolean execute) throws Exception {
+        
+        ResultValue rt = null;
+        
+        scanner.getNext();
+        switch(scanner.currentToken.subClassif) {
+            case Token.IDENTIFIER:
+                break;
+            case Token.INTEGER:
+                break;
+            case Token.FLOAT:
+                break;
+            case Token.STRING:
+                break;
+                    
+                    
+        }
+        
+        return rt;
+        
     }
 
     /**
