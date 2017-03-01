@@ -116,13 +116,14 @@ public class Parser {
             
         }
         //if separator, return
-        if (";".equals(scanner.getNext())) {
-            return rt;
-        } else if ("".equals(scanner.currentToken.tokenStr)) {
+        //if (";".equals(scanner.getNext())) {
+        //    return rt;
+        //} else if ("=".equals(scanner.currentToken.tokenStr)) {
             
            //call expressions(); 
+        expressions(execute);
         
-        }  
+        //}  
         
         return rt;
         
@@ -241,7 +242,15 @@ public class Parser {
         
         Token firstToken = scanner.currentToken;
         
-        scanner.getNext();
+        if (";".equals(scanner.getNext())) {
+            
+            return rt;
+            
+        }
+        
+        if (!"=".equals(scanner.currentToken.tokenStr)) {
+            scanner.getNext();
+        }
         
         if ("=".equals(scanner.currentToken.tokenStr)) {
             
@@ -257,6 +266,22 @@ public class Parser {
                     if (!";".equals(scanner.currentToken.tokenStr))
                         return rt; //for now, throw error (Assign3)
                     this.storage.put(firstToken.tokenStr, currentToken.tokenStr);
+                    //System.out.println("Successfully put " + scanner.currentToken.tokenStr + " into " + firstToken.tokenStr);
+                    return new ResultValue(scanner.currentToken.tokenStr);
+                case Token.FLOAT:
+                    Token currentFloatToken = scanner.currentToken;
+                    scanner.getNext(); //for assign3 should be ; only
+                    if (!";".equals(scanner.currentToken.tokenStr))
+                        return rt; //for now, throw error (Assign3)
+                    this.storage.put(firstToken.tokenStr, currentFloatToken.tokenStr);
+                    //System.out.println("Successfully put " + scanner.currentToken.tokenStr + " into " + firstToken.tokenStr);
+                    return new ResultValue(scanner.currentToken.tokenStr);
+                case Token.STRING:
+                    Token currentStringToken = scanner.currentToken;
+                    scanner.getNext(); //for assign3 should be ; only
+                    if (!";".equals(scanner.currentToken.tokenStr))
+                        return rt; //for now, throw error (Assign3)
+                    this.storage.put(firstToken.tokenStr, currentStringToken.tokenStr);
                     //System.out.println("Successfully put " + scanner.currentToken.tokenStr + " into " + firstToken.tokenStr);
                     return new ResultValue(scanner.currentToken.tokenStr);
                 
