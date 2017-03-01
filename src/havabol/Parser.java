@@ -465,6 +465,7 @@ public class Parser {
                             return rt; //for now, throw error (Assign3)
                         }
                         this.storage.put(firstToken.tokenStr, currentStringToken.tokenStr);
+                        break;
                     //System.out.println("Successfully put " + scanner.currentToken.tokenStr + " into " + firstToken.tokenStr);
                     default:
                         Token newToken = scanner.currentToken;
