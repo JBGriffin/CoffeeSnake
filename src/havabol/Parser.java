@@ -65,7 +65,7 @@ public class Parser {
      * @throws Exception Prints out the line number, token, and a message on where
      * the error occured.
      */
-    private void errorWithContext(String msg) throws Exception
+    public void errorWithContext(String msg) throws Exception
     {
         throw new ParserException(scanner.currentToken.iSourceLineNr, msg);
     }
