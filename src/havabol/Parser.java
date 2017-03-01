@@ -59,6 +59,12 @@ public class Parser {
 
     }
 
+    /**
+     * Calls exception class for user error.
+     * @param msg Message on where the error ocurred.
+     * @throws Exception Prints out the line number, token, and a message on where
+     * the error occured.
+     */
     private void errorWithContext(String msg) throws Exception
     {
         throw new ParserException(scanner.currentToken.iSourceLineNr, msg);
@@ -99,7 +105,7 @@ public class Parser {
                     //and will need to throw proper exception
                 case Token.OPERATOR:
                     /*System.err.println("Unexpected operator found");*/
-                    errorWithContext("Unexpected operator found. Usage: " + scanner.currentToken.primClassif);
+                    errorWithContext("Unexpected operator found. Usage: " + scanner.currentToken.tokenStr);
                     break;
                 //if default happens, something is seriously wrong in our code
                 default:
@@ -173,7 +179,7 @@ public class Parser {
         //if subClass is not an Identifer - illegal execution
         if (scanner.currentToken.subClassif != Token.IDENTIFIER)
             /*throw new Exception();//THROW EXCEPTION HERE*/
-            errorWithContext("Subclass is not an identifier. Usage: " + scanner.currentToken.subClassif);
+            errorWithContext("Subclass is not an identifier. Usage: " + scanner.currentToken.tokenStr);
 
         switch (workingToken.tokenStr) {
             //if Int - put in SymbolTable as Int
@@ -514,7 +520,8 @@ public class Parser {
 
         } else {
 
-            System.err.println("Found " + scanner.currentToken.tokenStr);
+            /*System.err.println("Found " + scanner.currentToken.tokenStr);*/
+            errorWithContext("Found " + scanner.currentToken.tokenStr);
 
         }
 
