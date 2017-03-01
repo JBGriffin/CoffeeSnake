@@ -59,6 +59,11 @@ public class Parser {
 
     }
 
+    private void errorWithContext(String msg) throws Exception
+    {
+        throw new ParserException(scanner.currentToken.iSourceLineNr, msg);
+    }
+
     /**
      * Begins grabbing tokens from scanner class
      * statements calls appropriate submethod to handle primClassif
@@ -66,7 +71,7 @@ public class Parser {
      * 
      * @param execute boolean - execute if true
      * @return ResultValue - at this point not necessary here
-     * @throws Exception should be ParserException
+     * @throws Exception should be ScannerException
      */
     private ResultValue statements(boolean execute) throws Exception {
 
@@ -93,7 +98,8 @@ public class Parser {
                 //handle operators - this probably should not be legal
                     //and will need to throw proper exception
                 case Token.OPERATOR:
-                    System.err.println("Unexpected operator found");
+                    /*System.err.println("Unexpected operator found");*/
+                    errorWithContext("Unexpected operator found. Usage: " + scanner.currentToken.primClassif);
                     break;
                 //if default happens, something is seriously wrong in our code
                 default:
@@ -166,7 +172,8 @@ public class Parser {
 
         //if subClass is not an Identifer - illegal execution
         if (scanner.currentToken.subClassif != Token.IDENTIFIER)
-            throw new Exception();//THROW EXCEPTION HERE
+            /*throw new Exception();//THROW EXCEPTION HERE*/
+            errorWithContext("Subclass is not an identifier. Usage: " + scanner.currentToken.subClassif);
 
         switch (workingToken.tokenStr) {
             //if Int - put in SymbolTable as Int
@@ -183,6 +190,7 @@ public class Parser {
                 break;
             //if nothing - throw exception (Assignment 3) - in future there will be more
             default:
+                errorWithContext("Error?");
                 return rt; //Throw Exception
 
 
@@ -320,7 +328,8 @@ public class Parser {
                 if (ste == null) {
 
                     //needs to throw parser exception
-                    System.err.println("Error!");
+                    /*System.err.println("Error!");*/
+                    errorWithContext("Syntax Error");
                     return rt;
 
                 //it does exist so call assignments to handle the rest

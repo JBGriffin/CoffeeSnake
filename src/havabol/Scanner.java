@@ -33,8 +33,8 @@ public class Scanner {
 	private int iColPos;
 	private int iSourceLineNr;
 	private char[] textCharM;
-        //Parser parser;
-        SymbolTable st;
+    //Parser parser;
+	SymbolTable st;
 
 	/**
 	 * Constructor for the class. Verifies that the source file is viable, and creates two new tokens
@@ -502,6 +502,6 @@ public class Scanner {
 	 */
 	private void error(String diagnosticTxt) throws Exception
 	{
-		throw new ParserException(iSourceLineNr, diagnosticTxt, sourceFileName);
+		throw new ScannerException(iSourceLineNr, diagnosticTxt, sourceFileName);
 	}
 }

@@ -1,3 +1,7 @@
+debug ShowToken On
+
+debug ShowExpr On
+
 Int i;
 Float pi;
 String day;
@@ -58,6 +62,8 @@ if loc == "TX" or loc == TN: // check for TX
 endif;
 print("\tDone with first if");
 
+debug ShowToken Off
+
 print(">>> Second If");
 // if then else
 if i >= 5:
@@ -108,7 +114,8 @@ while i < 5:
         j = j + 1;
     endwhile;
     bFlag = F;
-    print("\tbottom of while, i=", i, "j=", j); // Did I break again?
+    print("\tbottom of while, i=", i, "j=", j);
     i = i + 1;
 endwhile;
-print("\tAfter outer while"); // Test mc Testy
+print("\tAfter outer while");
+        
