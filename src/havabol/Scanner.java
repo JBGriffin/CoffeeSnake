@@ -218,8 +218,8 @@ public class Scanner {
 						return;
 					}
 					break;
-				// Operator tokens: + - * / < > = ! 
-				case '+': case '-':	case '*': case '/':case '^':
+				// Operator tokens: + - * / < > = !
+				case '-':case '+': case '^':case '*': case '/':
 				case '!': case '=': case '<': case '>':
 					nextTokStr = currentLine.substring(iColPos, index + 1);
 					// Check to see if we need to combine operators
@@ -449,6 +449,14 @@ public class Scanner {
 		}
 
         setNextToken();
+		// Check for unary minus
+		if(nextToken.tokenStr.equals("-") && (currentToken.primClassif == Token.OPERATOR
+				|| currentToken.tokenStr.equals("U-") || currentToken.subClassif == Token.CONTROL
+				|| currentToken.tokenStr.equals("(") || currentToken.tokenStr.equals(",")))
+		{
+			nextToken.tokenStr = "U-";
+		}
+
         currentToken = nextToken;
 
         return currentToken.tokenStr;

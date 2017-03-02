@@ -36,6 +36,13 @@ public class Numeric
         }
     }
 
+    /**
+     * Sets the value of the given result type.
+     * @param resultValue Value to be set
+     * @param type Determines whether resultValue is set to Token.INTEGER or Token.FLOAT
+     * @param szValue Display value of the result
+     * @return The result value with type and display set
+     */
     private ResultValue setValue(ResultValue resultValue, int type, String szValue)
     {
         resultValue.type = type;
@@ -159,42 +166,42 @@ public class Numeric
     /**
      * Takes in two operands and returns operand1 divided by operand2. If either operand
      * is a double, the result value type will be set to double.
-     * @param operand1 Operand containing integer or double
-     * @param operand2 Operand containing integer or double
+     * @param divisor Operand containing integer or double
+     * @param dividend Operand containing integer or double
      * @return Returns a ResultValue containing new type and string value.
      * @throws Exception Will throw divide by zero exception. Because in java dividing by zero with floats is valid,
      * will only be thrown for integer division by zero.
      */
-    public ResultValue divide(Numeric operand1, Numeric operand2) throws Exception
+    public ResultValue divide(Numeric divisor, Numeric dividend) throws Exception
     {
         ResultValue returnValue = new ResultValue("");
         double dblReturn;
         int intReturn = 0;
 
-        if (operand1.type == Token.INTEGER && operand2.type == Token.INTEGER)
+        if (divisor.type == Token.INTEGER && dividend.type == Token.INTEGER)
         {
-            if(operand2.integerValue != 0)
-                intReturn = operand1.integerValue / operand2.integerValue;
+            if(dividend.integerValue != 0)
+                intReturn = divisor.integerValue / dividend.integerValue;
             else
-                parser.errorWithContext("Can not divide by zero! Operands given: " + operand1.integerValue + " and "
-                        + operand2.integerValue);
+                parser.errorWithContext("Can not divide by zero! Operands given: " + divisor.integerValue + " and "
+                        + dividend.integerValue);
 
             returnValue = setValue(returnValue, Token.INTEGER, intReturn + "");
 
         }
-        else if (operand1.type == Token.FLOAT && operand2.type == Token.FLOAT)
+        else if (divisor.type == Token.FLOAT && dividend.type == Token.FLOAT)
         {
-            dblReturn = operand1.doubleValue / operand2.doubleValue;
+            dblReturn = divisor.doubleValue / dividend.doubleValue;
             returnValue = setValue(returnValue, Token.FLOAT, dblReturn + "");
         }
-        else if(operand1.type == Token.INTEGER && operand2.type == Token.FLOAT)
+        else if(divisor.type == Token.INTEGER && dividend.type == Token.FLOAT)
         {
-            dblReturn = operand1.integerValue / operand2.doubleValue;
+            dblReturn = divisor.integerValue / dividend.doubleValue;
             returnValue = setValue(returnValue, Token.FLOAT, dblReturn + "");
         }
         else
         {
-            dblReturn = operand1.doubleValue / operand2.integerValue;
+            dblReturn = divisor.doubleValue / dividend.integerValue;
             returnValue = setValue(returnValue, Token.FLOAT, dblReturn + "");
         }
 
@@ -205,12 +212,11 @@ public class Numeric
      * 
      * operand1 raised to the power of operand2
      * 
-     * @param operand1 "2" 2^3
-     * @param operand2 "3" 2^3
-     * @return
-     * @throws Exception 
+     * @param baseOfExp Base of the operation, can be integer or double
+     * @param powerOfExp What the base will be raised to the power of, can be integer or double
+     * @return Returns a ResultValue containing new type and string value.
      */
-    public ResultValue power(Numeric operand1, Numeric operand2) throws Exception
+    public ResultValue power(Numeric baseOfExp, Numeric powerOfExp) throws Exception
     {
         ResultValue returnValue = new ResultValue("");
         double dblReturn;
@@ -218,33 +224,25 @@ public class Numeric
 
         
         //2^3 op1 = 2 and op2 = 3
-        if (operand1.type == Token.INTEGER && operand2.type == Token.INTEGER)
+        if (baseOfExp.type == Token.INTEGER && powerOfExp.type == Token.INTEGER)
         {
-            //if(operand2.integerValue != 0)
-            intReturn = (int) Math.pow(operand1.integerValue, operand2.integerValue); 
-                //operand1.integerValue / operand2.integerValue;
-            //else
-            //    parser.errorWithContext("Can not divide by zero! Operands given: " + operand1.integerValue + " and "
-             //           + operand2.integerValue);
-
+            intReturn = (int) Math.pow(baseOfExp.integerValue, powerOfExp.integerValue);
             returnValue = setValue(returnValue, Token.INTEGER, intReturn + "");
 
         }
-        else if (operand1.type == Token.FLOAT && operand2.type == Token.FLOAT)
+        else if (baseOfExp.type == Token.FLOAT && powerOfExp.type == Token.FLOAT)
         {
-            dblReturn = Math.pow(operand1.integerValue, operand2.integerValue);
+            dblReturn = Math.pow(baseOfExp.integerValue, powerOfExp.integerValue);
             returnValue = setValue(returnValue, Token.FLOAT, dblReturn + "");
         }
-        else if(operand1.type == Token.INTEGER && operand2.type == Token.FLOAT)
+        else if(baseOfExp.type == Token.INTEGER && powerOfExp.type == Token.FLOAT)
         {
-            //dblReturn = operand1.integerValue / operand2.doubleValue;
-            dblReturn = Math.pow(operand1.integerValue, operand2.doubleValue);
+            dblReturn = Math.pow(baseOfExp.integerValue, powerOfExp.doubleValue);
             returnValue = setValue(returnValue, Token.FLOAT, dblReturn + "");
         }
         else
         {
-            //dblReturn = operand1.doubleValue / operand2.integerValue;
-            dblReturn = Math.pow(operand1.doubleValue, operand2.integerValue);
+            dblReturn = Math.pow(baseOfExp.doubleValue, powerOfExp.integerValue);
             returnValue = setValue(returnValue, Token.FLOAT, dblReturn + "");
         }
 
@@ -256,7 +254,7 @@ public class Numeric
      * Get priority of operator
      * 
      * @param szOperator +, -, *, ^, /, (, )
-     * @return 
+     * @return Priority of the operator
      */
     public int getPriority(String szOperator){
 		int iPriority = 0;
