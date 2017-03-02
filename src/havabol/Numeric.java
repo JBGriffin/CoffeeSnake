@@ -200,5 +200,89 @@ public class Numeric
 
         return returnValue;
     }
+    
+    /**
+     * 
+     * operand1 raised to the power of operand2
+     * 
+     * @param operand1 "2" 2^3
+     * @param operand2 "3" 2^3
+     * @return
+     * @throws Exception 
+     */
+    public ResultValue power(Numeric operand1, Numeric operand2) throws Exception
+    {
+        ResultValue returnValue = new ResultValue("");
+        double dblReturn;
+        int intReturn = 0;
+
+        
+        //2^3 op1 = 2 and op2 = 3
+        if (operand1.type == Token.INTEGER && operand2.type == Token.INTEGER)
+        {
+            //if(operand2.integerValue != 0)
+            intReturn = (int) Math.pow(operand1.integerValue, operand2.integerValue); 
+                //operand1.integerValue / operand2.integerValue;
+            //else
+            //    parser.errorWithContext("Can not divide by zero! Operands given: " + operand1.integerValue + " and "
+             //           + operand2.integerValue);
+
+            returnValue = setValue(returnValue, Token.INTEGER, intReturn + "");
+
+        }
+        else if (operand1.type == Token.FLOAT && operand2.type == Token.FLOAT)
+        {
+            dblReturn = Math.pow(operand1.integerValue, operand2.integerValue);
+            returnValue = setValue(returnValue, Token.FLOAT, dblReturn + "");
+        }
+        else if(operand1.type == Token.INTEGER && operand2.type == Token.FLOAT)
+        {
+            //dblReturn = operand1.integerValue / operand2.doubleValue;
+            dblReturn = Math.pow(operand1.integerValue, operand2.doubleValue);
+            returnValue = setValue(returnValue, Token.FLOAT, dblReturn + "");
+        }
+        else
+        {
+            //dblReturn = operand1.doubleValue / operand2.integerValue;
+            dblReturn = Math.pow(operand1.doubleValue, operand2.integerValue);
+            returnValue = setValue(returnValue, Token.FLOAT, dblReturn + "");
+        }
+
+        return returnValue;
+    }
+    
+    /**
+     * 
+     * Get priority of operator
+     * 
+     * @param szOperator +, -, *, ^, /, (, )
+     * @return 
+     */
+    public int getPriority(String szOperator){
+		int iPriority = 0;
+		
+        switch (szOperator) {
+            case "^":
+                iPriority = 3;
+                break;
+            case "*":
+            case "/":
+                iPriority = 2;
+                break;
+            case "+":
+            case "-":
+                iPriority = 1;
+                break;
+            case "(":
+            case ")":
+                iPriority = 0;
+                break;
+            default:
+                break;
+        }
+		
+		return iPriority;
+    
+    }
 
 }
