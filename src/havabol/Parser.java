@@ -214,27 +214,24 @@ public class Parser {
 
         ResultValue rt = null;
 
-        switch(scanner.currentToken.tokenStr) {
+        switch (scanner.currentToken.tokenStr) {
             case "if":
                 ifStatement(execute);
             case "while":
                 whileStatement(execute);
-                
-            
-            
+
         }
-        
+
         return rt;
 
     }
-    
-    
+
     private ResultValue ifStatement(boolean execute) throws Exception {
-        
+
         ResultValue rt = null;
-        
+
         scanner.getNext();
-        switch(scanner.currentToken.subClassif) {
+        switch (scanner.currentToken.subClassif) {
             case Token.IDENTIFIER:
                 break;
             case Token.INTEGER:
@@ -243,21 +240,19 @@ public class Parser {
                 break;
             case Token.STRING:
                 break;
-                    
-                    
+
         }
-        
+
         return rt;
-        
+
     }
-    
-    
+
     private ResultValue whileStatement(boolean execute) throws Exception {
-        
+
         ResultValue rt = null;
-        
+
         scanner.getNext();
-        switch(scanner.currentToken.subClassif) {
+        switch (scanner.currentToken.subClassif) {
             case Token.IDENTIFIER:
                 break;
             case Token.INTEGER:
@@ -266,12 +261,11 @@ public class Parser {
                 break;
             case Token.STRING:
                 break;
-                    
-                    
+
         }
-        
+
         return rt;
-        
+
     }
 
     /**
@@ -596,11 +590,11 @@ public class Parser {
                     return rt;
 
                 } else if ("/".equals(scanner.currentToken.tokenStr)) {
-                    
+
                     System.out.println("Found the plus");
                     scanner.getNext();
                     switch (scanner.currentToken.subClassif) {
-                        
+
                         case Token.INTEGER:
                             x = Integer.parseInt(firstToken.tokenStr);
                             x = x / Integer.parseInt(expressions(execute).szValue);
