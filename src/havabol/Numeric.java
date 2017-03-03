@@ -1,7 +1,8 @@
 package havabol;
 
 /**
- * Converts given result value strings into a numeric.
+ * Converts given result value strings into a numeric. Operand type will be set as the leftmost given
+ * operand. I.E., if given x += 1.0, x will be set as float.
  */
 public class Numeric
 {
@@ -51,8 +52,8 @@ public class Numeric
     }
 
     /**
-     * Takes in two operands and returns operand1 subtracted from operand2. If either operand
-     * is a double, the result value type will be set to double.
+     * Takes in two operands and returns operand1 subtracted from operand2. If mixed operands,
+     * then the result value will take the typing of the leftmost type.
      * @param operand1 Operand containing integer or double
      * @param operand2 Operand containing integer or double
      * @return Returns a ResultValue containing new type and string value.
@@ -76,8 +77,8 @@ public class Numeric
         }
         else if(operand1.type == Token.INTEGER && operand2.type == Token.FLOAT)
         {
-            dblReturn = operand1.integerValue - operand2.doubleValue;
-            returnValue = setValue(returnValue, Token.FLOAT, dblReturn + "");
+            intReturn = (int)(operand1.integerValue - operand2.doubleValue);
+            returnValue = setValue(returnValue, Token.INTEGER, intReturn + "");
         }
         else
         {
@@ -114,8 +115,8 @@ public class Numeric
         }
         else if(operand1.type == Token.INTEGER && operand2.type == Token.FLOAT)
         {
-            dblReturn = operand1.integerValue + operand2.doubleValue;
-            returnValue = setValue(returnValue, Token.FLOAT, dblReturn + "");
+            intReturn = (int)(operand1.integerValue + operand2.doubleValue);
+            returnValue = setValue(returnValue, Token.INTEGER, intReturn + "");
         }
         else
         {
@@ -151,8 +152,8 @@ public class Numeric
         }
         else if(operand1.type == Token.INTEGER && operand2.type == Token.FLOAT)
         {
-            dblReturn = operand1.integerValue * operand2.doubleValue;
-            returnValue = setValue(returnValue, Token.FLOAT, dblReturn + "");
+            intReturn = (int)(operand1.integerValue * operand2.doubleValue);
+            returnValue = setValue(returnValue, Token.INTEGER, intReturn + "");
         }
         else
         {
@@ -196,8 +197,12 @@ public class Numeric
         }
         else if(divisor.type == Token.INTEGER && dividend.type == Token.FLOAT)
         {
-            dblReturn = divisor.integerValue / dividend.doubleValue;
-            returnValue = setValue(returnValue, Token.FLOAT, dblReturn + "");
+            if(dividend.doubleValue != 0)
+                intReturn = (int)(divisor.integerValue / dividend.doubleValue);
+            else
+                parser.errorWithContext("Can not divide by zero! Operands given: " + divisor.integerValue + " and "
+                        + dividend.integerValue);
+            returnValue = setValue(returnValue, Token.INTEGER, intReturn + "");
         }
         else
         {
@@ -220,7 +225,7 @@ public class Numeric
     {
         ResultValue returnValue = new ResultValue("");
         double dblReturn;
-        int intReturn = 0;
+        int intReturn;
 
         
         //2^3 op1 = 2 and op2 = 3
@@ -237,8 +242,8 @@ public class Numeric
         }
         else if(baseOfExp.type == Token.INTEGER && powerOfExp.type == Token.FLOAT)
         {
-            dblReturn = Math.pow(baseOfExp.integerValue, powerOfExp.doubleValue);
-            returnValue = setValue(returnValue, Token.FLOAT, dblReturn + "");
+            intReturn = (int)(Math.pow(baseOfExp.integerValue , powerOfExp.doubleValue));
+            returnValue = setValue(returnValue, Token.INTEGER, intReturn + "");
         }
         else
         {
