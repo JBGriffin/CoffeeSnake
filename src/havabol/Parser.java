@@ -7,7 +7,7 @@ package havabol;
 
 /**
  *
- * Parser starts by another object calling parse() Objects: SymbolTable st:
+ * Parser starts by another object calling parse() Objects: SymbolTable symbolTable:
  * SymbolTable to reference all global symbols and put new user defined symbols
  * in.
  *
@@ -21,7 +21,7 @@ package havabol;
  */
 public class Parser {
 
-    SymbolTable st;
+    SymbolTable symbolTable;
 
     StorageManager storage;
 
@@ -30,16 +30,16 @@ public class Parser {
     /**
      * Parser will go through user source code and execute statements
      *
-     * @param st the shared symbol table from all objects
+     * @param symbolTable the shared symbol table from all objects
      * @param scanner shared scanner from all objects
      */
-    public Parser(SymbolTable st, Scanner scanner) {
+    public Parser(SymbolTable symbolTable, Scanner scanner) {
 
-        this.st = st;
+        this.symbolTable = symbolTable;
 
         this.scanner = scanner;
 
-        this.storage = new StorageManager(st);
+        this.storage = new StorageManager(symbolTable);
 
     }
 
@@ -107,7 +107,8 @@ public class Parser {
                     break;
                 //if default happens, something is seriously wrong in our code
                 default:
-                    return rt;
+                    errorWithContext("Something went seriously wrong. Given: " + scanner.currentToken.tokenStr);
+                    return null;
             }
 
         }
@@ -146,7 +147,8 @@ public class Parser {
                 break;
             //should not be possible (Throw Parser Exception)
             default:
-                return rt;
+                errorWithContext("Something went seriously wrong in the control statement. Given: " + scanner.currentToken.tokenStr);
+                return null;
         }
 
         //return rt to controlStatement method
@@ -179,20 +181,20 @@ public class Parser {
         switch (workingToken.tokenStr) {
             //if Int - put in SymbolTable as Int
             case "Int":
-                this.st.putSymbol(sznewTokenStr, new STIdentifiers(sznewTokenStr, Token.CONTROL, Token.INTEGER, Token.INTEGER, 0));
+                this.symbolTable.putSymbol(sznewTokenStr, new STIdentifiers(sznewTokenStr, Token.CONTROL, Token.INTEGER, Token.INTEGER, 0));
                 break;
             //if Float - put in SymbolTable as Float
             case "Float":
-                this.st.putSymbol(sznewTokenStr, new STIdentifiers(sznewTokenStr, Token.CONTROL, Token.FLOAT, Token.FLOAT, 0));
+                this.symbolTable.putSymbol(sznewTokenStr, new STIdentifiers(sznewTokenStr, Token.CONTROL, Token.FLOAT, Token.FLOAT, 0));
                 break;
             //if String - put in SymbolTable as String
             case "String":
-                this.st.putSymbol(sznewTokenStr, new STIdentifiers(sznewTokenStr, Token.CONTROL, Token.STRING, Token.STRING, 0));
+                this.symbolTable.putSymbol(sznewTokenStr, new STIdentifiers(sznewTokenStr, Token.CONTROL, Token.STRING, Token.STRING, 0));
                 break;
             //if nothing - throw exception (Assignment 3) - in future there will be more
             default:
                 errorWithContext("Error?");
-                return rt; //Throw Exception
+                return null; //Throw Exception
 
         }
 
@@ -299,9 +301,9 @@ public class Parser {
         //for now only builtins are possible (Assign 3)
         if (scanner.currentToken.subClassif == Token.BUILTIN) {
             //make sure symbol exists in global table
-            if (((STFunction) this.st.getSymbol(scanner.currentToken.tokenStr)) != null) {
+            if (((STFunction) this.symbolTable.getSymbol(scanner.currentToken.tokenStr)) != null) {
                 //if it does, get it
-                STFunction stf = (STFunction) this.st.getSymbol(scanner.currentToken.tokenStr);
+                STFunction stf = (STFunction) this.symbolTable.getSymbol(scanner.currentToken.tokenStr);
                 //find out which function is being called
                 switch (stf.symbol) {
                     //for now only handles print
@@ -365,7 +367,7 @@ public class Parser {
 
             case Token.IDENTIFIER:
                 //recall identifier
-                STEntry ste = (STIdentifiers) st.getSymbol(scanner.currentToken.tokenStr);
+                STEntry ste = (STIdentifiers) symbolTable.getSymbol(scanner.currentToken.tokenStr);
                 // if does not exist, throw error
                 if (ste == null) {
 
@@ -702,7 +704,7 @@ public class Parser {
 
         }
 
-        System.err.println(scanner.currentToken.tokenStr);
+        errorWithContext("Bad joo-joo found: " + scanner.currentToken.tokenStr);
 
         return rt;
 
