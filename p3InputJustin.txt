@@ -1,0 +1,5 @@
+Int x = 3;
+String myString = "Hello World";
+x = 10 + 5; 
+print("x");
+print(myString);
