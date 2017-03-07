@@ -438,7 +438,8 @@ public class Parser {
             case "=":
                 scanner.getNext();
                 //
-                switch (scanner.currentToken.subClassif) {
+                switch (scanner.currentToken.subClassif)
+                {
                     //save simple integer (Assign 3)
                     case Token.INTEGER:
                         Token currentToken = scanner.currentToken;
@@ -474,8 +475,11 @@ public class Parser {
                 }
             //break;
             //to come soon
+            // Assumption: simple assignments have happened.
+            // Will grab the LHS and apply the operation from the RHS
             case "+=":
                 //will need to call Utility.add
+                rt = numericOperation(firstToken, rt);
                 break;
             case "-=":
                 break;
@@ -491,6 +495,33 @@ public class Parser {
 
         return rt;
 
+    }
+
+    /**
+     * Simple unary assignment method. Assumes that simple assignment statements have
+     * already occured. TODO: Figure out how the storage manager works.
+     * @param firstToken Left hand side of the assignment. This is what will be returned after
+     *                   the operation has happened
+     * @param resOp Result value to be returned using the token.
+     * @return Result value of the operation given. If x += 2 were given, will return x incremented
+     * by 2.
+     */
+    private ResultValue numericOperation(Token firstToken, ResultValue resOp)
+    {
+        Token secondToken = scanner.nextToken;
+
+        // Grab first numeric, and grab the item from the storage manager
+        //Numeric nOp1 = new Numeric(this, )
+
+        // Grab second numeric, and grab the item from the storage manager
+
+        // Create result values from numerics
+
+        // run whatever operation was given
+
+        // return result
+
+        return null;
     }
 
     /**
@@ -514,7 +545,7 @@ public class Parser {
         float y = (float) 0.0;
 
         //get all negative signs (Unary -)
-        while ("-".equals(scanner.currentToken.tokenStr)) {
+        while ("U-".equals(scanner.currentToken.tokenStr)) {
 
             firstIsNegative = !firstIsNegative;
             scanner.getNext();
