@@ -479,7 +479,7 @@ public class Parser {
             // Will grab the LHS and apply the operation from the RHS
             case "+=":
                 //will need to call Utility.add
-                rt = numericOperation(firstToken, rt);
+                rt = numericOperation(firstToken, "+=");
                 break;
             case "-=":
                 break;
@@ -502,26 +502,40 @@ public class Parser {
      * already occured. TODO: Figure out how the storage manager works.
      * @param firstToken Left hand side of the assignment. This is what will be returned after
      *                   the operation has happened
-     * @param resOp Result value to be returned using the token.
      * @return Result value of the operation given. If x += 2 were given, will return x incremented
      * by 2.
      */
-    private ResultValue numericOperation(Token firstToken, ResultValue resOp)
-    {
+    private ResultValue numericOperation(Token firstToken, String operator) throws Exception {
         Token secondToken = scanner.nextToken;
+        ResultValue resOp1 = new ResultValue(firstToken.tokenStr);
+
+        resOp1.szValue = this.storage.get(this, firstToken.tokenStr);
+        if(resOp1.szValue == null)
+            errorWithContext("Value must be initiated before use! Given: " + firstToken.tokenStr);
+        resOp1.type = firstToken.INTEGER;
 
         // Grab first numeric, and grab the item from the storage manager
-        //Numeric nOp1 = new Numeric(this, )
+        Numeric nOp1 = new Numeric(this, resOp1, "1st operator", operator);
+        System.out.println("Resop1 == " + resOp1.szValue);
 
         // Grab second numeric, and grab the item from the storage manager
+        ResultValue resOp2 = new ResultValue(secondToken.tokenStr);
+        resOp2.szValue = this.storage.get(this, secondToken.tokenStr);
+        resOp2.type = secondToken.INTEGER;
+        System.out.println("resOp2 == " + resOp2.szValue);
+
+        Numeric nOp2 = new Numeric(this, resOp2, "2nd operator", operator);
 
         // Create result values from numerics
+        ResultValue returnValue = new ResultValue("");
+        returnValue = Numeric.add(nOp1, nOp2);
+        this.storage.put(firstToken.tokenStr, returnValue.szValue);
 
         // run whatever operation was given
 
         // return result
 
-        return null;
+        return returnValue;
     }
 
     /**

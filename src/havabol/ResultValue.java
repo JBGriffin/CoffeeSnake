@@ -32,6 +32,10 @@ public class ResultValue {
         }
         
     }
-    
+
+    public void setType(int type)
+    {
+        this.type = type;
+    }
     
 }

@@ -33,7 +33,7 @@ public class Numeric
                 doubleValue = Float.parseFloat(strValue);
                 break;
             default:
-                parser.errorWithContext("Expression must be a numeric. Item " + resultValue.szValue + " given as " + operand);
+                parser.errorWithContext("Expression must be a numeric. Item " + resultValue.szValue + " given as " + resultValue.type);
         }
     }
 
@@ -44,7 +44,7 @@ public class Numeric
      * @param szValue Display value of the result
      * @return The result value with type and display set
      */
-    private ResultValue setValue(ResultValue resultValue, int type, String szValue)
+    private static ResultValue setValue(ResultValue resultValue, int type, String szValue)
     {
         resultValue.type = type;
         resultValue.szValue = szValue;
@@ -58,7 +58,7 @@ public class Numeric
      * @param operand2 Operand containing integer or double
      * @return Returns a ResultValue containing new type and string value.
      */
-    public ResultValue subtract(Numeric operand1, Numeric operand2)
+    public static ResultValue subtract(Numeric operand1, Numeric operand2)
     {
         ResultValue returnValue = new ResultValue("");
         int intReturn;
@@ -96,7 +96,7 @@ public class Numeric
      * @param operand2 Operand containing integer or double
      * @return Returns a ResultValue containing new type and string value.
      */
-    public ResultValue add(Numeric operand1, Numeric operand2)
+    public static ResultValue add(Numeric operand1, Numeric operand2)
     {
         ResultValue returnValue = new ResultValue("");
         int intReturn;
