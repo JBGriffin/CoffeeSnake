@@ -377,7 +377,7 @@ public class Parser {
                     //needs to throw parser exception
                     /*System.err.println("Error!");*/
                     errorWithContext("Syntax Error");
-                    return rt;
+                    return null;
 
                     //it does exist so call assignments to handle the rest
                 } else {
@@ -409,7 +409,7 @@ public class Parser {
      *
      *
      *
-     * @param execute
+     * @param execute Boolean to see whether or not we execute the statement
      * @return ResultValue of completed assignment NOTE: = 2 + 3 will return 5
      * @throws Exception //should be ParseException
      */
@@ -423,7 +423,7 @@ public class Parser {
         //check to see if it is simple assignment
         if (";".equals(scanner.getNext())) {
 
-            return rt;
+            return null;
 
         }
         //move to assignment oparator
@@ -436,6 +436,7 @@ public class Parser {
             scanner.getNext();
         }
 
+        // Creates and assigns a value into the first token
         if(scanner.currentToken.tokenStr.equals("=")) {
             scanner.getNext();
             //
@@ -476,8 +477,8 @@ public class Parser {
         }
         else
         {
-            rt = numericOperation(firstToken, scanner.currentToken.tokenStr);
-
+            // Assumes that the token has already been initialized and put into the symbol table
+            rt = unaryOperation(firstToken, scanner.currentToken.tokenStr);
         }
 
         return rt;
@@ -492,7 +493,7 @@ public class Parser {
      * @return Result value of the operation given. If x += 2 were given, will return x incremented
      * by 2.
      */
-    private ResultValue numericOperation(Token firstToken, String operator) throws Exception {
+    private ResultValue unaryOperation(Token firstToken, String operator) throws Exception {
         scanner.getNext();
         Token secondToken = scanner.nextToken;
 
@@ -509,6 +510,12 @@ public class Parser {
 
         // Grab second numeric, and grab the item from the storage manager
         ResultValue resOp2 = new ResultValue(secondToken.tokenStr, secondToken.subClassif);
+        // Check if the value exists in storage. If it does, we'll set it to that value
+        // If it doesn't, set it back to the second token's value. Numeric will take care
+        // of it if it's not a proper value
+        resOp2.szValue = this.storage.get(this, secondToken.tokenStr);
+        if(resOp2.szValue == null)
+            resOp2.szValue = secondToken.tokenStr;
 
         Numeric nOp2 = new Numeric(this, resOp2, "2nd operator", operator);
 
@@ -544,7 +551,7 @@ public class Parser {
      *
      * NEED REFRACTORING BECAUSE MOST WAS MOVED TO ASSIGNMENTS
      *
-     * @param execute
+     * @param execute Boolean to see whether or not we're executing
      * @return ResultValue NOTE: = 3 + 5; should return 8
      * @throws Exception should be Parser Exception
      */
