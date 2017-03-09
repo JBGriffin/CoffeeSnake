@@ -17,19 +17,10 @@ public class ResultValue {
     public String terminatingStr;   // Used for end of lists of things (e.g.,
                                     // list of starter terminated by "endwhile"
     
-    public ResultValue(String value) {
+    public ResultValue(String value, int dataType) {
         
         this.szValue = value;
-
-        switch(szValue)
-        {
-            case "INTEGER":
-                this.type = Token.INTEGER;
-                break;
-            case "FLOAT":
-                this.type = Token.FLOAT;
-                break;
-        }
+        this.type = dataType;
         
     }
 

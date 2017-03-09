@@ -451,13 +451,13 @@ public class Parser {
                         //if (!";".equals(scanner.currentToken.tokenStr))
                         rt = expressions(execute);
                         this.storage.put(firstToken.tokenStr, rt.szValue);
-                        return new ResultValue(scanner.currentToken.tokenStr);
+                        return new ResultValue(scanner.currentToken.tokenStr, Token.INTEGER);
                     //save simple float (Assign 3)
                     case Token.FLOAT:
                         Token currentFloatToken = scanner.currentToken;
                         rt = expressions(execute); //for now, throw error (Assign3)
                         this.storage.put(firstToken.tokenStr, Float.parseFloat(rt.szValue) + "");
-                        return new ResultValue(scanner.currentToken.tokenStr);
+                        return new ResultValue(scanner.currentToken.tokenStr, Token.FLOAT);
                     //save simple string (Assign 3)
                     case Token.STRING:
                         Token currentStringToken = scanner.currentToken;
@@ -473,7 +473,7 @@ public class Parser {
                         rt = expressions(execute);
                         System.out.println(rt.szValue);
                         this.storage.put(firstToken.tokenStr, rt.szValue);
-                        return new ResultValue(scanner.currentToken.tokenStr);
+                        return new ResultValue(scanner.currentToken.tokenStr, 0); // TODO: find what data type this is
                     //return new ResultValue(scanner.currentToken.tokenStr);
 
                 }
@@ -514,25 +514,24 @@ public class Parser {
         scanner.getNext();
         Token secondToken = scanner.nextToken;
 
-        ResultValue resOp1 = new ResultValue(firstToken.tokenStr);
+        ResultValue resOp1 = new ResultValue(firstToken.tokenStr, firstToken.subClassif);
 
         resOp1.szValue = this.storage.get(this, firstToken.tokenStr);
         if(resOp1.szValue == null)
             errorWithContext("Value must be initiated before use! Given: " + firstToken.tokenStr);
-        resOp1.type = firstToken.INTEGER;
+
 
         // Grab first numeric, and grab the item from the storage manager
         Numeric nOp1 = new Numeric(this, resOp1, "1st operator", operator);
 
 
         // Grab second numeric, and grab the item from the storage manager
-        ResultValue resOp2 = new ResultValue(secondToken.tokenStr);
-        resOp2.type = secondToken.INTEGER;
+        ResultValue resOp2 = new ResultValue(secondToken.tokenStr, secondToken.subClassif);
 
         Numeric nOp2 = new Numeric(this, resOp2, "2nd operator", operator);
 
         // Create result values from numerics
-        ResultValue returnValue = new ResultValue("");
+        ResultValue returnValue;
         returnValue = Numeric.add(nOp1, nOp2);
         this.storage.put(firstToken.tokenStr, returnValue.szValue);
 
@@ -576,7 +575,7 @@ public class Parser {
 
                 //means it was a simple assignment
                 if (";".equals(scanner.getNext())) {
-                    rt = new ResultValue(firstToken.tokenStr);
+                    rt = new ResultValue(firstToken.tokenStr, Token.SEPARATOR);
 
                     return rt;
 
@@ -588,12 +587,12 @@ public class Parser {
                         case Token.INTEGER:
                             x = Integer.parseInt(firstToken.tokenStr);
                             x = x + Integer.parseInt(expressions(execute).szValue);
-                            rt = new ResultValue(x + "");
+                            rt = new ResultValue(x + "", Token.INTEGER);
                             break;
                         case Token.FLOAT:
                             x = Integer.parseInt(firstToken.tokenStr);
                             x = (int) (x + Float.parseFloat(expressions(execute).szValue));
-                            rt = new ResultValue(x + "");
+                            rt = new ResultValue(x + "", Token.FLOAT);
                             break;
                     }
 
@@ -607,12 +606,12 @@ public class Parser {
                         case Token.INTEGER:
                             x = Integer.parseInt(firstToken.tokenStr);
                             x = x - Integer.parseInt(expressions(execute).szValue);
-                            rt = new ResultValue(x + "");
+                            rt = new ResultValue(x + "", Token.INTEGER);
                             break;
                         case Token.FLOAT:
                             x = Integer.parseInt(firstToken.tokenStr);
                             x = (int) (x - Float.parseFloat(expressions(execute).szValue));
-                            rt = new ResultValue(x + "");
+                            rt = new ResultValue(x + "", Token.FLOAT);
                             break;
                     }
 
@@ -626,12 +625,12 @@ public class Parser {
                         case Token.INTEGER:
                             x = Integer.parseInt(firstToken.tokenStr);
                             x = x * Integer.parseInt(expressions(execute).szValue);
-                            rt = new ResultValue(x + "");
+                            rt = new ResultValue(x + "", Token.INTEGER);
                             break;
                         case Token.FLOAT:
                             x = Integer.parseInt(firstToken.tokenStr);
                             x = (int) (x * Float.parseFloat(expressions(execute).szValue));
-                            rt = new ResultValue(x + "");
+                            rt = new ResultValue(x + "", Token.FLOAT);
                             break;
                     }
 
@@ -646,12 +645,12 @@ public class Parser {
                         case Token.INTEGER:
                             x = Integer.parseInt(firstToken.tokenStr);
                             x = x / Integer.parseInt(expressions(execute).szValue);
-                            rt = new ResultValue(x + "");
+                            rt = new ResultValue(x + "", Token.INTEGER);
                             break;
                         case Token.FLOAT:
                             x = Integer.parseInt(firstToken.tokenStr);
                             x = (int) (x / Float.parseFloat(expressions(execute).szValue));
-                            rt = new ResultValue(x + "");
+                            rt = new ResultValue(x + "", Token.FLOAT);
                             break;
                     }
 
@@ -666,7 +665,7 @@ public class Parser {
 
                 //means it was a simple assignment
                 if (";".equals(scanner.getNext())) {
-                    rt = new ResultValue(firstToken.tokenStr);
+                    rt = new ResultValue(firstToken.tokenStr, Token.SEPARATOR);
 
                     return rt;
 
@@ -678,12 +677,12 @@ public class Parser {
                         case Token.INTEGER:
                             y = Float.parseFloat(firstToken.tokenStr);
                             y = y + Integer.parseInt(expressions(execute).szValue);
-                            rt = new ResultValue(y + "");
+                            rt = new ResultValue(y + "", Token.INTEGER);
                             break;
                         case Token.FLOAT:
                             y = Float.parseFloat(firstToken.tokenStr);
                             y = (y + Float.parseFloat(expressions(execute).szValue));
-                            rt = new ResultValue(y + "");
+                            rt = new ResultValue(y + "", Token.FLOAT);
                             break;
                     }
 
@@ -697,12 +696,12 @@ public class Parser {
                         case Token.INTEGER:
                             y = Float.parseFloat(firstToken.tokenStr);
                             y = y - Integer.parseInt(expressions(execute).szValue);
-                            rt = new ResultValue(y + "");
+                            rt = new ResultValue(y + "", Token.INTEGER);
                             break;
                         case Token.FLOAT:
                             y = Float.parseFloat(firstToken.tokenStr);
                             y = (y - Float.parseFloat(expressions(execute).szValue));
-                            rt = new ResultValue(y + "");
+                            rt = new ResultValue(y + "", Token.FLOAT);
                             break;
                     }
 
@@ -716,12 +715,12 @@ public class Parser {
                         case Token.INTEGER:
                             y = Float.parseFloat(firstToken.tokenStr);
                             y = y * Integer.parseInt(expressions(execute).szValue);
-                            rt = new ResultValue(y + "");
+                            rt = new ResultValue(y + "", Token.INTEGER);
                             break;
                         case Token.FLOAT:
                             y = Float.parseFloat(firstToken.tokenStr);
                             y = (y * Float.parseFloat(expressions(execute).szValue));
-                            rt = new ResultValue(y + "");
+                            rt = new ResultValue(y + "", Token.FLOAT);
                             break;
                     }
 
@@ -735,12 +734,12 @@ public class Parser {
                         case Token.INTEGER:
                             y = Float.parseFloat(firstToken.tokenStr);
                             y = y / Integer.parseInt(expressions(execute).szValue);
-                            rt = new ResultValue(y + "");
+                            rt = new ResultValue(y + "", Token.INTEGER);
                             break;
                         case Token.FLOAT:
                             y = Float.parseFloat(firstToken.tokenStr);
                             y = (y / Float.parseFloat(expressions(execute).szValue));
-                            rt = new ResultValue(y + "");
+                            rt = new ResultValue(y + "", Token.FLOAT);
                             break;
                     }
 

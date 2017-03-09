@@ -1,5 +1,7 @@
 package havabol;
 
+import java.util.IntSummaryStatistics;
+
 /**
  * Converts given result value strings into a numeric. Operand type will be set as the leftmost given
  * operand. I.E., if given x += 1.0, x will be set as float.
@@ -32,6 +34,9 @@ public class Numeric
             case Token.FLOAT:
                 doubleValue = Float.parseFloat(strValue);
                 break;
+            case Token.IDENTIFIER:
+                integerValue = Integer.parseInt(strValue);
+                break;
             default:
                 parser.errorWithContext("Expression must be a numeric. Item " + resultValue.szValue + " given as " + resultValue.type);
         }
@@ -60,7 +65,7 @@ public class Numeric
      */
     public static ResultValue subtract(Numeric operand1, Numeric operand2)
     {
-        ResultValue returnValue = new ResultValue("");
+        ResultValue returnValue = new ResultValue("",0);
         int intReturn;
         double dblReturn;
 
@@ -98,7 +103,7 @@ public class Numeric
      */
     public static ResultValue add(Numeric operand1, Numeric operand2)
     {
-        ResultValue returnValue = new ResultValue("");
+        ResultValue returnValue = new ResultValue("", 0);
         int intReturn;
         double dblReturn;
 
@@ -135,7 +140,7 @@ public class Numeric
      */
     public ResultValue multiply(Numeric operand1, Numeric operand2)
     {
-        ResultValue returnValue = new ResultValue("");
+        ResultValue returnValue = new ResultValue("", 0);
         int intReturn;
         double dblReturn;
 
@@ -175,7 +180,7 @@ public class Numeric
      */
     public ResultValue divide(Numeric divisor, Numeric dividend) throws Exception
     {
-        ResultValue returnValue = new ResultValue("");
+        ResultValue returnValue = new ResultValue("", 0);
         double dblReturn;
         int intReturn = 0;
 
@@ -223,7 +228,7 @@ public class Numeric
      */
     public ResultValue power(Numeric baseOfExp, Numeric powerOfExp) throws Exception
     {
-        ResultValue returnValue = new ResultValue("");
+        ResultValue returnValue = new ResultValue("", 0);
         double dblReturn;
         int intReturn;
 
