@@ -1,7 +1,5 @@
 package havabol;
 
-import java.util.IntSummaryStatistics;
-
 /**
  * Converts given result value strings into a numeric. Operand type will be set as the leftmost given
  * operand. I.E., if given x += 1.0, x will be set as float.
@@ -34,8 +32,27 @@ public class Numeric
             case Token.FLOAT:
                 doubleValue = Float.parseFloat(strValue);
                 break;
+            /* Dirty!! Is there a better way to do this??
+             */
             case Token.IDENTIFIER:
-                integerValue = Integer.parseInt(strValue);
+                try
+                {
+                    doubleValue = Double.parseDouble(strValue);
+                }
+                catch (NullPointerException e)
+                {
+                    try
+                    {
+                        integerValue = Integer.parseInt(strValue);
+                    }
+                    catch (NullPointerException i)
+                    {
+                        parser.errorWithContext("Expression must be a numeric. Item " + resultValue.szValue
+                            + " given as " + resultValue.type);
+                    }
+                }
+
+
                 break;
             default:
                 parser.errorWithContext("Expression must be a numeric. Item " + resultValue.szValue + " given as " + resultValue.type);
@@ -49,7 +66,7 @@ public class Numeric
      * @param szValue Display value of the result
      * @return The result value with type and display set
      */
-    private static ResultValue setValue(ResultValue resultValue, int type, String szValue)
+    private ResultValue setValue(ResultValue resultValue, int type, String szValue)
     {
         resultValue.type = type;
         resultValue.szValue = szValue;
@@ -63,7 +80,7 @@ public class Numeric
      * @param operand2 Operand containing integer or double
      * @return Returns a ResultValue containing new type and string value.
      */
-    public static ResultValue subtract(Numeric operand1, Numeric operand2)
+    public ResultValue subtract(Numeric operand1, Numeric operand2)
     {
         ResultValue returnValue = new ResultValue("",0);
         int intReturn;
@@ -101,7 +118,7 @@ public class Numeric
      * @param operand2 Operand containing integer or double
      * @return Returns a ResultValue containing new type and string value.
      */
-    public static ResultValue add(Numeric operand1, Numeric operand2)
+    public ResultValue add(Numeric operand1, Numeric operand2)
     {
         ResultValue returnValue = new ResultValue("", 0);
         int intReturn;
@@ -266,7 +283,7 @@ public class Numeric
      * @param szOperator +, -, *, ^, /, (, )
      * @return Priority of the operator
      */
-    public int getPriority(String szOperator){
+    public static int getPriority(String szOperator){
 		int iPriority = 0;
 		
         switch (szOperator) {
