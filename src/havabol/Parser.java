@@ -50,7 +50,7 @@ public class Parser {
      */
     public void parse() throws Exception {
         //init result value as null - don't think it is necessary here though
-        ResultValue rt = null;
+        boolean rt = true;
 
         //begin grabbing items from scanner
         rt = statements(true);
@@ -77,7 +77,7 @@ public class Parser {
      * @return ResultValue - at this point not necessary here
      * @throws Exception should be ScannerException
      */
-    private ResultValue statements(boolean execute) throws Exception {
+    private boolean statements(boolean execute) throws Exception {
 
         //init result value so methods can return into rt
         ResultValue rt = null;
@@ -111,12 +111,12 @@ public class Parser {
                 //if default happens, something is seriously wrong in our code
                 default:
                     errorWithContext("Something went seriously wrong. Given: " + scanner.currentToken.tokenStr);
-                    return null;
+                    return false;
             }
 
         }
 
-        return rt; //returns only to parse()
+        return execute; //returns only to parse()
 
     }
 
@@ -132,21 +132,21 @@ public class Parser {
      */
     private ResultValue controlStatement(boolean execute) throws Exception {
 
-        ResultValue rt = null; //init for assignments
+        ResultValue returnValue = null; //init for assignments
 
         //grab the current token sub class
         switch (scanner.currentToken.subClassif) {
             //if declare - call declareStatement
             case Token.DECLARE:
-                rt = declareStatement(execute);
+                returnValue = declareStatement(execute);
                 break;
             //if flow (if, while, etc.) call flow
             case Token.FLOW:
-                rt = flowStatement(execute);
+                returnValue = flowStatement(execute);
                 break;
             //if end (endif, endwhile, etc.) call end
             case Token.END:
-                rt = endStatement(execute);
+                returnValue = endStatement(execute);
                 break;
             //should not be possible (Throw Parser Exception)
             default:
@@ -155,7 +155,7 @@ public class Parser {
         }
 
         //return rt to controlStatement method
-        return rt;
+        return returnValue;
 
     }
 
@@ -170,7 +170,7 @@ public class Parser {
      */
     private ResultValue declareStatement(boolean execute) throws Exception {
 
-        ResultValue rt = null; //init for return
+        ResultValue returnValue; //init for return
 
         //System.out.println(scanner.currentToken.tokenStr);
         Token workingToken = scanner.currentToken;
@@ -195,16 +195,19 @@ public class Parser {
                 this.symbolTable.putSymbol(sznewTokenStr, new STIdentifiers(sznewTokenStr, Token.CONTROL, Token.STRING, Token.STRING, 0));
                 break;
             //if nothing - throw exception (Assignment 3) - in future there will be more
+            case "Bool":
+                this.symbolTable.putSymbol(sznewTokenStr, new STIdentifiers(sznewTokenStr, Token.CONTROL, Token.BOOLEAN, Token.BOOLEAN, 0));
+                break;
             default:
-                errorWithContext("Error?");
+                errorWithContext("Declaration not recognized. Given: " + workingToken.tokenStr);
                 return null; //Throw Exception
 
         }
 
         //after identifier handle RHS
-        rt = assignments(execute);
+        returnValue = assignments(execute);
 
-        return rt;
+        return returnValue;
 
     }
 
@@ -217,7 +220,7 @@ public class Parser {
      */
     private ResultValue flowStatement(boolean execute) throws Exception {
 
-        ResultValue rt = null;
+        ResultValue returnValue = null;
 
         switch (scanner.currentToken.tokenStr) {
             case "if":
@@ -227,7 +230,7 @@ public class Parser {
 
         }
 
-        return rt;
+        return returnValue;
 
     }
 
@@ -437,48 +440,58 @@ public class Parser {
         }
 
         // Creates and assigns a value into the first token
-        if(scanner.currentToken.tokenStr.equals("=")) {
-            scanner.getNext();
-            //
-            switch (scanner.currentToken.subClassif) {
-                //save simple integer (Assign 3)
-                case Token.INTEGER:
-                    Token currentToken = scanner.currentToken;
-                    //scanner.getNext();
-                    //if (!";".equals(scanner.currentToken.tokenStr))
-                    rt = expressions(execute);
-                    this.storage.put(firstToken.tokenStr, rt.szValue);
-                    return new ResultValue(scanner.currentToken.tokenStr, Token.INTEGER);
-                //save simple float (Assign 3)
-                case Token.FLOAT:
-                    Token currentFloatToken = scanner.currentToken;
-                    rt = expressions(execute); //for now, throw error (Assign3)
-                    this.storage.put(firstToken.tokenStr, Float.parseFloat(rt.szValue) + "");
-                    return new ResultValue(scanner.currentToken.tokenStr, Token.FLOAT);
-                //save simple string (Assign 3)
-                case Token.STRING:
-                    Token currentStringToken = scanner.currentToken;
-                    scanner.getNext(); //for assign3 should be ; only
-                    if (!";".equals(scanner.currentToken.tokenStr)) {
-                        return rt; //for now, throw error (Assign3)
-                    }
-                    this.storage.put(firstToken.tokenStr, currentStringToken.tokenStr);
-                    break;
-                //System.out.println("Successfully put " + scanner.currentToken.tokenStr + " into " + firstToken.tokenStr);
-                default:
-                    Token newToken = scanner.currentToken;
-                    rt = expressions(execute);
-                    System.out.println(rt.szValue);
-                    this.storage.put(firstToken.tokenStr, rt.szValue);
-                    return new ResultValue(scanner.currentToken.tokenStr, 0); // TODO: find what data type this is
-                //return new ResultValue(scanner.currentToken.tokenStr);
-
-            }
-        }
-        else
+/*        if(scanner.currentToken.tokenStr.equals("=")) {*/
+        switch(scanner.currentToken.tokenStr)
         {
+            case "=":
+                scanner.getNext();
+                switch (scanner.currentToken.subClassif) {
+                    //save simple integer (Assign 3)
+                    case Token.INTEGER:
+                        Token currentToken = scanner.currentToken;
+                        //scanner.getNext();
+                        //if (!";".equals(scanner.currentToken.tokenStr))
+                        rt = expressions(execute);
+                        this.storage.put(firstToken.tokenStr, rt.szValue);
+                        return new ResultValue(scanner.currentToken.tokenStr, Token.INTEGER);
+                    //save simple float (Assign 3)
+                    case Token.FLOAT:
+                        Token currentFloatToken = scanner.currentToken;
+                        rt = expressions(execute); //for now, throw error (Assign3)
+                        this.storage.put(firstToken.tokenStr, Float.parseFloat(rt.szValue) + "");
+                        return new ResultValue(scanner.currentToken.tokenStr, Token.FLOAT);
+                    //save simple string (Assign 3)
+                    case Token.STRING:
+                        Token currentStringToken = scanner.currentToken;
+                        scanner.getNext(); //for assign3 should be ; only
+                        if (!";".equals(scanner.currentToken.tokenStr)) {
+                            return rt; //for now, throw error (Assign3)
+                        }
+                        this.storage.put(firstToken.tokenStr, currentStringToken.tokenStr);
+                        break;
+                    //System.out.println("Successfully put " + scanner.currentToken.tokenStr + " into " + firstToken.tokenStr);
+                    case Token.BOOLEAN:
+                        System.out.println("I'M HERE!!!" );
+                    default:
+                        Token newToken = scanner.currentToken;
+                        rt = expressions(execute);
+                        System.out.println(rt.szValue);
+                        this.storage.put(firstToken.tokenStr, rt.szValue);
+                        return new ResultValue(scanner.currentToken.tokenStr, 0); // TODO: find what data type this is
+                    //return new ResultValue(scanner.currentToken.tokenStr);
+
+                }
             // Assumes that the token has already been initialized and put into the symbol table
-            rt = unaryOperation(firstToken, scanner.currentToken.tokenStr);
+            case "+=":case "-=":case "*=":
+            case "/=":case "^=":
+                rt = unaryOperation(firstToken, scanner.currentToken.tokenStr);
+                break;
+            case ">":case ">=":case"<":case"<=":case "==":
+                System.out.println("Made it!");
+                boolean bExecute = equalityChecker(firstToken, scanner.currentToken.tokenStr);
+                break;
+            default:
+                errorWithContext("Bad shit happened. Given: " + scanner.currentToken.tokenStr);
         }
 
         return rt;
@@ -486,22 +499,42 @@ public class Parser {
     }
 
     /**
+     * Method to check and return an equality statement. Currently made a function because I'm not
+     * quite sure if this will only be called in one place
+     * @param leftToken Left hand side of the equality statement
+     * @param comparison Operator to compare against
+     * @return True or False based on whether or not the item is equal
+     * @throws Exception Exception thrown if something went seriously wrong
+     */
+    private boolean equalityChecker(Token leftToken, String comparison) throws Exception
+    {
+        scanner.getNext();
+        Token rightToken = scanner.nextToken;
+
+        ResultValue resOp1 = new ResultValue(leftToken.tokenStr, leftToken.subClassif);
+
+        System.out.println("Inside equality check, comparison = " + comparison);
+
+        return true;
+    }
+
+    /**
      * Simple unary assignment method. Assumes that simple assignment statements have
      * already occurred.
-     * @param firstToken Left hand side of the assignment. This is what will be returned after
+     * @param leftToken Left hand side of the assignment. This is what will be returned after
      *                   the operation has happened
      * @return Result value of the operation given. If x += 2 were given, will return x incremented
      * by 2.
      */
-    private ResultValue unaryOperation(Token firstToken, String operator) throws Exception {
+    private ResultValue unaryOperation(Token leftToken, String operator) throws Exception {
         scanner.getNext();
-        Token secondToken = scanner.nextToken;
+        Token rightToken = scanner.nextToken;
 
-        ResultValue resOp1 = new ResultValue(firstToken.tokenStr, firstToken.subClassif);
+        ResultValue resOp1 = new ResultValue(leftToken.tokenStr, leftToken.subClassif);
 
-        resOp1.szValue = this.storage.get(this, firstToken.tokenStr);
+        resOp1.szValue = this.storage.get(this, leftToken.tokenStr);
         if(resOp1.szValue == null)
-            errorWithContext("Value must be initiated before use! Given: " + firstToken.tokenStr);
+            errorWithContext("Value must be initiated before use! Given: " + leftToken.tokenStr);
 
 
         // Grab first numeric, and grab the item from the storage manager
@@ -509,13 +542,13 @@ public class Parser {
 
 
         // Grab second numeric, and grab the item from the storage manager
-        ResultValue resOp2 = new ResultValue(secondToken.tokenStr, secondToken.subClassif);
+        ResultValue resOp2 = new ResultValue(rightToken.tokenStr, rightToken.subClassif);
         // Check if the value exists in storage. If it does, we'll set it to that value
         // If it doesn't, set it back to the second token's value. Numeric will take care
         // of it if it's not a proper value
-        resOp2.szValue = this.storage.get(this, secondToken.tokenStr);
+        resOp2.szValue = this.storage.get(this, rightToken.tokenStr);
         if(resOp2.szValue == null)
-            resOp2.szValue = secondToken.tokenStr;
+            resOp2.szValue = rightToken.tokenStr;
 
         Numeric nOp2 = new Numeric(this, resOp2, "2nd operator", operator);
 
@@ -526,7 +559,7 @@ public class Parser {
                 returnValue = nOp2.add(nOp1, nOp2);
                 break;
             case "-=":
-                returnValue = nOp1.subtract(nOp1, nOp2);
+                returnValue = nOp2.subtract(nOp1, nOp2);
                 break;
             case "*=":
                 returnValue = nOp2.multiply(nOp1, nOp2);
@@ -541,7 +574,7 @@ public class Parser {
                 errorWithContext("Bad operator given: " + operator);
         }
 
-        this.storage.put(firstToken.tokenStr, returnValue.szValue);
+        this.storage.put(leftToken.tokenStr, returnValue.szValue);
         return returnValue;
     }
 
@@ -749,17 +782,11 @@ public class Parser {
                             rt = new ResultValue(y + "", Token.FLOAT);
                             break;
                     }
-
                     return rt;
-
                 }
-
         }
-
         errorWithContext("Bad joo-joo found: " + scanner.currentToken.tokenStr);
-
         return rt;
-
     }
 
 }
