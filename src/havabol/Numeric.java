@@ -275,6 +275,155 @@ public class Numeric
 
         return returnValue;
     }
+
+    /**
+     * Returns a truth value based on the two numerics given
+     * @param leftNum Left hand side of the equality
+     * @param rightNum Right hand side of the equality
+     * @param comparison Operator given: >, <, ==, etc.
+     * @return True or False based on the equality
+     * @throws Exception Parser exception if given bad equality statement
+     */
+    public ResultValue equalValue(Numeric leftNum, Numeric rightNum, String comparison) throws Exception
+    {
+        ResultValue returnValue = new ResultValue("", Token.BOOLEAN);
+        switch(comparison)
+        {
+            case ">":
+                if (leftNum.type == Token.INTEGER && rightNum.type == Token.INTEGER)
+                {
+                    returnValue = setValue(returnValue, Token.BOOLEAN
+                            , (leftNum.integerValue > rightNum.integerValue) + "");
+                }
+                else if (leftNum.type == Token.FLOAT && rightNum.type == Token.FLOAT)
+                {
+                    returnValue = setValue(returnValue, Token.BOOLEAN
+                            , (leftNum.doubleValue > rightNum.doubleValue) + "");
+                }
+                else if(leftNum.type == Token.INTEGER && rightNum.type == Token.FLOAT)
+                {
+
+                    returnValue = setValue(returnValue, Token.BOOLEAN
+                            , (leftNum.integerValue > rightNum.doubleValue) + "");
+                }
+                else
+                {
+                    returnValue = setValue(returnValue, Token.BOOLEAN
+                            , (leftNum.doubleValue > rightNum.integerValue) + "");
+                }
+            case ">=":
+                if (leftNum.type == Token.INTEGER && rightNum.type == Token.INTEGER)
+                {
+                    returnValue = setValue(returnValue, Token.BOOLEAN
+                            , (leftNum.integerValue >= rightNum.integerValue) + "");
+                }
+                else if (leftNum.type == Token.FLOAT && rightNum.type == Token.FLOAT)
+                {
+                    returnValue = setValue(returnValue, Token.BOOLEAN
+                            , (leftNum.doubleValue >= rightNum.integerValue) + "");
+                }
+                else if(leftNum.type == Token.INTEGER && rightNum.type == Token.FLOAT)
+                {
+                    returnValue = setValue(returnValue, Token.BOOLEAN
+                            , (leftNum.integerValue >= rightNum.doubleValue) + "");
+                }
+                else
+                {
+                    returnValue = setValue(returnValue, Token.BOOLEAN
+                            , (leftNum.doubleValue >= rightNum.doubleValue) + "");
+                }
+
+            case "<":
+                if (leftNum.type == Token.INTEGER && rightNum.type == Token.INTEGER)
+                {
+                    returnValue = setValue(returnValue, Token.BOOLEAN
+                            , (leftNum.integerValue < rightNum.integerValue) + "");
+                }
+                else if (leftNum.type == Token.FLOAT && rightNum.type == Token.FLOAT)
+                {
+                    returnValue = setValue(returnValue, Token.BOOLEAN
+                            , (leftNum.doubleValue < rightNum.doubleValue) + "");
+                }
+                else if(leftNum.type == Token.INTEGER && rightNum.type == Token.FLOAT)
+                {
+                    returnValue = setValue(returnValue, Token.BOOLEAN
+                            , (leftNum.integerValue < rightNum.doubleValue) + "");
+                }
+                else
+                {
+                    returnValue = setValue(returnValue, Token.BOOLEAN
+                            , (leftNum.doubleValue < rightNum.doubleValue) + "");
+                }
+            case "<=":
+                if (leftNum.type == Token.INTEGER && rightNum.type == Token.INTEGER)
+                {
+                    returnValue = setValue(returnValue, Token.BOOLEAN
+                            , (leftNum.integerValue <= rightNum.integerValue) + "");
+                }
+                else if (leftNum.type == Token.FLOAT && rightNum.type == Token.FLOAT)
+                {
+                    returnValue = setValue(returnValue, Token.BOOLEAN
+                            , (leftNum.doubleValue <= rightNum.doubleValue) + "");
+                }
+                else if(leftNum.type == Token.INTEGER && rightNum.type == Token.FLOAT)
+                {
+                    returnValue = setValue(returnValue, Token.BOOLEAN
+                            , (leftNum.integerValue <= rightNum.doubleValue) + "");
+                }
+                else
+                {
+                    returnValue = setValue(returnValue, Token.BOOLEAN
+                            , (leftNum.doubleValue <= rightNum.doubleValue) + "");
+                }
+            case "==":
+                if (leftNum.type == Token.INTEGER && rightNum.type == Token.INTEGER)
+                {
+                    returnValue = setValue(returnValue, Token.BOOLEAN
+                            , (leftNum.integerValue == rightNum.integerValue) + "");
+                }
+                else if (leftNum.type == Token.FLOAT && rightNum.type == Token.FLOAT)
+                {
+                    returnValue = setValue(returnValue, Token.BOOLEAN
+                            , (leftNum.doubleValue == rightNum.doubleValue) + "");
+                }
+                else if(leftNum.type == Token.INTEGER && rightNum.type == Token.FLOAT)
+                {
+                    returnValue = setValue(returnValue, Token.BOOLEAN
+                            , (leftNum.integerValue == rightNum.doubleValue) + "");
+                }
+                else
+                {
+                    returnValue = setValue(returnValue, Token.BOOLEAN
+                            , (leftNum.doubleValue == rightNum.doubleValue) + "");
+                }
+            case "!=":
+                if (leftNum.type == Token.INTEGER && rightNum.type == Token.INTEGER)
+                {
+                    returnValue = setValue(returnValue, Token.BOOLEAN
+                            , (leftNum.integerValue != rightNum.integerValue) + "");
+                }
+                else if (leftNum.type == Token.FLOAT && rightNum.type == Token.FLOAT)
+                {
+                    returnValue = setValue(returnValue, Token.BOOLEAN
+                            , (leftNum.doubleValue != rightNum.doubleValue) + "");
+                }
+                else if(leftNum.type == Token.INTEGER && rightNum.type == Token.FLOAT)
+                {
+                    returnValue = setValue(returnValue, Token.BOOLEAN
+                            , (leftNum.integerValue != rightNum.doubleValue) + "");
+                }
+                else
+                {
+                    returnValue = setValue(returnValue, Token.BOOLEAN
+                            , (leftNum.doubleValue != rightNum.doubleValue) + "");
+                }
+            default:
+                parser.errorWithContext("Bad equality operator given: " + comparison);
+
+        }
+
+        return returnValue;
+    }
     
     /**
      * 

@@ -1,4 +1,7 @@
 Int x = 3;
+Bool bCheck;
+bCheck = 2 > 3;
+print(bCheck);
 //String myString = "Hello World";
 x += 4;
 print("x");

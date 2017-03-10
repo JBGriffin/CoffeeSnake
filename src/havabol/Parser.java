@@ -452,7 +452,7 @@ public class Parser {
                         //scanner.getNext();
                         //if (!";".equals(scanner.currentToken.tokenStr))
                         rt = expressions(execute);
-                        this.storage.put(firstToken.tokenStr, rt.szValue);
+                        this.storage.put(firstToken.tokenStr, rt.szValue + "");
                         return new ResultValue(scanner.currentToken.tokenStr, Token.INTEGER);
                     //save simple float (Assign 3)
                     case Token.FLOAT:
@@ -486,9 +486,9 @@ public class Parser {
             case "/=":case "^=":
                 rt = unaryOperation(firstToken, scanner.currentToken.tokenStr);
                 break;
-            case ">":case ">=":case"<":case"<=":case "==":
+            case ">":case ">=":case"<":case"<=":case "==":case "!=":
                 System.out.println("Made it!");
-                boolean bExecute = equalityChecker(firstToken, scanner.currentToken.tokenStr);
+                evaluateEquality(firstToken, scanner.currentToken.tokenStr);
                 break;
             default:
                 errorWithContext("Bad shit happened. Given: " + scanner.currentToken.tokenStr);
@@ -500,22 +500,32 @@ public class Parser {
 
     /**
      * Method to check and return an equality statement. Currently made a function because I'm not
-     * quite sure if this will only be called in one place
+     * quite sure if this will only be called in one place. Note: LHS and RHS may or may not be symbols,
+     * so it needs to check for both. Will not throw an error if it doesn't exist in the storage.
      * @param leftToken Left hand side of the equality statement
      * @param comparison Operator to compare against
      * @return True or False based on whether or not the item is equal
      * @throws Exception Exception thrown if something went seriously wrong
      */
-    private boolean equalityChecker(Token leftToken, String comparison) throws Exception
+    private ResultValue evaluateEquality(Token leftToken, String comparison) throws Exception
     {
         scanner.getNext();
-        Token rightToken = scanner.nextToken;
-
+        Token rightToken = scanner.currentToken;    // Solely for readability
         ResultValue resOp1 = new ResultValue(leftToken.tokenStr, leftToken.subClassif);
+        ResultValue resOp2 = new ResultValue(rightToken.tokenStr, rightToken.subClassif);
 
-        System.out.println("Inside equality check, comparison = " + comparison);
+        resOp1.szValue = this.storage.get(this, leftToken.tokenStr);
+        if(resOp1.szValue == null)
+            resOp1.szValue = leftToken.tokenStr;
 
-        return true;
+        resOp2.szValue = this.storage.get(this, rightToken.tokenStr);
+        if(resOp2.szValue == null)
+            resOp2.szValue = rightToken.tokenStr;
+
+        Numeric nOp1 = new Numeric(this, resOp1, "First Operator", comparison);
+        Numeric nOp2 = new Numeric(this, resOp1, "Second Operator", comparison);
+
+        return nOp2.equalValue(nOp1, nOp2, comparison);
     }
 
     /**
@@ -606,6 +616,7 @@ public class Parser {
             firstToken = scanner.currentToken;
 
         }
+
         switch (firstToken.subClassif) {
             case Token.INTEGER:
                 //if negative, make negative
@@ -695,7 +706,10 @@ public class Parser {
                     }
 
                     return rt;
-
+                }
+                else // Check for equalities
+                {
+                    return rt = evaluateEquality(firstToken, scanner.currentToken.tokenStr);
                 }
             case Token.FLOAT:
                 //if negative, make negative
@@ -784,6 +798,21 @@ public class Parser {
                     }
                     return rt;
                 }
+                else // Check for equalities
+                {
+                    return rt = evaluateEquality(firstToken, scanner.currentToken.tokenStr);
+                }
+            /*case Token.BOOLEAN:
+                //if negative, make negative
+                if (firstIsNegative) {
+                    firstToken.tokenStr = (Integer.parseInt(firstToken.tokenStr) * -1) + "";
+                }
+                //means it was a simple assignment
+                if (";".equals(scanner.getNext()))
+                {
+                    rt = new ResultValue(firstToken.tokenStr, Token.SEPARATOR);
+                    return rt;
+                }*/
         }
         errorWithContext("Bad joo-joo found: " + scanner.currentToken.tokenStr);
         return rt;
