@@ -311,6 +311,7 @@ public class Numeric
                     returnValue = setValue(returnValue, Token.BOOLEAN
                             , (leftNum.doubleValue > rightNum.integerValue) + "");
                 }
+                break;
             case ">=":
                 if (leftNum.type == Token.INTEGER && rightNum.type == Token.INTEGER)
                 {
@@ -332,7 +333,7 @@ public class Numeric
                     returnValue = setValue(returnValue, Token.BOOLEAN
                             , (leftNum.doubleValue >= rightNum.doubleValue) + "");
                 }
-
+                break;
             case "<":
                 if (leftNum.type == Token.INTEGER && rightNum.type == Token.INTEGER)
                 {
@@ -354,6 +355,7 @@ public class Numeric
                     returnValue = setValue(returnValue, Token.BOOLEAN
                             , (leftNum.doubleValue < rightNum.doubleValue) + "");
                 }
+                break;
             case "<=":
                 if (leftNum.type == Token.INTEGER && rightNum.type == Token.INTEGER)
                 {
@@ -375,6 +377,7 @@ public class Numeric
                     returnValue = setValue(returnValue, Token.BOOLEAN
                             , (leftNum.doubleValue <= rightNum.doubleValue) + "");
                 }
+                break;
             case "==":
                 if (leftNum.type == Token.INTEGER && rightNum.type == Token.INTEGER)
                 {
@@ -396,6 +399,7 @@ public class Numeric
                     returnValue = setValue(returnValue, Token.BOOLEAN
                             , (leftNum.doubleValue == rightNum.doubleValue) + "");
                 }
+                break;
             case "!=":
                 if (leftNum.type == Token.INTEGER && rightNum.type == Token.INTEGER)
                 {
@@ -417,6 +421,7 @@ public class Numeric
                     returnValue = setValue(returnValue, Token.BOOLEAN
                             , (leftNum.doubleValue != rightNum.doubleValue) + "");
                 }
+                break;
             default:
                 parser.errorWithContext("Bad equality operator given: " + comparison);
 

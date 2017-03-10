@@ -802,7 +802,7 @@ public class Parser {
                 {
                     return rt = evaluateEquality(firstToken, scanner.currentToken.tokenStr);
                 }
-            /*case Token.BOOLEAN:
+            case Token.BOOLEAN:
                 //if negative, make negative
                 if (firstIsNegative) {
                     firstToken.tokenStr = (Integer.parseInt(firstToken.tokenStr) * -1) + "";
@@ -812,7 +812,7 @@ public class Parser {
                 {
                     rt = new ResultValue(firstToken.tokenStr, Token.SEPARATOR);
                     return rt;
-                }*/
+                }
         }
         errorWithContext("Bad joo-joo found: " + scanner.currentToken.tokenStr);
         return rt;
