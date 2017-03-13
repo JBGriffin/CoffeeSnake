@@ -225,6 +225,7 @@ public class Parser {
         switch (scanner.currentToken.tokenStr) {
             case "if":
                 ifStatement(execute);
+                break;
             case "while":
                 whileStatement(execute);
 
@@ -247,8 +248,13 @@ public class Parser {
     private void ifStatement(boolean execute) throws Exception {
         ResultValue rt = null;
 
-        if(! execute)
+        if(! execute){
+            statements(false);
+            scanner.getNext();
+
             return; // Skip
+        }
+
         scanner.getNext();
 
         ResultValue toExecute = evaluateEquality(scanner.currentToken, scanner.getNext());
@@ -256,37 +262,31 @@ public class Parser {
         if(toExecute.szValue.equals("T"))
         {
             //p(toExecute.szValue);
-            p(scanner.currentToken.tokenStr);
+            //p(scanner.currentToken.tokenStr);
             statements(true);
+            scanner.getNext();
 
+            if(scanner.currentToken.tokenStr.equals("else")) {
+                p("Current token: " + scanner.currentToken.tokenStr);
+                statements(false);
+            }
         }
         else if(toExecute.szValue.equals("F"))
         {
             //skipTo("if", "endif");
             //p("was false");
-            p(scanner.currentToken.tokenStr);
+            //p(scanner.currentToken.tokenStr);
             statements(false);
+            scanner.getNext();
+            if(scanner.currentToken.tokenStr.equals("else")){
+                statements(true);
+            }
         }
 
-        scanner.getNext();
+        statements(true);
+        /*scanner.getNext();*/
 
         //while(! scanner.currentToken.tokenStr.equals(":") )
-
-
-
-
-        switch (scanner.currentToken.subClassif) {
-            case Token.IDENTIFIER:
-                break;
-            case Token.INTEGER:
-                break;
-            case Token.FLOAT:
-                break;
-            case Token.STRING:
-                break;
-
-        }
-
 
 
     }
@@ -319,9 +319,11 @@ public class Parser {
      * @param execute
      * @return ResultValue
      */
-    private ResultValue endStatement(boolean execute) {
+    private ResultValue endStatement(boolean execute) throws Exception{
 
         ResultValue rt = null;
+
+        statements(true);
 
         //System.out.println(scanner.currentToken.tokenStr);
         return rt;
@@ -555,7 +557,7 @@ public class Parser {
      */
     private ResultValue evaluateEquality(Token leftToken, String comparison) throws Exception
     {
-        //scanner.getNext();
+        ResultValue retVal;
 
         if(comparison.equals(":")){
             if(leftToken.subClassif == Token.BOOLEAN)
@@ -567,15 +569,9 @@ public class Parser {
         }
 
         //there is more than just one token
-
-
+        // Advance the cursor
         scanner.getNext();
         Token rightToken = scanner.currentToken;    // Solely for readability
-
-/*
-        if(rightToken.subClassif == Token.BOOLEAN && scanner.nextToken.tokenStr != ":")
-            return new ResultValue(rightToken.tokenStr, rightToken.subClassif);
-*/
 
         ResultValue resOp1 = new ResultValue(leftToken.tokenStr, leftToken.subClassif);
         ResultValue resOp2 = new ResultValue(rightToken.tokenStr, rightToken.subClassif);
@@ -593,17 +589,15 @@ public class Parser {
 
         if (!":".equals(scanner.getNext())){
             //if there is more, do recursive call
-
             //4 > 3 and 3 < 4
-
-
             //^^^for future
 
-            errorWithContext("Expected : not found");
+            errorWithContext("Expected ':' not found at end of statement. Given: " + scanner.currentToken.tokenStr);
 
         }
 
-        return nOp2.equalValue(nOp1, nOp2, comparison);
+        retVal = nOp2.equalValue(nOp1, nOp2, comparison);
+        return retVal;
     }
 
     /**

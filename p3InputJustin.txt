@@ -1,14 +1,31 @@
 Int x = 3;
-Bool bCheck;
-bCheck = 2 > 3;
-print(bCheck);
+Bool bCheck = F;
+if T:
+    print("simple should be true");
+endif;
+
+if bCheck:
+    print("else check. This should not print");
+else:
+    if T:
+        print("Else reached and printed correctly");
+    else:
+        print("I'm broken");
+
+if 5 <= 5:
+    print("greater statement2");
+endif;
+
+//Bool bCheck;
+//bCheck = 2 > 3;
+//print(bCheck);
 //String myString = "Hello World";
-x += 4;
-print("x");
-x += 5;
-print("x");
-x -= 5;
-print("x");
-x *= 2;
-print("x");
+//x += 4;
+//print("x");
+//x += 5;
+//print("x");
+//x -= 5;
+//print("x");
+//x *= 2;
+//print("x");
 //print(myString);
