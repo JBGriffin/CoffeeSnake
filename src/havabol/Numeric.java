@@ -427,6 +427,13 @@ public class Numeric
 
         }
 
+        if (returnValue.szValue.equals("true"))
+            returnValue.szValue = "T";
+         else if(returnValue.szValue.equals("false"))
+            returnValue.szValue = "F";
+        else
+            parser.errorWithContext("Not a valid boolean statement! Given: " + returnValue.szValue);
+
         return returnValue;
     }
     

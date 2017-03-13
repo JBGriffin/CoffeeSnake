@@ -81,41 +81,41 @@ public class Parser {
 
         //init result value so methods can return into rt
         ResultValue rt = null;
-
-        //go until all source code is empty
-        while (!scanner.getNext().isEmpty()) {
-            //System.out.println("In statemnts with " + scanner.currentToken.tokenStr);
-            //checking for all possible primary classifications
-            switch (scanner.currentToken.primClassif) {
-                //handle control
-                case Token.CONTROL:
-                    rt = controlStatement(execute);
-                    break;
-                //handle operands
-                case Token.OPERAND:
-                    rt = operand(execute);
-                    break;
-                //handle functions - currently only built in (Assign 3)
-                case Token.FUNCTION:
-                    rt = function(execute);
-                    break;
-                //handle operators - this probably should not be legal
-                //and will need to throw proper exception
-                case Token.OPERATOR:
+        if(execute) {
+            //go until all source code is empty
+            while (!scanner.getNext().isEmpty()) {
+                //System.out.println("In statemnts with " + scanner.currentToken.tokenStr);
+                //checking for all possible primary classifications
+                switch (scanner.currentToken.primClassif) {
+                    //handle control
+                    case Token.CONTROL:
+                        rt = controlStatement(execute);
+                        break;
+                    //handle operands
+                    case Token.OPERAND:
+                        rt = operand(execute);
+                        break;
+                    //handle functions - currently only built in (Assign 3)
+                    case Token.FUNCTION:
+                        rt = function(execute);
+                        break;
+                    //handle operators - this probably should not be legal
+                    //and will need to throw proper exception
+                    case Token.OPERATOR:
                     /*System.err.println("Unexpected operator found");*/
-                    errorWithContext("Unexpected operator found. Usage: " + scanner.currentToken.tokenStr);
-                    break;
-                case Token.SEPARATOR:
-                    rt = null;
-                    break;
-                //if default happens, something is seriously wrong in our code
-                default:
-                    errorWithContext("Something went seriously wrong. Given: " + scanner.currentToken.tokenStr);
-                    return false;
+                        errorWithContext("Unexpected operator found. Usage: " + scanner.currentToken.tokenStr);
+                        break;
+                    case Token.SEPARATOR:
+                        rt = null;
+                        break;
+                    //if default happens, something is seriously wrong in our code
+                    default:
+                        errorWithContext("Something went seriously wrong. Given: " + scanner.currentToken.tokenStr);
+                        return false;
+                }
+
             }
-
         }
-
         return execute; //returns only to parse()
 
     }
@@ -131,29 +131,29 @@ public class Parser {
      * @throws Exception //should be parser exception
      */
     private ResultValue controlStatement(boolean execute) throws Exception {
-
         ResultValue returnValue = null; //init for assignments
+        if(execute) {
 
-        //grab the current token sub class
-        switch (scanner.currentToken.subClassif) {
-            //if declare - call declareStatement
-            case Token.DECLARE:
-                returnValue = declareStatement(execute);
-                break;
-            //if flow (if, while, etc.) call flow
-            case Token.FLOW:
-                returnValue = flowStatement(execute);
-                break;
-            //if end (endif, endwhile, etc.) call end
-            case Token.END:
-                returnValue = endStatement(execute);
-                break;
-            //should not be possible (Throw Parser Exception)
-            default:
-                errorWithContext("Something went seriously wrong in the control statement. Given: " + scanner.currentToken.tokenStr);
-                return null;
+            //grab the current token sub class
+            switch (scanner.currentToken.subClassif) {
+                //if declare - call declareStatement
+                case Token.DECLARE:
+                    returnValue = declareStatement(execute);
+                    break;
+                //if flow (if, while, etc.) call flow
+                case Token.FLOW:
+                    returnValue = flowStatement(execute);
+                    break;
+                //if end (endif, endwhile, etc.) call end
+                case Token.END:
+                    returnValue = endStatement(execute);
+                    break;
+                //should not be possible (Throw Parser Exception)
+                default:
+                    errorWithContext("Something went seriously wrong in the control statement. Given: " + scanner.currentToken.tokenStr);
+                    return null;
+            }
         }
-
         //return rt to controlStatement method
         return returnValue;
 
@@ -169,44 +169,44 @@ public class Parser {
      * @throws Exception should be ParseException
      */
     private ResultValue declareStatement(boolean execute) throws Exception {
+        ResultValue returnValue = null; //init for return
+        if(execute) {
 
-        ResultValue returnValue; //init for return
+            //System.out.println(scanner.currentToken.tokenStr);
+            Token workingToken = scanner.currentToken;
+            String sznewTokenStr = scanner.getNext();
 
-        //System.out.println(scanner.currentToken.tokenStr);
-        Token workingToken = scanner.currentToken;
-        String sznewTokenStr = scanner.getNext();
+            //if subClass is not an Identifer - illegal execution
+            if (scanner.currentToken.subClassif != Token.IDENTIFIER) /*throw new Exception();//THROW EXCEPTION HERE*/ {
+                errorWithContext("Subclass is not an identifier. Usage: " + scanner.currentToken.tokenStr);
+            }
 
-        //if subClass is not an Identifer - illegal execution
-        if (scanner.currentToken.subClassif != Token.IDENTIFIER) /*throw new Exception();//THROW EXCEPTION HERE*/ {
-            errorWithContext("Subclass is not an identifier. Usage: " + scanner.currentToken.tokenStr);
+            switch (workingToken.tokenStr) {
+                //if Int - put in SymbolTable as Int
+                case "Int":
+                    this.symbolTable.putSymbol(sznewTokenStr, new STIdentifiers(sznewTokenStr, Token.CONTROL, Token.INTEGER, Token.INTEGER, 0));
+                    break;
+                //if Float - put in SymbolTable as Float
+                case "Float":
+                    this.symbolTable.putSymbol(sznewTokenStr, new STIdentifiers(sznewTokenStr, Token.CONTROL, Token.FLOAT, Token.FLOAT, 0));
+                    break;
+                //if String - put in SymbolTable as String
+                case "String":
+                    this.symbolTable.putSymbol(sznewTokenStr, new STIdentifiers(sznewTokenStr, Token.CONTROL, Token.STRING, Token.STRING, 0));
+                    break;
+                //if nothing - throw exception (Assignment 3) - in future there will be more
+                case "Bool":
+                    this.symbolTable.putSymbol(sznewTokenStr, new STIdentifiers(sznewTokenStr, Token.CONTROL, Token.BOOLEAN, Token.BOOLEAN, 0));
+                    break;
+                default:
+                    errorWithContext("Declaration not recognized. Given: " + workingToken.tokenStr);
+                    return null; //Throw Exception
+
+            }
+
+            //after identifier handle RHS
+            returnValue = assignments(execute);
         }
-
-        switch (workingToken.tokenStr) {
-            //if Int - put in SymbolTable as Int
-            case "Int":
-                this.symbolTable.putSymbol(sznewTokenStr, new STIdentifiers(sznewTokenStr, Token.CONTROL, Token.INTEGER, Token.INTEGER, 0));
-                break;
-            //if Float - put in SymbolTable as Float
-            case "Float":
-                this.symbolTable.putSymbol(sznewTokenStr, new STIdentifiers(sznewTokenStr, Token.CONTROL, Token.FLOAT, Token.FLOAT, 0));
-                break;
-            //if String - put in SymbolTable as String
-            case "String":
-                this.symbolTable.putSymbol(sznewTokenStr, new STIdentifiers(sznewTokenStr, Token.CONTROL, Token.STRING, Token.STRING, 0));
-                break;
-            //if nothing - throw exception (Assignment 3) - in future there will be more
-            case "Bool":
-                this.symbolTable.putSymbol(sznewTokenStr, new STIdentifiers(sznewTokenStr, Token.CONTROL, Token.BOOLEAN, Token.BOOLEAN, 0));
-                break;
-            default:
-                errorWithContext("Declaration not recognized. Given: " + workingToken.tokenStr);
-                return null; //Throw Exception
-
-        }
-
-        //after identifier handle RHS
-        returnValue = assignments(execute);
-
         return returnValue;
 
     }
@@ -234,11 +234,47 @@ public class Parser {
 
     }
 
-    private ResultValue ifStatement(boolean execute) throws Exception {
+    private void skipTo(String curPos, String end)
+    {
 
+        if (curPos == "if") {
+
+        }
+
+    }
+
+
+    private void ifStatement(boolean execute) throws Exception {
         ResultValue rt = null;
 
+        if(! execute)
+            return; // Skip
         scanner.getNext();
+
+        ResultValue toExecute = evaluateEquality(scanner.currentToken, scanner.getNext());
+
+        if(toExecute.szValue.equals("T"))
+        {
+            //p(toExecute.szValue);
+            p(scanner.currentToken.tokenStr);
+            statements(true);
+
+        }
+        else if(toExecute.szValue.equals("F"))
+        {
+            //skipTo("if", "endif");
+            //p("was false");
+            p(scanner.currentToken.tokenStr);
+            statements(false);
+        }
+
+        scanner.getNext();
+
+        //while(! scanner.currentToken.tokenStr.equals(":") )
+
+
+
+
         switch (scanner.currentToken.subClassif) {
             case Token.IDENTIFIER:
                 break;
@@ -251,7 +287,7 @@ public class Parser {
 
         }
 
-        return rt;
+
 
     }
 
@@ -300,58 +336,58 @@ public class Parser {
      * @throws Exception
      */
     private ResultValue function(boolean execute) throws Exception {
-
         ResultValue rt = null; //init for assignment
+        if(execute) {
 
-        //System.out.println(scanner.currentToken.tokenStr);
-        //for now only builtins are possible (Assign 3)
-        if (scanner.currentToken.subClassif == Token.BUILTIN) {
-            //make sure symbol exists in global table
-            if (((STFunction) this.symbolTable.getSymbol(scanner.currentToken.tokenStr)) != null) {
-                //if it does, get it
-                STFunction stf = (STFunction) this.symbolTable.getSymbol(scanner.currentToken.tokenStr);
-                //find out which function is being called
-                switch (stf.symbol) {
-                    //for now only handles print
-                    //if print statement
-                    case "print":
-                        //handle print (TEMPORARY Assign 3) I think this 
-                        //will need its own submethod
-                        StringBuilder sb = new StringBuilder(); //build string to print
+            //System.out.println(scanner.currentToken.tokenStr);
+            //for now only builtins are possible (Assign 3)
+            if (scanner.currentToken.subClassif == Token.BUILTIN) {
+                //make sure symbol exists in global table
+                if (((STFunction) this.symbolTable.getSymbol(scanner.currentToken.tokenStr)) != null) {
+                    //if it does, get it
+                    STFunction stf = (STFunction) this.symbolTable.getSymbol(scanner.currentToken.tokenStr);
+                    //find out which function is being called
+                    switch (stf.symbol) {
+                        //for now only handles print
+                        //if print statement
+                        case "print":
+                            //handle print (TEMPORARY Assign 3) I think this
+                            //will need its own submethod
+                            StringBuilder sb = new StringBuilder(); //build string to print
 
-                        //go until a necessary ; is found
-                        while (!";".equals(scanner.getNext())) {
-                            //check using sub class
-                            switch (scanner.currentToken.subClassif) {
-                                //if idenifier - get from storage
-                                //currently, if identifier does not exist it 
-                                //will just be null and continue
-                                case Token.IDENTIFIER:
-                                    sb.append(this.storage.get(this, scanner.currentToken.tokenStr));
-                                    break;
-                                //if it is a string, append string to statement
-                                case Token.STRING:
-                                    sb.append(scanner.currentToken.tokenStr);
-                                    break;
-                                //if separator, continue
-                                case Token.SEPARATOR:
-                                    break;
-                                //soon we can add '+' to also append strings
-                                default:
-                                    break;
+                            //go until a necessary ; is found
+                            while (!";".equals(scanner.getNext())) {
+                                //check using sub class
+                                switch (scanner.currentToken.subClassif) {
+                                    //if idenifier - get from storage
+                                    //currently, if identifier does not exist it
+                                    //will just be null and continue
+                                    case Token.IDENTIFIER:
+                                        sb.append(this.storage.get(this, scanner.currentToken.tokenStr));
+                                        break;
+                                    //if it is a string, append string to statement
+                                    case Token.STRING:
+                                        sb.append(scanner.currentToken.tokenStr);
+                                        break;
+                                    //if separator, continue
+                                    case Token.SEPARATOR:
+                                        break;
+                                    //soon we can add '+' to also append strings
+                                    default:
+                                        break;
+
+                                }
 
                             }
+                            // ; was found, print and continue parsing
+                            System.out.println(sb.toString());
 
-                        }
-                        // ; was found, print and continue parsing
-                        System.out.println(sb.toString());
+                    }
 
                 }
 
             }
-
         }
-
         return rt;
 
     }
@@ -366,40 +402,42 @@ public class Parser {
      * @throws Exception
      */
     private ResultValue operand(boolean execute) throws Exception {
+
         ResultValue rt = null;
+        if(execute) {
 
-        //System.out.println(scanner.currentToken.tokenStr);
-        switch (scanner.currentToken.subClassif) {
+            //System.out.println(scanner.currentToken.tokenStr);
+            switch (scanner.currentToken.subClassif) {
 
-            case Token.IDENTIFIER:
-                //recall identifier
-                STEntry ste = (STIdentifiers) symbolTable.getSymbol(scanner.currentToken.tokenStr);
-                // if does not exist, throw error
-                if (ste == null) {
+                case Token.IDENTIFIER:
+                    //recall identifier
+                    STEntry ste = (STIdentifiers) symbolTable.getSymbol(scanner.currentToken.tokenStr);
+                    // if does not exist, throw error
+                    if (ste == null) {
 
-                    //needs to throw parser exception
+                        //needs to throw parser exception
                     /*System.err.println("Error!");*/
-                    errorWithContext("Syntax Error");
-                    return null;
+                        errorWithContext("Syntax Error");
+                        return null;
 
-                    //it does exist so call assignments to handle the rest
-                } else {
+                        //it does exist so call assignments to handle the rest
+                    } else {
 
-                    //System.out.println("Success so far!");
-                    rt = assignments(execute);
-                    return rt;
+                        //System.out.println("Success so far!");
+                        rt = assignments(execute);
+                        return rt;
 
-                }
-            //if it exists, continue, otherwise break
+                    }
+                    //if it exists, continue, otherwise break
 
-            //if operand found as int, float or string, maybe return?? idk
-            //so far, does not get to this point
-            case Token.INTEGER:
-            case Token.FLOAT:
-            case Token.STRING:
+                    //if operand found as int, float or string, maybe return?? idk
+                    //so far, does not get to this point
+                case Token.INTEGER:
+                case Token.FLOAT:
+                case Token.STRING:
 
+            }
         }
-
         return rt;
 
     }
@@ -419,81 +457,89 @@ public class Parser {
     private ResultValue assignments(boolean execute) throws Exception {
 
         ResultValue rt = null;
-        //save off first token when method called
-        Token firstToken = scanner.currentToken;
+        if(execute) {
+            //save off first token when method called
+            Token firstToken = scanner.currentToken;
 
 
-        //check to see if it is simple assignment
-        if (";".equals(scanner.getNext())) {
+            //check to see if it is simple assignment
+            if (";".equals(scanner.getNext())) {
 
-            return null;
+                return null;
 
-        }
-        //move to assignment oparator
-        //if (!"=".equals(scanner.currentToken.tokenStr)) {
-        //    scanner.getNext();
-        //}
+            }
+            //move to assignment oparator
+            //if (!"=".equals(scanner.currentToken.tokenStr)) {
+            //    scanner.getNext();
+            //}
 
-        //this should be better than above because could be +=, -=, etc.
-        if (!scanner.currentToken.tokenStr.contains("=")) {
-            scanner.getNext();
-        }
-
-        // Creates and assigns a value into the first token
-/*        if(scanner.currentToken.tokenStr.equals("=")) {*/
-        switch(scanner.currentToken.tokenStr)
-        {
-            case "=":
+            //this should be better than above because could be +=, -=, etc.
+            if (!scanner.currentToken.tokenStr.contains("=")) {
                 scanner.getNext();
-                switch (scanner.currentToken.subClassif) {
-                    //save simple integer (Assign 3)
-                    case Token.INTEGER:
-                        Token currentToken = scanner.currentToken;
-                        //scanner.getNext();
-                        //if (!";".equals(scanner.currentToken.tokenStr))
-                        rt = expressions(execute);
-                        this.storage.put(firstToken.tokenStr, rt.szValue + "");
-                        return new ResultValue(scanner.currentToken.tokenStr, Token.INTEGER);
-                    //save simple float (Assign 3)
-                    case Token.FLOAT:
-                        Token currentFloatToken = scanner.currentToken;
-                        rt = expressions(execute); //for now, throw error (Assign3)
-                        this.storage.put(firstToken.tokenStr, Float.parseFloat(rt.szValue) + "");
-                        return new ResultValue(scanner.currentToken.tokenStr, Token.FLOAT);
-                    //save simple string (Assign 3)
-                    case Token.STRING:
-                        Token currentStringToken = scanner.currentToken;
-                        scanner.getNext(); //for assign3 should be ; only
-                        if (!";".equals(scanner.currentToken.tokenStr)) {
-                            return rt; //for now, throw error (Assign3)
-                        }
-                        this.storage.put(firstToken.tokenStr, currentStringToken.tokenStr);
-                        break;
-                    //System.out.println("Successfully put " + scanner.currentToken.tokenStr + " into " + firstToken.tokenStr);
-                    case Token.BOOLEAN:
-                        System.out.println("I'M HERE!!!" );
-                    default:
-                        Token newToken = scanner.currentToken;
-                        rt = expressions(execute);
-                        System.out.println(rt.szValue);
-                        this.storage.put(firstToken.tokenStr, rt.szValue);
-                        return new ResultValue(scanner.currentToken.tokenStr, 0); // TODO: find what data type this is
-                    //return new ResultValue(scanner.currentToken.tokenStr);
+            }
 
-                }
-            // Assumes that the token has already been initialized and put into the symbol table
-            case "+=":case "-=":case "*=":
-            case "/=":case "^=":
-                rt = unaryOperation(firstToken, scanner.currentToken.tokenStr);
-                break;
-            case ">":case ">=":case"<":case"<=":case "==":case "!=":
-                System.out.println("Made it!");
-                evaluateEquality(firstToken, scanner.currentToken.tokenStr);
-                break;
-            default:
-                errorWithContext("Bad shit happened. Given: " + scanner.currentToken.tokenStr);
+            // Creates and assigns a value into the first token
+/*        if(scanner.currentToken.tokenStr.equals("=")) {*/
+            switch (scanner.currentToken.tokenStr) {
+                case "=":
+                    scanner.getNext();
+                    switch (scanner.currentToken.subClassif) {
+                        //save simple integer (Assign 3)
+                        case Token.INTEGER:
+                            Token currentToken = scanner.currentToken;
+                            //scanner.getNext();
+                            //if (!";".equals(scanner.currentToken.tokenStr))
+                            rt = expressions(execute);
+                            this.storage.put(firstToken.tokenStr, rt.szValue + "");
+                            return new ResultValue(scanner.currentToken.tokenStr, Token.INTEGER);
+                        //save simple float (Assign 3)
+                        case Token.FLOAT:
+                            Token currentFloatToken = scanner.currentToken;
+                            rt = expressions(execute); //for now, throw error (Assign3)
+                            this.storage.put(firstToken.tokenStr, Float.parseFloat(rt.szValue) + "");
+                            return new ResultValue(scanner.currentToken.tokenStr, Token.FLOAT);
+                        //save simple string (Assign 3)
+                        case Token.STRING:
+                            Token currentStringToken = scanner.currentToken;
+                            scanner.getNext(); //for assign3 should be ; only
+                            if (!";".equals(scanner.currentToken.tokenStr)) {
+                                return rt; //for now, throw error (Assign3)
+                            }
+                            this.storage.put(firstToken.tokenStr, currentStringToken.tokenStr);
+                            break;
+                        //System.out.println("Successfully put " + scanner.currentToken.tokenStr + " into " + firstToken.tokenStr);
+                        case Token.BOOLEAN:
+                            //System.out.println("I'M HERE!!!");
+                        default:
+                            Token newToken = scanner.currentToken;
+                            rt = expressions(execute);
+                            System.out.println(rt.szValue);
+                            this.storage.put(firstToken.tokenStr, rt.szValue);
+                            return new ResultValue(scanner.currentToken.tokenStr, 0); // TODO: find what data type this is
+                        //return new ResultValue(scanner.currentToken.tokenStr);
+
+                    }
+                    // Assumes that the token has already been initialized and put into the symbol table
+                case "+=":
+                case "-=":
+                case "*=":
+                case "/=":
+                case "^=":
+                    rt = unaryOperation(firstToken, scanner.currentToken.tokenStr);
+                    break;
+                case ">":
+                case ">=":
+                case "<":
+                case "<=":
+                case "==":
+                case "!=":
+                    System.out.println("Made it!");
+                    evaluateEquality(firstToken, scanner.currentToken.tokenStr);
+                    break;
+                default:
+                    errorWithContext("Bad shit happened. Given: " + scanner.currentToken.tokenStr);
+            }
         }
-
         return rt;
 
     }
@@ -509,8 +555,28 @@ public class Parser {
      */
     private ResultValue evaluateEquality(Token leftToken, String comparison) throws Exception
     {
+        //scanner.getNext();
+
+        if(comparison.equals(":")){
+            if(leftToken.subClassif == Token.BOOLEAN)
+                return new ResultValue(leftToken.tokenStr, Token.BOOLEAN);
+            else if (leftToken.subClassif == Token.IDENTIFIER)
+                return new ResultValue(this.storage.get(this,leftToken.tokenStr), Token.BOOLEAN);
+            else
+                errorWithContext("Lone token MUST be a boolean! Given: " + leftToken.tokenStr);
+        }
+
+        //there is more than just one token
+
+
         scanner.getNext();
         Token rightToken = scanner.currentToken;    // Solely for readability
+
+/*
+        if(rightToken.subClassif == Token.BOOLEAN && scanner.nextToken.tokenStr != ":")
+            return new ResultValue(rightToken.tokenStr, rightToken.subClassif);
+*/
+
         ResultValue resOp1 = new ResultValue(leftToken.tokenStr, leftToken.subClassif);
         ResultValue resOp2 = new ResultValue(rightToken.tokenStr, rightToken.subClassif);
 
@@ -524,6 +590,18 @@ public class Parser {
 
         Numeric nOp1 = new Numeric(this, resOp1, "First Operator", comparison);
         Numeric nOp2 = new Numeric(this, resOp1, "Second Operator", comparison);
+
+        if (!":".equals(scanner.getNext())){
+            //if there is more, do recursive call
+
+            //4 > 3 and 3 < 4
+
+
+            //^^^for future
+
+            errorWithContext("Expected : not found");
+
+        }
 
         return nOp2.equalValue(nOp1, nOp2, comparison);
     }
@@ -816,6 +894,14 @@ public class Parser {
         }
         errorWithContext("Bad joo-joo found: " + scanner.currentToken.tokenStr);
         return rt;
+    }
+
+
+
+    private void p(String s){
+
+        System.out.println("OURDEBUGLINE::: " + s);
+
     }
 
 }
