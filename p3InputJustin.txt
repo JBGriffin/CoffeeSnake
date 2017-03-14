@@ -1,19 +1,26 @@
 Int x = 3;
-Bool bCheck = F;
+Bool bCheck = T;
 if T:
     print("simple should be true");
 endif;
 
 if bCheck:
-    print("else check. This should not print");
+    print("If  check. This should  print");
+    print("Second if check. I should also print");
+endif;
+
+if F:
+    print("Second if check. This may print, but the stuff after is bad");
 else:
     if T:
-        print("Else reached and printed correctly");
+        print("Nested if/else reached and printed correctly");
     else:
         print("I'm broken");
+    endif;
+endif;
 
 if 5 <= 5:
-    print("greater statement2");
+    print("Equality checker. Is 5 greater than or equal to 5");
 endif;
 
 //Bool bCheck;

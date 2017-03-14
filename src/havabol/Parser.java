@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package havabol;
 
 /**
@@ -27,6 +22,8 @@ public class Parser {
 
     Scanner scanner;
 
+    Token lastOpenStatement;
+
     /**
      * Parser will go through user source code and execute statements
      *
@@ -44,7 +41,8 @@ public class Parser {
     }
 
     /**
-     * Begin parsing from HavaBol
+     * Logical main to the interpreter. Begins executing HavaBol code. Will throw an error
+     * and kill the program if it runs into code that is unable to execute
      *
      * @throws Exception should be parser exception
      */
@@ -60,9 +58,9 @@ public class Parser {
     /**
      * Calls exception class for user error.
      *
-     * @param msg Message on where the error ocurred.
+     * @param msg Message on where the error occurred.
      * @throws Exception Prints out the line number, token, and a message on
-     * where the error occured.
+     * where the error occurred.
      */
     public void errorWithContext(String msg) throws Exception {
         throw new ParserException(scanner.currentToken.iSourceLineNr, msg);
@@ -102,7 +100,6 @@ public class Parser {
                     //handle operators - this probably should not be legal
                     //and will need to throw proper exception
                     case Token.OPERATOR:
-                    /*System.err.println("Unexpected operator found");*/
                         errorWithContext("Unexpected operator found. Usage: " + scanner.currentToken.tokenStr);
                         break;
                     case Token.SEPARATOR:
@@ -117,7 +114,6 @@ public class Parser {
             }
         }
         return execute; //returns only to parse()
-
     }
 
     /**
@@ -177,7 +173,8 @@ public class Parser {
             String sznewTokenStr = scanner.getNext();
 
             //if subClass is not an Identifer - illegal execution
-            if (scanner.currentToken.subClassif != Token.IDENTIFIER) /*throw new Exception();//THROW EXCEPTION HERE*/ {
+            if (scanner.currentToken.subClassif != Token.IDENTIFIER)
+            {
                 errorWithContext("Subclass is not an identifier. Usage: " + scanner.currentToken.tokenStr);
             }
 
@@ -244,51 +241,52 @@ public class Parser {
 
     }
 
-
+    /**
+     * Evaluates if/else statements. Will decide whether or not to execute the next statements. Is able to
+     * execute multi-lined if/else statements, but can not execute nested if statements.
+     * @param execute Boolean to decide whether or not to execute statements.
+     * @throws Exception Kills the program if something goes wrong
+     */
     private void ifStatement(boolean execute) throws Exception {
         ResultValue rt = null;
 
         if(! execute){
             statements(false);
             scanner.getNext();
-
+            if(scanner.currentToken.tokenStr.equals("if"))
+                ifStatement(false);
             return; // Skip
         }
 
         scanner.getNext();
 
         ResultValue toExecute = evaluateEquality(scanner.currentToken, scanner.getNext());
-
-        if(toExecute.szValue.equals("T"))
-        {
-            //p(toExecute.szValue);
-            //p(scanner.currentToken.tokenStr);
-            statements(true);
-            scanner.getNext();
-
-            if(scanner.currentToken.tokenStr.equals("else")) {
-                p("Current token: " + scanner.currentToken.tokenStr);
-                statements(false);
-            }
-        }
-        else if(toExecute.szValue.equals("F"))
-        {
-            //skipTo("if", "endif");
-            //p("was false");
-            //p(scanner.currentToken.tokenStr);
-            statements(false);
-            scanner.getNext();
-            if(scanner.currentToken.tokenStr.equals("else")){
+        while(scanner.currentToken.subClassif != Token.END) {
+            if (toExecute.szValue.equals("T")) {
+                lastOpenStatement = scanner.currentToken;
+                //p(toExecute.szValue);
+                //p(scanner.currentToken.tokenStr);
                 statements(true);
+                scanner.getNext();
+
+                if (scanner.currentToken.tokenStr.equals("else")) {
+                    p("Current token: " + scanner.currentToken.tokenStr);
+                    statements(false);
+                }
+            } else if (toExecute.szValue.equals("F")) {
+                lastOpenStatement = scanner.currentToken;
+                //skipTo("if", "endif");
+                //p("was false");
+                //p(scanner.currentToken.tokenStr);
+                statements(false);
+                scanner.getNext();
+                if (scanner.currentToken.tokenStr.equals("else")) {
+                    statements(true);
+                }
             }
+            scanner.getNext();
         }
-
-        statements(true);
-        /*scanner.getNext();*/
-
-        //while(! scanner.currentToken.tokenStr.equals(":") )
-
-
+        endStatement(execute);
     }
 
     private ResultValue whileStatement(boolean execute) throws Exception {
@@ -321,9 +319,14 @@ public class Parser {
      */
     private ResultValue endStatement(boolean execute) throws Exception{
 
+        if(scanner.currentToken.primClassif == Token.EOF)
+            errorWithContext("End of file reached with no closing 'endif' statement. Last used if statement used at line "
+                + lastOpenStatement.iSourceLineNr + " , position " + lastOpenStatement.iColPos);
         ResultValue rt = null;
-
-        statements(true);
+        if(execute)
+            statements(true);
+        else
+            statements(false);
 
         //System.out.println(scanner.currentToken.tokenStr);
         return rt;
@@ -470,10 +473,6 @@ public class Parser {
                 return null;
 
             }
-            //move to assignment oparator
-            //if (!"=".equals(scanner.currentToken.tokenStr)) {
-            //    scanner.getNext();
-            //}
 
             //this should be better than above because could be +=, -=, etc.
             if (!scanner.currentToken.tokenStr.contains("=")) {
@@ -481,7 +480,6 @@ public class Parser {
             }
 
             // Creates and assigns a value into the first token
-/*        if(scanner.currentToken.tokenStr.equals("=")) {*/
             switch (scanner.currentToken.tokenStr) {
                 case "=":
                     scanner.getNext();
@@ -522,21 +520,8 @@ public class Parser {
 
                     }
                     // Assumes that the token has already been initialized and put into the symbol table
-                case "+=":
-                case "-=":
-                case "*=":
-                case "/=":
-                case "^=":
+                case "+=":case "-=":case "*=":case "/=":case "^=":
                     rt = unaryOperation(firstToken, scanner.currentToken.tokenStr);
-                    break;
-                case ">":
-                case ">=":
-                case "<":
-                case "<=":
-                case "==":
-                case "!=":
-                    System.out.println("Made it!");
-                    evaluateEquality(firstToken, scanner.currentToken.tokenStr);
                     break;
                 default:
                     errorWithContext("Bad shit happened. Given: " + scanner.currentToken.tokenStr);
@@ -557,13 +542,18 @@ public class Parser {
      */
     private ResultValue evaluateEquality(Token leftToken, String comparison) throws Exception
     {
-        ResultValue retVal;
+        ResultValue retVal = new ResultValue(null, 0);
 
         if(comparison.equals(":")){
             if(leftToken.subClassif == Token.BOOLEAN)
                 return new ResultValue(leftToken.tokenStr, Token.BOOLEAN);
-            else if (leftToken.subClassif == Token.IDENTIFIER)
-                return new ResultValue(this.storage.get(this,leftToken.tokenStr), Token.BOOLEAN);
+            else if (leftToken.subClassif == Token.IDENTIFIER){
+                retVal.szValue = this.storage.get(this, leftToken.tokenStr);
+                retVal.type = Token.BOOLEAN;
+                if(retVal.szValue == null)
+                    errorWithContext("Bad identifier given. Usage: " + leftToken.tokenStr);
+                return retVal;
+            }
             else
                 errorWithContext("Lone token MUST be a boolean! Given: " + leftToken.tokenStr);
         }
@@ -587,18 +577,26 @@ public class Parser {
         Numeric nOp1 = new Numeric(this, resOp1, "First Operator", comparison);
         Numeric nOp2 = new Numeric(this, resOp1, "Second Operator", comparison);
 
-        if (!":".equals(scanner.getNext())){
+        retVal = nOp2.equalValue(nOp1, nOp2, comparison);
+
+        if (! ":".equals(scanner.getNext()))
+        {
             //if there is more, do recursive call
             //4 > 3 and 3 < 4
             //^^^for future
+            switch(scanner.currentToken.tokenStr){
+                // Set up for later
+                case "and":
+                case "or":
 
-            errorWithContext("Expected ':' not found at end of statement. Given: " + scanner.currentToken.tokenStr);
-
+                default:
+                    errorWithContext("Expected ':' not found at end of statement. Given: " + scanner.currentToken.tokenStr);
+            }
         }
 
-        retVal = nOp2.equalValue(nOp1, nOp2, comparison);
         return retVal;
     }
+
 
     /**
      * Simple unary assignment method. Assumes that simple assignment statements have
@@ -890,8 +888,10 @@ public class Parser {
         return rt;
     }
 
-
-
+    /**
+     * Debugging method made by Justin. Needs to be better, but by God it gets the job done.
+     * @param s
+     */
     private void p(String s){
 
         System.out.println("OURDEBUGLINE::: " + s);
