@@ -232,13 +232,32 @@ public class Parser {
 
     }
 
-    private void skipTo(String curPos, String end)
-    {
+    /**
+     * Method to iterate through expressions from a starting statement to a separator.
+     * Called if a previous expression has already been evaluated to false. So, if given
+     * `if i < 0:` it will skip from "if" to the ":".
+     * @param startPositon Starting statement in the thread. Provided as error checker.
+     * @param endPosition Separator to return out of.
+     * @throws Exception If a separator is never encountered, i.e. end of file is reached,
+     * error will be thrown.
+     */
+    private void skipTo(String startPositon, String endPosition) throws Exception {
+        int startColPos = scanner.currentToken.iColPos;
+        int startLnPos = scanner.currentToken.iSourceLineNr;
+        while(true)
+        {
+            scanner.getNext();
 
-        if (curPos == "if") {
+            if(scanner.currentToken.tokenStr.equals(endPosition))
+            {
+                scanner.getNext();
+                return;
+            }
 
+            if(scanner.currentToken.primClassif == Token.EOF)
+                errorWithContext("Separator never encountered for " + startPositon
+                    + " statement found at line number " + startLnPos + ", position " + startColPos);
         }
-
     }
 
     /**
