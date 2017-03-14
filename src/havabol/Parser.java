@@ -269,7 +269,8 @@ public class Parser {
     private void ifStatement(boolean execute) throws Exception {
         ResultValue rt = null;
 
-        if(! execute){
+        if(! execute)
+        {
             statements(false);
             scanner.getNext();
             if(scanner.currentToken.tokenStr.equals("if"))
