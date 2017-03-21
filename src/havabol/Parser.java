@@ -316,29 +316,31 @@ public class Parser {
     }
 
     private void ifStatement(boolean execute) throws Exception {
-        scanner.getNext();
+        String controlVar = scanner.currentToken.tokenStr;
 
-        if(execute){
-            ResultValue resultCond = evaluateEquality(scanner.currentToken, scanner.getNext());
-            ResultValue toExecute = null;
-            if(resultCond.szValue.equals("T"))
+        if(execute)
+        {
+            switch (controlVar)
             {
-                toExecute = statements(true);
-                if(toExecute.szValue.equals("else"))
-                {
+                case "if":
+                    scanner.getNext();
+                    ResultValue resultCond = evaluateEquality(scanner.currentToken, scanner.getNext());
+                    ResultValue toExecute = null;
+                    scanner.getNext();
+                    if (resultCond.szValue.equals("T")) {
 
-                    statements(false);
-                }
-                else
-                {
+                        toExecute = statements(true);
+                        if (toExecute.szValue.equals("else")) {
 
-                    statements(false);
-                }
+                            statements(false);
+                        } else if (toExecute.szValue.equals("endif")) {
+                            statements(true);
+                        }
+                        else {
 
-            }
-            else
-            {
-                statements(false);
+                            statements(false);
+                        }
+                    }
             }
         }
         else
