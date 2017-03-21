@@ -48,7 +48,7 @@ public class Parser {
      */
     public void parse() throws Exception {
         //init result value as null - don't think it is necessary here though
-        boolean rt = true;
+        ResultValue rt = new ResultValue("", 0);
 
         //begin grabbing items from scanner
         rt = statements(true);
@@ -75,7 +75,7 @@ public class Parser {
      * @return ResultValue - at this point not necessary here
      * @throws Exception should be ScannerException
      */
-    private boolean statements(boolean execute) throws Exception {
+    private ResultValue statements(boolean execute) throws Exception {
 
         //init result value so methods can return into rt
         ResultValue rt = null;
@@ -108,12 +108,12 @@ public class Parser {
                     //if default happens, something is seriously wrong in our code
                     default:
                         errorWithContext("Something went seriously wrong. Given: " + scanner.currentToken.tokenStr);
-                        return false;
+                        return null;
                 }
 
             }
         }
-        return execute; //returns only to parse()
+        return rt; //returns only to parse()
     }
 
     /**
