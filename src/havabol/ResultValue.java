@@ -10,23 +10,17 @@ package havabol;
  * @author Justin Hooge
  */
 public class ResultValue {
-    
+
     public int type;             // Data type of result
     public String szValue;          // Data in string representation 
     public String structure;        // Primitive, fixed array, unbounded array
     public String terminatingStr;   // Used for end of lists of things (e.g.,
-                                    // list of starter terminated by "endwhile"
-    
+    // list of starter terminated by "endwhile"
+
     public ResultValue(String value, int dataType) {
-        
+
         this.szValue = value;
         this.type = dataType;
-        
-    }
 
-    public void setType(int type)
-    {
-        this.type = type;
     }
-    
 }

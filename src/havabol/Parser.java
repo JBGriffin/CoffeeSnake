@@ -113,6 +113,10 @@ public class Parser {
 
             }
         }
+        else {
+            rt = new ResultValue("F", Token.END);
+            return rt;
+        }
         return rt; //returns only to parse()
     }
 
@@ -266,7 +270,7 @@ public class Parser {
      * @param execute Boolean to decide whether or not to execute statements.
      * @throws Exception Kills the program if something goes wrong
      */
-    private void ifStatement(boolean execute) throws Exception {
+    private void ifStatementOld(boolean execute) throws Exception {
         ResultValue rt = null;
 
         if(! execute)
@@ -291,6 +295,7 @@ public class Parser {
 
                 if (scanner.currentToken.tokenStr.equals("else")) {
                     p("Current token: " + scanner.currentToken.tokenStr);
+                    toExecute.szValue = "F";
                     statements(false);
                 }
             } else if (toExecute.szValue.equals("F")) {
@@ -301,12 +306,46 @@ public class Parser {
                 statements(false);
                 scanner.getNext();
                 if (scanner.currentToken.tokenStr.equals("else")) {
+                    toExecute.szValue = "T";
                     statements(true);
                 }
             }
             scanner.getNext();
         }
         endStatement(execute);
+    }
+
+    private void ifStatement(boolean execute) throws Exception {
+        scanner.getNext();
+
+        if(execute){
+            ResultValue resultCond = evaluateEquality(scanner.currentToken, scanner.getNext());
+            ResultValue toExecute = null;
+            if(resultCond.szValue.equals("T"))
+            {
+                toExecute = statements(true);
+                if(toExecute.szValue.equals("else"))
+                {
+
+                    statements(false);
+                }
+                else
+                {
+
+                    statements(false);
+                }
+
+            }
+            else
+            {
+                statements(false);
+            }
+        }
+        else
+        {
+            skipTo("if", ":");
+            statements(false);
+        }
     }
 
     private ResultValue whileStatement(boolean execute) throws Exception {
@@ -343,11 +382,26 @@ public class Parser {
             errorWithContext("End of file reached with no closing 'endif' statement. Last used if statement used at line "
                 + lastOpenStatement.iSourceLineNr + " , position " + lastOpenStatement.iColPos);
         ResultValue rt = null;
-        if(execute)
+       /* if(execute)
             statements(true);
         else
-            statements(false);
+            statements(false);*/
+        if(!execute)
+            return null;
+        switch(scanner.currentToken.tokenStr)
+        {
+            case "endif":
+                rt = new ResultValue("endif", Token.END);
+                break;
+            case "else":
+                rt = new ResultValue("else", Token.END);
+                break;
+            case "endwhile":
+                rt = new ResultValue("endwhile", Token.END);
+                break;
+            default:
 
+        }
         //System.out.println(scanner.currentToken.tokenStr);
         return rt;
 

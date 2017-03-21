@@ -30,10 +30,10 @@ public class HavaBol
         Scanner scan;
         Parser parser;
         try {
-            System.out.printf("%-11s %-12s %s\n"
+            /*System.out.printf("%-11s %-12s %s\n"
                     , "primClassif"
                     , "subClassif"
-                    , "tokenStr");
+                    , "tokenStr");*/
             scan = new Scanner(args[0], symbolTable);
             parser = new Parser(symbolTable, scan);
             parser.parse();
