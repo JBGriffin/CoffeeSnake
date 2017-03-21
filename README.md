@@ -28,4 +28,5 @@ Assignment 3 Due Thursday, March 23rd:
     
 
     //TO DO
-
+    // Change greater than, equal to, etc to only check left 
+    // type, and that is what equality is off of.
