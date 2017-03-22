@@ -29,9 +29,9 @@ public class Scanner {
 	
 	private String currentLine;
 	private String sourceFileName;
-	private ArrayList<String> sourceFileM;
-	private int iColPos;
-	private int iSourceLineNr;
+	public ArrayList<String> sourceFileM;
+	public int iColPos;
+	public int iSourceLineNr;
 	private char[] textCharM;
     //Parser parser;
 	SymbolTable st;
@@ -77,7 +77,7 @@ public class Scanner {
 	 * currentLine to the next line of the code. Once the file size is met, will break to return EoF.
 	 * <p>
 	 */
-	private void advanceLine()
+	public void advanceLine()
 	{
 		iSourceLineNr += 1;
 		iColPos = 0;

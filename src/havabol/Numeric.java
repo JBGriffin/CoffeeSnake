@@ -37,22 +37,23 @@ public class Numeric
             case Token.IDENTIFIER:
                 try
                 {
-                    doubleValue = Double.parseDouble(strValue);
+                    integerValue = Integer.parseInt(strValue);
+                    type = Token.INTEGER;
                 }
-                catch (NullPointerException e)
+                catch (NumberFormatException e)
                 {
                     try
                     {
-                        integerValue = Integer.parseInt(strValue);
+
+                        doubleValue = Double.parseDouble(strValue);
+                        type = Token.FLOAT;
                     }
-                    catch (NullPointerException i)
+                    catch (NumberFormatException i)
                     {
                         parser.errorWithContext("Expression must be a numeric. Item " + resultValue.szValue
                             + " given as " + resultValue.type);
                     }
                 }
-
-
                 break;
             default:
                 parser.errorWithContext("Expression must be a numeric. Item " + resultValue.szValue + " given as " + resultValue.type);
@@ -71,6 +72,13 @@ public class Numeric
         resultValue.type = type;
         resultValue.szValue = szValue;
         return resultValue;
+    }
+
+    private ResultValue setBool(ResultValue resultValue, boolean bValue)
+    {
+        ResultValue boolVal = new ResultValue(bValue + "", Token.BOOLEAN);
+
+        return boolVal;
     }
 
     /**
@@ -294,6 +302,8 @@ public class Numeric
                 {
                     returnValue = setValue(returnValue, Token.BOOLEAN
                             , (leftNum.integerValue > rightNum.integerValue) + "");
+
+
                 }
                 else if (leftNum.type == Token.FLOAT && rightNum.type == Token.FLOAT)
                 {
@@ -405,21 +415,25 @@ public class Numeric
                 {
                     returnValue = setValue(returnValue, Token.BOOLEAN
                             , (leftNum.integerValue != rightNum.integerValue) + "");
+
                 }
                 else if (leftNum.type == Token.FLOAT && rightNum.type == Token.FLOAT)
                 {
                     returnValue = setValue(returnValue, Token.BOOLEAN
                             , (leftNum.doubleValue != rightNum.doubleValue) + "");
+
                 }
                 else if(leftNum.type == Token.INTEGER && rightNum.type == Token.FLOAT)
                 {
                     returnValue = setValue(returnValue, Token.BOOLEAN
                             , (leftNum.integerValue != rightNum.doubleValue) + "");
+
                 }
                 else
                 {
                     returnValue = setValue(returnValue, Token.BOOLEAN
                             , (leftNum.doubleValue != rightNum.doubleValue) + "");
+
                 }
                 break;
             default:

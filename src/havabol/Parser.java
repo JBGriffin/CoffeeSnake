@@ -92,7 +92,7 @@ private ResultValue statements(boolean execute) throws Exception {
                     //return if it is "else" or "endif"
 
 
-                    if(rt != null && (rt.szValue.equals("else") || rt.szValue.equals("endif"))) {
+                    if(rt != null && (rt.szValue.equals("else") || rt.szValue.equals("endif") || (rt.szValue.equals("endwhile")))) {
                         return rt;
                     }
                     break;
@@ -107,8 +107,9 @@ private ResultValue statements(boolean execute) throws Exception {
                 //handle operators - this probably should not be legal
                 //and will need to throw proper exception
                 case Token.OPERATOR:
-                    errorWithContext("Unexpected operator found. Usage: " + scanner.currentToken.tokenStr);
-                    break;
+                    //errorWithContext("Unexpected operator found. Usage: " + scanner.currentToken.tokenStr);
+                    scanner.getNext();
+                    continue;
                 case Token.SEPARATOR:
                     rt = null;
                     break;
@@ -236,6 +237,7 @@ private ResultValue flowStatement(boolean execute) throws Exception {
             break;
         case "while":
             whileStatement(execute);
+            break;
 
     }
 
@@ -370,24 +372,64 @@ private void ifStatement(boolean execute) throws Exception {
     }
 }
 
-private ResultValue whileStatement(boolean execute) throws Exception {
+private void whileStatement(boolean execute) throws Exception {
 
-    ResultValue rt = null;
+    if(execute)
+    {
+        int iWhileStart = scanner.currentToken.iSourceLineNr - 1;
+        int iColPos = scanner.currentToken.iColPos;
+        int iEndWhile;
+        int iColEnd;
+        scanner.getNext();
+        ResultValue resultCond = evaluateEquality(scanner.currentToken, scanner.getNext());
+        ResultValue toExecute = null;
+        scanner.getNext();
 
-    scanner.getNext();
-    switch (scanner.currentToken.subClassif) {
-        case Token.IDENTIFIER:
-            break;
-        case Token.INTEGER:
-            break;
-        case Token.FLOAT:
-            break;
-        case Token.STRING:
-            break;
+        //p(iWhileStart + " " + iColPos);
+        //p(scanner.sourceFileM.get(iWhileStart));
+        while (resultCond.szValue.equals("T")) {
+            toExecute = statements(true);
+            if (toExecute.szValue.equals("endwhile")) {
+                iColEnd = scanner.iColPos;
+                iEndWhile = scanner.iSourceLineNr;
+                scanner.iSourceLineNr = iWhileStart;
+                scanner.iColPos = iColPos;
+                scanner.advanceLine();
+                scanner.getNext();
+                scanner.getNext();
+                resultCond = evaluateEquality(scanner.currentToken, scanner.getNext());
+                scanner.getNext();
+                if (resultCond.szValue.equals("T")){
+                    continue;
+                } else {
+                    scanner.iSourceLineNr = iEndWhile;
+                    scanner.iColPos = iColEnd;
+                    scanner.advanceLine();
+                    return;
+                }
+
+                //if (scanner.getNext().equals(":"))
+                //    scanner.getNext();
+                //return;
+            }
+        }
+        //if was false
+
+        p(417);
+            toExecute = statements(false);
+        p(418);
+            if (toExecute.szValue.equals("endwhile")) {
+                if (scanner.getNext().equals(":"))
+                    scanner.getNext();
+                return;
+            }
 
     }
-
-    return rt;
+    else
+    {
+        skipTo("while", ":");
+        statements(false);
+    }
 
 }
 
@@ -420,9 +462,9 @@ private ResultValue endStatement(boolean execute) throws Exception{
             return rt;
         case "endwhile":
             rt = new ResultValue("endwhile", Token.END);
-            break;
+            return rt;
         default:
-
+            errorWithContext("Expected ending statement");
     }
     //System.out.println(scanner.currentToken.tokenStr);
     return rt;
@@ -621,7 +663,7 @@ private ResultValue assignments(boolean execute) throws Exception {
                 }
                 // Assumes that the token has already been initialized and put into the symbol table
             case "+=":case "-=":case "*=":case "/=":case "^=":
-                rt = unaryOperation(firstToken, scanner.currentToken.tokenStr);
+                rt = unaryOperation(execute, firstToken, scanner.currentToken.tokenStr);
                 break;
             default:
                 errorWithContext("Bad shit happened. Given: " + scanner.currentToken.tokenStr);
@@ -668,13 +710,12 @@ private ResultValue evaluateEquality(Token leftToken, String comparison) throws 
     resOp1.szValue = this.storage.get(this, leftToken.tokenStr);
     if(resOp1.szValue == null)
         resOp1.szValue = leftToken.tokenStr;
-
     resOp2.szValue = this.storage.get(this, rightToken.tokenStr);
     if(resOp2.szValue == null)
         resOp2.szValue = rightToken.tokenStr;
 
     Numeric nOp1 = new Numeric(this, resOp1, "First Operator", comparison);
-    Numeric nOp2 = new Numeric(this, resOp1, "Second Operator", comparison);
+    Numeric nOp2 = new Numeric(this, resOp2, "Second Operator", comparison);
 
     retVal = nOp2.equalValue(nOp1, nOp2, comparison);
 
@@ -705,7 +746,7 @@ private ResultValue evaluateEquality(Token leftToken, String comparison) throws 
  * @return Result value of the operation given. If x += 2 were given, will return x incremented
  * by 2.
  */
-private ResultValue unaryOperation(Token leftToken, String operator) throws Exception {
+private ResultValue unaryOperation(boolean execute, Token leftToken, String operator) throws Exception {
     scanner.getNext();
     Token rightToken = scanner.nextToken;
 
@@ -753,7 +794,8 @@ private ResultValue unaryOperation(Token leftToken, String operator) throws Exce
             errorWithContext("Bad operator given: " + operator);
     }
 
-    this.storage.put(leftToken.tokenStr, returnValue.szValue);
+    if (execute)
+        this.storage.put(leftToken.tokenStr, returnValue.szValue);
     return returnValue;
 }
 
@@ -995,6 +1037,10 @@ private void p(String s){
 
     System.out.println("OURDEBUGLINE::: " + s);
 
+}
+
+private void p(int LineNumber){
+    System.out.println("Line Number::: " + LineNumber);
 }
 
 }
