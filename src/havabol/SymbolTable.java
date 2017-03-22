@@ -41,7 +41,7 @@ public class SymbolTable {
          * @param entry to put in table
          */
         public void putSymbol(String symbol, STEntry entry){
-            System.out.println(symbol + " being saved");
+            //System.out.println(symbol + " being saved");
             this.ht.put(symbol, entry);
             
         }

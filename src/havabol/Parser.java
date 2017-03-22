@@ -278,7 +278,7 @@ public class Parser {
         if(execute)
         {
             scanner.getNext();
-            ResultValue resultCond = evaluateEquality(scanner.currentToken, scanner.getNext());
+            ResultValue resultCond = evaluateEquality(execute,scanner.currentToken, scanner.getNext());
             ResultValue toExecute = null;
             scanner.getNext();
             if (resultCond.szValue.equals("T")) {
@@ -331,7 +331,7 @@ public class Parser {
             int iEndWhile;
             int iColEnd;
             scanner.getNext();
-            ResultValue resultCond = evaluateEquality(scanner.currentToken, scanner.getNext());
+            ResultValue resultCond = evaluateEquality(execute,scanner.currentToken, scanner.getNext());
             ResultValue toExecute = null;
             scanner.getNext();
 
@@ -347,7 +347,7 @@ public class Parser {
 
                     scanner.loopReset(iWhileStart);
 
-                    resultCond = evaluateEquality(scanner.currentToken, scanner.getNext());
+                    resultCond = evaluateEquality(execute, scanner.currentToken, scanner.getNext());
                     scanner.getNext();
                     if (! resultCond.szValue.equals("T")){
                         scanner.iSourceLineNr = iEndWhile;
@@ -438,6 +438,7 @@ public class Parser {
                         //go until a necessary ; is found
                         while (!";".equals(scanner.getNext())) {
                             //check using sub class
+                            if (!execute) continue;
                             switch (scanner.currentToken.subClassif) {
                                 //if idenifier - get from storage
                                 //currently, if identifier does not exist it
@@ -614,7 +615,7 @@ public class Parser {
      * @return True or False based on whether or not the item is equal
      * @throws Exception Exception thrown if something went seriously wrong
      */
-    private ResultValue evaluateEquality(Token leftToken, String comparison) throws Exception
+    private ResultValue evaluateEquality(boolean execute, Token leftToken, String comparison) throws Exception
     {
         ResultValue retVal = new ResultValue(null, 0);
 
@@ -622,7 +623,8 @@ public class Parser {
             if(leftToken.subClassif == Token.BOOLEAN)
                 return new ResultValue(leftToken.tokenStr, Token.BOOLEAN);
             else if (leftToken.subClassif == Token.IDENTIFIER){
-                retVal.szValue = this.storage.get(this, leftToken.tokenStr);
+                if (execute)
+                    retVal.szValue = this.storage.get(this, leftToken.tokenStr);
                 retVal.type = Token.BOOLEAN;
                 if(retVal.szValue == null)
                     errorWithContext("Bad identifier given. Usage: " + leftToken.tokenStr);
@@ -636,22 +638,22 @@ public class Parser {
         // Advance the cursor
         scanner.getNext();
         Token rightToken = scanner.currentToken;    // Solely for readability
+        if (execute) {
+            ResultValue resOp1 = new ResultValue(leftToken.tokenStr, leftToken.subClassif);
+            ResultValue resOp2 = new ResultValue(rightToken.tokenStr, rightToken.subClassif);
 
-        ResultValue resOp1 = new ResultValue(leftToken.tokenStr, leftToken.subClassif);
-        ResultValue resOp2 = new ResultValue(rightToken.tokenStr, rightToken.subClassif);
+            resOp1.szValue = this.storage.get(this, leftToken.tokenStr);
+            if(resOp1.szValue == null)
+                resOp1.szValue = leftToken.tokenStr;
+            resOp2.szValue = this.storage.get(this, rightToken.tokenStr);
+            if(resOp2.szValue == null)
+                resOp2.szValue = rightToken.tokenStr;
 
-        resOp1.szValue = this.storage.get(this, leftToken.tokenStr);
-        if(resOp1.szValue == null)
-            resOp1.szValue = leftToken.tokenStr;
-        resOp2.szValue = this.storage.get(this, rightToken.tokenStr);
-        if(resOp2.szValue == null)
-            resOp2.szValue = rightToken.tokenStr;
+            Numeric nOp1 = new Numeric(this, resOp1, "First Operator", comparison);
+            Numeric nOp2 = new Numeric(this, resOp2, "Second Operator", comparison);
 
-        Numeric nOp1 = new Numeric(this, resOp1, "First Operator", comparison);
-        Numeric nOp2 = new Numeric(this, resOp2, "Second Operator", comparison);
-
-        retVal = nOp2.equalValue(nOp1, nOp2, comparison);
-
+            retVal = nOp2.equalValue(nOp1, nOp2, comparison);
+        }
         if (! ":".equals(scanner.getNext()))
         {
             //if there is more, do recursive call
@@ -660,8 +662,9 @@ public class Parser {
             switch(scanner.currentToken.tokenStr){
                 // Set up for later
                 case "and":
+                    break;
                 case "or":
-
+                    break;
                 default:
                     errorWithContext("Expected ':' not found at end of statement. Given: " + scanner.currentToken.tokenStr);
             }
@@ -681,11 +684,14 @@ public class Parser {
      */
     private ResultValue unaryOperation(boolean execute, Token leftToken, String operator) throws Exception {
         scanner.getNext();
+        
         Token rightToken = scanner.nextToken;
 
         ResultValue resOp1 = new ResultValue(leftToken.tokenStr, leftToken.subClassif);
-
-        resOp1.szValue = this.storage.get(this, leftToken.tokenStr);
+        if (execute)
+            resOp1.szValue = this.storage.get(this, leftToken.tokenStr);
+        else
+            resOp1.szValue = "0";
         if(resOp1.szValue == null)
             errorWithContext("Value must be initiated before use! Given: " + leftToken.tokenStr);
 
@@ -699,7 +705,10 @@ public class Parser {
         // Check if the value exists in storage. If it does, we'll set it to that value
         // If it doesn't, set it back to the second token's value. Numeric will take care
         // of it if it's not a proper value
-        resOp2.szValue = this.storage.get(this, rightToken.tokenStr);
+        if (execute)
+            resOp2.szValue = this.storage.get(this, rightToken.tokenStr);
+        else
+            resOp2.szValue = "0";
         if(resOp2.szValue == null)
             resOp2.szValue = rightToken.tokenStr;
 
@@ -853,7 +862,7 @@ public class Parser {
                 }
                 else // Check for equalities
                 {
-                    return rt = evaluateEquality(firstToken, scanner.currentToken.tokenStr);
+                    return rt = evaluateEquality(execute, firstToken, scanner.currentToken.tokenStr);
                 }
             case Token.FLOAT:
                 //if negative, make negative
@@ -944,7 +953,7 @@ public class Parser {
                 }
                 else // Check for equalities
                 {
-                    return rt = evaluateEquality(firstToken, scanner.currentToken.tokenStr);
+                    return rt = evaluateEquality(execute, firstToken, scanner.currentToken.tokenStr);
                 }
             case Token.BOOLEAN:
                 //if negative, make negative
