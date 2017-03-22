@@ -80,53 +80,51 @@ public class Parser {
 
         //init result value so methods can return into rt
         ResultValue rt = null;
-        if(true) {
-            //go until all source code is empty
-            while (!scanner.currentToken.tokenStr.isEmpty()) {
-                //System.out.println("In statemnts with " + scanner.currentToken.tokenStr);
-                //checking for all possible primary classifications
-                switch (scanner.currentToken.primClassif) {
-                    //handle control
-                    case Token.CONTROL:
-                        rt = controlStatement(execute);
-                        //return if it is "else" or "endif"
+        /*if(true) {*/
+        //go until all source code is empty
+        while (!scanner.currentToken.tokenStr.isEmpty()) {
+            //System.out.println("In statemnts with " + scanner.currentToken.tokenStr);
+            //checking for all possible primary classifications
+            switch (scanner.currentToken.primClassif) {
+                //handle control
+                case Token.CONTROL:
+                    rt = controlStatement(execute);
+                    //return if it is "else" or "endif"
 
 
-                        if(rt != null && (rt.szValue.equals("else") || rt.szValue.equals("endif") || (rt.szValue.equals("endwhile")))) {
-                            return rt;
-                        }
-                        break;
-                    //handle operands
-                    case Token.OPERAND:
-                        rt = operand(execute);
-                        break;
-                    //handle functions - currently only built in (Assign 3)
-                    case Token.FUNCTION:
-                        rt = function(execute);
-                        break;
-                    //handle operators - this probably should not be legal
-                    //and will need to throw proper exception
-                    case Token.OPERATOR:
-                        //errorWithContext("Unexpected operator found. Usage: " + scanner.currentToken.tokenStr);
-                        scanner.getNext();
-                        continue;
-                    case Token.SEPARATOR:
-                        rt = null;
-                        break;
-                    //if default happens, something is seriously wrong in our code
-                    default:
-                        errorWithContext("Something went seriously wrong. Given: " + scanner.currentToken.tokenStr);
-                        return null;
-                }
-
-                scanner.getNext();
-
+                    if(rt != null && (rt.szValue.equals("else") || rt.szValue.equals("endif") || (rt.szValue.equals("endwhile")))) {
+                        return rt;
+                    }
+                    break;
+                //handle operands
+                case Token.OPERAND:
+                    rt = operand(execute);
+                    break;
+                //handle functions - currently only built in (Assign 3)
+                case Token.FUNCTION:
+                    rt = function(execute);
+                    break;
+                //handle operators - this probably should not be legal
+                //and will need to throw proper exception
+                case Token.OPERATOR:
+                    //errorWithContext("Unexpected operator found. Usage: " + scanner.currentToken.tokenStr);
+                    scanner.getNext();
+                    continue;
+                case Token.SEPARATOR:
+                    rt = null;
+                    break;
+                //if default happens, something is seriously wrong in our code
+                default:
+                    errorWithContext("Something went seriously wrong. Given: " + scanner.currentToken.tokenStr);
+                    return null;
             }
+            scanner.getNext();
         }
-        else {
+        //}
+        /*else {
             rt = new ResultValue("F", Token.END);
             return rt;
-        }
+        }*/
         return rt; //returns only to parse()
     }
 
@@ -150,7 +148,7 @@ public class Parser {
                 break;
             //if flow (if, while, etc.) call flow
             case Token.FLOW:
-                returnValue = flowStatement(execute);
+                flowStatement(execute);
                 break;
             //if end (endif, endwhile, etc.) call end
             case Token.END:
@@ -171,7 +169,7 @@ public class Parser {
      * control - declare token and the next should be an identifier - if not
      * throw exception
      *
-     * @param execute
+     * @param execute Boolean to determine whether or not the statement needs to be executed
      * @return ResultValue to controlStatement
      * @throws Exception should be ParseException
      */
@@ -222,12 +220,11 @@ public class Parser {
 
     /**
      *
-     * NEEDS CODE - would be called for if,while, etc.
+     * Called to determine what flow statement to call, e.g. if, while, for loops
      *
-     * @param execute
-     * @return ResultValue
+     * @param execute Whether or not to execute the statements
      */
-    private ResultValue flowStatement(boolean execute) throws Exception {
+    private void flowStatement(boolean execute) throws Exception {
 
         ResultValue returnValue = null;
 
@@ -240,21 +237,18 @@ public class Parser {
                 break;
 
         }
-
-        return returnValue;
-
     }
 
     /**
      * Method to iterate through expressions from a starting statement to a separator.
      * Called if a previous expression has already been evaluated to false. So, if given
      * `if i < 0:` it will skip from "if" to the ":".
-     * @param startPositon Starting statement in the thread. Provided as error checker.
+     * @param startPosition Starting statement in the thread. Provided as error checker.
      * @param endPosition Separator to return out of.
      * @throws Exception If a separator is never encountered, i.e. end of file is reached,
      * error will be thrown.
      */
-    private void skipTo(String startPositon, String endPosition) throws Exception {
+    private void skipTo(String startPosition, String endPosition) throws Exception {
         int startColPos = scanner.currentToken.iColPos;
         int startLnPos = scanner.currentToken.iSourceLineNr;
         while(true)
@@ -268,7 +262,7 @@ public class Parser {
             }
 
             if(scanner.currentToken.primClassif == Token.EOF)
-                errorWithContext("Separator never encountered for " + startPositon
+                errorWithContext("Separator never encountered for " + startPosition
                         + " statement found at line number " + startLnPos + ", position " + startColPos);
         }
     }
@@ -304,10 +298,8 @@ public class Parser {
             }
             //if was false
             else {
-
                 toExecute = statements(false);
                 if (toExecute.szValue.equals("else")) {
-
                     scanner.getNext();
                     scanner.getNext();
                     statements(true);
@@ -336,7 +328,6 @@ public class Parser {
         if(execute)
         {
             int iWhileStart = scanner.currentToken.iSourceLineNr - 1;
-            int iColPos = scanner.currentToken.iColPos;
             int iEndWhile;
             int iColEnd;
             scanner.getNext();
@@ -346,21 +337,19 @@ public class Parser {
 
             //p(iWhileStart + " " + iColPos);
             //p(scanner.sourceFileM.get(iWhileStart));
+
+            // Will loop until condition is false.
             while (resultCond.szValue.equals("T")) {
                 toExecute = statements(true);
                 if (toExecute.szValue.equals("endwhile")) {
                     iColEnd = scanner.iColPos;
                     iEndWhile = scanner.iSourceLineNr;
-                    scanner.iSourceLineNr = iWhileStart;
-                    scanner.iColPos = iColPos;
-                    scanner.advanceLine();
-                    scanner.getNext();
-                    scanner.getNext();
+
+                    scanner.loopReset(iWhileStart);
+
                     resultCond = evaluateEquality(scanner.currentToken, scanner.getNext());
                     scanner.getNext();
-                    if (resultCond.szValue.equals("T")){
-                        continue;
-                    } else {
+                    if (! resultCond.szValue.equals("T")){
                         scanner.iSourceLineNr = iEndWhile;
                         scanner.iColPos = iColEnd;
                         scanner.advanceLine();
@@ -369,14 +358,13 @@ public class Parser {
                 }
             }
             //while evaluation was false
-
-
             toExecute = statements(false);
             if (toExecute.szValue.equals("endwhile"))
             {
-                if (scanner.getNext().equals(":"))
+                if (scanner.getNext().equals(":")) {
+
                     scanner.getNext();
-                return;
+                }
             }
 
         }
@@ -389,17 +377,17 @@ public class Parser {
 
     /**
      *
-     * NEEDS CODE
+     * Ending statement has been encountered. Will return the proper ending statement
      *
-     * @param execute
-     * @return ResultValue
+     * @param execute Whether or not to execute the statement
+     * @return ResultValue Value of the item given. Will return endif, endwhile, etc.
      */
     private ResultValue endStatement(boolean execute) throws Exception{
 
         if(scanner.currentToken.primClassif == Token.EOF)
             errorWithContext("End of file reached with no closing 'endif' statement. Last used if statement used at line "
                     + lastOpenStatement.iSourceLineNr + " , position " + lastOpenStatement.iColPos);
-        ResultValue rt = null;
+        ResultValue rt;
 
         switch(scanner.currentToken.tokenStr)
         {
@@ -413,19 +401,19 @@ public class Parser {
                 rt = new ResultValue("endwhile", Token.END);
                 return rt;
             default:
-                errorWithContext("Expected ending statement");
+                errorWithContext("Expected ending statement. Given: " + scanner.currentToken.tokenStr);
         }
-        //System.out.println(scanner.currentToken.tokenStr);
-        return rt;
-
+        // Will never reach this
+        return null;
     }
 
     /**
-     * function currently only handles built in function "print"
+     * Function currently only handles built in function "print"
      *
-     * @param execute
-     * @return ResultValue
-     * @throws Exception
+     * @param execute Whether or not to execute the function
+     * @return ResultValue Returns value for the function. Will only return something from
+     * user defined functions
+     * @throws Exception If something goes wrong, kills the program
      */
     private ResultValue function(boolean execute) throws Exception {
         ResultValue rt = null; //init for assignment
@@ -489,9 +477,9 @@ public class Parser {
      * identifier exist - go to assignments, else - exit So far, only called
      * from statements method.
      *
-     * @param execute
-     * @return
-     * @throws Exception
+     * @param execute Whether or not to execute the statement
+     * @return The value of the assignment
+     * @throws Exception Thrown if assignment set up incorrectly
      */
     private ResultValue operand(boolean execute) throws Exception {
 
@@ -508,8 +496,7 @@ public class Parser {
                     if (ste == null) {
 
                         //needs to throw parser exception
-                /*System.err.println("Error!");*/
-                        errorWithContext("Syntax Error");
+                        errorWithContext("Incorrect token given. Usage: " + scanner.currentToken.tokenStr);
                         return null;
 
                         //it does exist so call assignments to handle the rest
@@ -536,12 +523,9 @@ public class Parser {
 
     /**
      *
-     * assinments will handle anything starting with =, +=, -=, etc.
-     *
+     * Assignments will handle anything starting with =, +=, -=, etc.
      * and will call expressions after determining which assignment type it is
-     *
-     *
-     *
+     * <p>
      * @param execute Boolean to see whether or not we execute the statement
      * @return ResultValue of completed assignment NOTE: = 2 + 3 will return 5
      * @throws Exception //should be ParseException
@@ -988,6 +972,10 @@ public class Parser {
 
     }
 
+    /**
+     * Even more janky debug statement, but it's just as useful
+     * @param LineNumber Line number we're on
+     */
     private void p(int LineNumber){
         System.out.println("Line Number::: " + LineNumber);
     }

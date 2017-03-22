@@ -29,7 +29,7 @@ public class Scanner {
 	
 	private String currentLine;
 	private String sourceFileName;
-	public ArrayList<String> sourceFileM;
+	private ArrayList<String> sourceFileM;
 	public int iColPos;
 	public int iSourceLineNr;
 	private char[] textCharM;
@@ -118,13 +118,9 @@ public class Scanner {
 		{
 			advanceLine();
 		}
-                
-                
-		
+
 		// reset column position
 		iColPos = 0;
-                
-                
 	}
 	
 	/**
@@ -499,6 +495,26 @@ public class Scanner {
 					break;
 			}
 		}
+	}
+
+	/**
+	 * Utility to reset to the beginning of a loop. Sets source line to the start of
+	 * the while loop and creates two new tokens. Because advanceline() goes off
+	 * current line number, it will set itself to the proper tokens.
+	 * @param iLoopStart Start of the loop sent in
+	 * @throws Exception If do not exist, will throw an error
+	 */
+	public void loopReset(int iLoopStart) throws Exception
+	{
+		// Set up new tokens
+		this.iSourceLineNr = iLoopStart;
+		this.currentToken = new Token();
+		this.nextToken = new Token();
+
+		// Populate the new tokens
+		advanceLine();
+		getNext();
+		getNext();
 	}
 
 	/**
