@@ -822,7 +822,6 @@ public class Parser {
         //get all negative signs (Unary -)
         while ("U-".equals(scanner.currentToken.tokenStr)) {
 
-            p("FOUND NEGATIVE");
             firstIsNegative = !firstIsNegative;
             scanner.getNext();
             firstToken = scanner.currentToken;
