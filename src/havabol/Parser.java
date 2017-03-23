@@ -281,6 +281,41 @@ public class Parser {
             }
         }
     }
+    
+    
+    
+    /**
+     * Method to iterate through expressions from a starting statement to a
+     * separator. Called if a previous expression has already been evaluated to
+     * false. So, if given `if i < 0:` it will skip from "if" to the ":". @param
+     * startPosition Starting st
+     *
+     * atement in the thread. Provided as error checker. @param endPosition
+     * Separator to return out of. @throws Exception If a separator is never
+     * encountered, i.e. end of file is
+     *
+     * r
+     * eached, error will be thrown.
+     */
+    private void skipToEndif() throws Exception {
+        int startColPos = scanner.currentToken.iColPos;
+        int startLnPos = scanner.currentToken.iSourceLineNr;
+        
+        int iIfsEncountered = 0;
+        
+        while(!scanner.currentToken.tokenStr.isEmpty()){
+            if (scanner.getNext().equals("if")) iIfsEncountered++;
+            if (scanner.currentToken.tokenStr.equals("endif")){
+                if (iIfsEncountered == 0) return;
+                iIfsEncountered--;
+            }
+            
+                errorWithContext("SkipTo error");
+            
+        }
+        
+       
+    }
 
     /**
      * Evaluates if/else statements. Will decide whether or not to execute the
@@ -306,21 +341,21 @@ public class Parser {
 
             //if true, we want to execute statements until endif
             if (resultCond.szValue.equals("T")) {
-
                 toExecute = statements(true);
                 //do not execute this else
-                if (toExecute == null)
+                if (toExecute == null) {
                     errorWithContext("Expected \"endif\" or \"else\" near line " + iIfLine + " not found");
+                }
                 if (toExecute.szValue.equals("else")) {
-
                     //skip past else
                     scanner.getNext();
                     //skip past ":"
                     scanner.getNext();
                     //start executing with False until endif found
                     statements(false);
-                    if (!"endif".equals(scanner.currentToken.tokenStr))
+                    if (!"endif".equals(scanner.currentToken.tokenStr)) {
                         errorWithContext("Expected endif near " + iIfLine + " not found");
+                    }
                     //leave ifStatements once endif found
                 } else if (toExecute.szValue.equals("endif")) {
                     ////GARRETT I FOUND A BUG -> luckily it didn't affect anything
@@ -329,6 +364,22 @@ public class Parser {
                         scanner.getNext();
                     }
                     return;
+                    //ResultValue r = statements(execute);
+                    /*
+                    if (scanner.currentToken.tokenStr != null) {
+                        if ("else".equals(scanner.currentToken.tokenStr)) {
+                            scanner.getNext();
+                            scanner.getNext();
+                            //statements(!execute);
+                            //skipTo("else","endif");
+                            if (execute) statements(execute);
+                            p(378);
+                            skipToEndif();
+                            return;
+                        }
+                    }*/
+
+                    
                 }
             } //if was false
             else {
@@ -341,9 +392,9 @@ public class Parser {
                     //skip past :
                     scanner.getNext();
                     statements(true);
-
-                    if (!"endif".equals(scanner.currentToken.tokenStr))
+                    if (!"endif".equals(scanner.currentToken.tokenStr)) {
                         errorWithContext("Expected endif near " + iIfLine + " not found");
+                    }
                     //stop at endif
                 } else if (toExecute.szValue.equals("endif")) {
                     //skip over endif and ;
@@ -731,13 +782,13 @@ public class Parser {
             case "^=":
                 rt = unaryOperation(execute, firstToken, scanner.currentToken.tokenStr);
                 if (rt != null) {
-                                if (scanner.bShowExpr) {
-                                    System.out.println("\t\t... Expression: " + rt.szValue);
-                                }
-                                if (scanner.bShowAssign) {
-                                    System.out.println("\t\t... Assignment: " + firstToken.tokenStr + " = " + rt.szValue);
-                                }
-                            }
+                    if (scanner.bShowExpr) {
+                        System.out.println("\t\t... Expression: " + rt.szValue);
+                    }
+                    if (scanner.bShowAssign) {
+                        System.out.println("\t\t... Assignment: " + firstToken.tokenStr + " = " + rt.szValue);
+                    }
+                }
                 break;
             default:
                 errorWithContext("Expected assignment or \";.\" Found: " + scanner.currentToken.tokenStr);
@@ -799,6 +850,7 @@ public class Parser {
             if ((resOp1.type == Token.STRING || resOp1.type == Token.IDENTIFIER)
                     && (resOp2.type == Token.STRING || resOp2.type == Token.IDENTIFIER)) {
                 //do comparison between strings
+                
                 if ((resOp1.type == Token.IDENTIFIER
                         && ((STIdentifiers) symbolTable.getSymbol(leftToken.tokenStr)).iParmType != Token.STRING)
                         && (resOp2.type == Token.IDENTIFIER
@@ -809,26 +861,35 @@ public class Parser {
                     switch (comparison) {
                         case "<":
                             if (resOp1.szValue.compareTo(resOp2.szValue) < 0) {
-                                return new ResultValue(true + "", Token.BOOLEAN);
+                                return new ResultValue("T", Token.BOOLEAN);
+                            } else {
+                                return new ResultValue("F", Token.BOOLEAN);
                             }
                         case ">":
                             if (resOp1.szValue.compareTo(resOp2.szValue) > 0) {
-                                return new ResultValue(true + "", Token.BOOLEAN);
+                                return new ResultValue("T", Token.BOOLEAN);
+                            } else {
+                                return new ResultValue("F", Token.BOOLEAN);
                             }
                         case "==":
-                            return new ResultValue(resOp1.szValue.equals(resOp2.szValue) + "", Token.BOOLEAN);
+                            
+                            return new ResultValue((resOp1.szValue.equals(resOp2.szValue) + "").toUpperCase().charAt(0) + "", Token.BOOLEAN);
                         case "!=":
-                            return new ResultValue(!resOp1.szValue.equals(resOp2.szValue) + "", Token.BOOLEAN);
+                            return new ResultValue((!resOp1.szValue.equals(resOp2.szValue) + "").toUpperCase().charAt(0) + "", Token.BOOLEAN);
                         case ">=":
                             if (resOp1.szValue.compareTo(resOp2.szValue) >= 0) {
-                                return new ResultValue(true + "", Token.BOOLEAN);
+                                return new ResultValue("T", Token.BOOLEAN);
+                            } else {
+                                return new ResultValue("F", Token.BOOLEAN);
                             }
                         case "<=":
                             if (resOp1.szValue.compareTo(resOp2.szValue) <= 0) {
-                                return new ResultValue(true + "", Token.BOOLEAN);
+                                return new ResultValue("T", Token.BOOLEAN);
+                            } else {
+                                return new ResultValue("F", Token.BOOLEAN);
                             }
                     }
-                    return new ResultValue(resOp1.szValue.equals(resOp2.szValue) + "", Token.BOOLEAN);
+                    return new ResultValue((resOp1.szValue.equals(resOp2.szValue) + "").toUpperCase().charAt(0) + "", Token.BOOLEAN);
                 }
             }
 
@@ -1836,5 +1897,7 @@ public class Parser {
     private void p(int LineNumber) {
         System.out.println("Line Number::: " + LineNumber);
     }
+
+    
 
 }
