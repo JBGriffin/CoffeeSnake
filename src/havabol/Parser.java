@@ -296,6 +296,7 @@ public class Parser {
         //else, skip to next branch
         if (execute) {
             //move past "if"
+            int iIfLine = scanner.currentToken.iSourceLineNr;
             scanner.getNext();
             //returns = "T" or "F"
             ResultValue resultCond = evaluateEquality(execute, scanner.currentToken, scanner.getNext());
@@ -308,6 +309,8 @@ public class Parser {
 
                 toExecute = statements(true);
                 //do not execute this else
+                if (toExecute == null)
+                    errorWithContext("Expected \"endif\" or \"else\" near line " + iIfLine + " not found");
                 if (toExecute.szValue.equals("else")) {
 
                     //skip past else
@@ -316,7 +319,8 @@ public class Parser {
                     scanner.getNext();
                     //start executing with False until endif found
                     statements(false);
-
+                    if (!"endif".equals(scanner.currentToken.tokenStr))
+                        errorWithContext("Expected endif near " + iIfLine + " not found");
                     //leave ifStatements once endif found
                 } else if (toExecute.szValue.equals("endif")) {
                     ////GARRETT I FOUND A BUG -> luckily it didn't affect anything
@@ -338,6 +342,8 @@ public class Parser {
                     scanner.getNext();
                     statements(true);
 
+                    if (!"endif".equals(scanner.currentToken.tokenStr))
+                        errorWithContext("Expected endif near " + iIfLine + " not found");
                     //stop at endif
                 } else if (toExecute.szValue.equals("endif")) {
                     //skip over endif and ;
@@ -734,7 +740,7 @@ public class Parser {
                             }
                 break;
             default:
-                errorWithContext("Bad stuff happened. Given: " + scanner.currentToken.tokenStr);
+                errorWithContext("Expected assignment or \";.\" Found: " + scanner.currentToken.tokenStr);
         }
         return rt;
 
