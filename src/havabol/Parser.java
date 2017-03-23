@@ -119,6 +119,7 @@ public class Parser {
                     errorWithContext("Something went seriously wrong. Given: " + scanner.currentToken.tokenStr);
                     return null;
             }
+            //iterate to next token
             scanner.getNext();
         }
         //}
@@ -188,6 +189,7 @@ public class Parser {
             errorWithContext("Subclass is not an identifier. Usage: " + scanner.currentToken.tokenStr);
         }
 
+        //if execute is true, put item into symbol table
         if (execute) {
             switch (workingToken.tokenStr) {
                 //if Int - put in SymbolTable as Int
@@ -232,6 +234,7 @@ public class Parser {
         //p("flow statement");
         ResultValue returnValue = null;
 
+        //currently the only possibilities here are if and while. 
         switch (scanner.currentToken.tokenStr) {
             case "if":
                 ifStatement(execute);
@@ -239,6 +242,9 @@ public class Parser {
             case "while":
                 whileStatement(execute);
                 break;
+            default:
+                errorWithContext("Unexpected flow statement found");
+                
 
         }
     }
@@ -263,11 +269,13 @@ public class Parser {
         while (true) {
             scanner.getNext();
 
+            //go until end position is found, advance past and return to caller
             if (scanner.currentToken.tokenStr.equals(endPosition)) {
                 scanner.getNext();
                 return;
             }
 
+            //missing closing - tell user
             if (scanner.currentToken.primClassif == Token.EOF) {
                 errorWithContext("Separator never encountered for " + startPosition
                         + " statement found at line number " + startLnPos + ", position " + startColPos);
@@ -285,36 +293,56 @@ public class Parser {
      */
     private void ifStatement(boolean execute) throws Exception {
         //p("ifStatement");
+        //if we want to execute, go through statement
+        //else, skip to next branch
         if (execute) {
+            //move past "if"
             scanner.getNext();
+            //returns = "T" or "F"
             ResultValue resultCond = evaluateEquality(execute, scanner.currentToken, scanner.getNext());
             ResultValue toExecute = null;
-            scanner.getNext();
+            //move past ":"
+            scanner.getNext(); 
+            
+            //if true, we want to execute statements until endif
             if (resultCond.szValue.equals("T")) {
 
                 toExecute = statements(true);
+                //do not execute this else
                 if (toExecute.szValue.equals("else")) {
 
+                    //skip past else
                     scanner.getNext();
+                    //skip past ":"
                     scanner.getNext();
+                    //start executing with False until endif found
                     statements(false);
 
+                //leave ifStatements once endif found
                 } else if (toExecute.szValue.equals("endif")) {
-                    if (scanner.getNext().equals(":")) {
+                    ////GARRETT I FOUND A BUG -> luckily it didn't affect anything
+                    if (scanner.getNext().equals(";")) {
+                        //advance past endif and ;
                         scanner.getNext();
                     }
                     return;
                 }
             } //if was false
             else {
+                //skip first branch by sending false to statements
                 toExecute = statements(false);
+                //execute the else branch
                 if (toExecute.szValue.equals("else")) {
+                    //skip past else
                     scanner.getNext();
+                    //skip past :
                     scanner.getNext();
                     statements(true);
 
+                //stop at endif
                 } else if (toExecute.szValue.equals("endif")) {
-                    if (scanner.getNext().equals(":")) {
+                    //skip over endif and ;
+                    if (scanner.getNext().equals(";")) {
                         scanner.getNext();
                     }
                     return;
@@ -350,15 +378,19 @@ public class Parser {
             while (resultCond.szValue.equals("T")) {
                 toExecute = statements(true);
 
+                //once found, re-eval expression
                 if (toExecute.szValue.equals("endwhile")) {
                     //p("TO EXECUTE FOUND ENDWHILE");
                     iColEnd = scanner.iColPos;
                     iEndWhile = scanner.iSourceLineNr;
 
+                    //rewind loop
                     scanner.loopReset(iWhileStart);
 
+                    //re-eval
                     resultCond = evaluateEquality(execute, scanner.currentToken, scanner.getNext());
-                    scanner.getNext();
+                    scanner.getNext(); //move pass :
+                    //if not true, advance to end of loop
                     if (!resultCond.szValue.equals("T")) {
                         scanner.iSourceLineNr = iEndWhile;
                         scanner.iColPos = iColEnd;
@@ -368,11 +400,14 @@ public class Parser {
                 } else {
                     //found endif probably.
 
+                    
+                    //need to figure out what exactly this is about
                     scanner.getNext();
                 }
             }
             //while evaluation was false
             toExecute = statements(false);
+            //advance past endwhile and :
             if (toExecute.szValue.equals("endwhile")) {
                 if (scanner.getNext().equals(":")) {
 
@@ -380,6 +415,7 @@ public class Parser {
                 }
             }
 
+            //skip to end if needed
         } else {
             skipTo("while", ":");
             statements(false);
@@ -404,6 +440,8 @@ public class Parser {
         }
         ResultValue rt;
 
+        //determine which end statement it is
+        //needed for nested loops
         switch (scanner.currentToken.tokenStr) {
             case "endif":
                 rt = new ResultValue("endif", Token.END);
@@ -704,6 +742,7 @@ public class Parser {
                         && ((STIdentifiers) symbolTable.getSymbol(rightToken.tokenStr)).iParmType != Token.STRING)) {
 
                 } else {
+                    //handle string comparisons
                     switch (comparison) {
                         case "<":
                             if (resOp1.szValue.compareTo(resOp2.szValue) < 0) {
