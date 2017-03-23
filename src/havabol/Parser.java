@@ -632,11 +632,13 @@ public class Parser {
                         rt = expressions(execute);
 
                         if (execute) {
-                            if (scanner.bShowExpr) {
-                                System.out.println("\t\tExpression = " + rt.szValue);
-                            }
-                            if (scanner.bShowAssign) {
-                                System.out.println("\t\t" + firstToken.tokenStr + " = " + rt.szValue);
+                            if (rt.szValue != null) {
+                                if (scanner.bShowExpr) {
+                                    System.out.println("\t\tExpression = " + rt.szValue);
+                                }
+                                if (scanner.bShowAssign) {
+                                    System.out.println("\t\t" + firstToken.tokenStr + " = " + rt.szValue);
+                                }
                             }
                             switch (firstToken.subClassif) {
                                 case Token.INTEGER:
@@ -655,11 +657,13 @@ public class Parser {
                         rt = expressions(execute); //for now, throw error (Assign3)
 
                         if (execute) {
-                            if (scanner.bShowExpr) {
-                                System.out.println("\t\tExpression = " + rt.szValue);
-                            }
-                            if (scanner.bShowAssign) {
-                                System.out.println("\t\t" + firstToken.tokenStr + " = " + rt.szValue);
+                            if (rt.szValue != null) {
+                                if (scanner.bShowExpr) {
+                                    System.out.println("\t\tExpression = " + rt.szValue);
+                                }
+                                if (scanner.bShowAssign) {
+                                    System.out.println("\t\t" + firstToken.tokenStr + " = " + rt.szValue);
+                                }
                             }
                             switch (firstToken.subClassif) {
                                 case Token.INTEGER:
@@ -680,8 +684,10 @@ public class Parser {
                             return rt; //for now, throw error (Assign3)
                         }
                         if (execute) {
-                            if (scanner.bShowAssign) {
-                                System.out.println("\t\t" + firstToken.tokenStr + " = " + rt.szValue);
+                            if (rt != null) {
+                                if (scanner.bShowAssign) {
+                                    System.out.println("\t\t" + firstToken.tokenStr + " = " + rt.szValue);
+                                }
                             }
                             this.storage.put(firstToken.tokenStr, currentStringToken.tokenStr);
                         }
@@ -697,11 +703,13 @@ public class Parser {
                         //System.out.println(rt.szValue);
 
                         if (execute) {
-                            if (scanner.bShowExpr) {
-                                System.out.println("\t\tExpression = " + rt.szValue);
-                            }
-                            if (scanner.bShowAssign) {
-                                System.out.println("\t\t" + firstToken.tokenStr + " = " + rt.szValue);
+                            if (rt != null) {
+                                if (scanner.bShowExpr) {
+                                    System.out.println("\t\tExpression = " + rt.szValue);
+                                }
+                                if (scanner.bShowAssign) {
+                                    System.out.println("\t\t" + firstToken.tokenStr + " = " + rt.szValue);
+                                }
                             }
                             this.storage.put(firstToken.tokenStr, rt.szValue);
                         }
@@ -716,12 +724,14 @@ public class Parser {
             case "/=":
             case "^=":
                 rt = unaryOperation(execute, firstToken, scanner.currentToken.tokenStr);
-                if (scanner.bShowExpr) {
-                    System.out.println("\t\tExpression = " + rt.szValue);
-                }
-                if (scanner.bShowAssign) {
-                    System.out.println("\t\t" + firstToken.tokenStr + " = " + rt.szValue);
-                }
+                if (rt != null) {
+                                if (scanner.bShowExpr) {
+                                    System.out.println("\t\tExpression = " + rt.szValue);
+                                }
+                                if (scanner.bShowAssign) {
+                                    System.out.println("\t\t" + firstToken.tokenStr + " = " + rt.szValue);
+                                }
+                            }
                 break;
             default:
                 errorWithContext("Bad stuff happened. Given: " + scanner.currentToken.tokenStr);
