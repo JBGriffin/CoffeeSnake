@@ -698,7 +698,36 @@ public class Parser {
             if ((resOp1.type == Token.STRING || resOp1.type == Token.IDENTIFIER)
                     && (resOp2.type == Token.STRING || resOp2.type == Token.IDENTIFIER)) {
                 //do comparison between strings
-                return new ResultValue(resOp1.szValue.equals(resOp2.szValue) + "", Token.BOOLEAN);
+                if ((resOp1.type == Token.IDENTIFIER
+                        && ((STIdentifiers) symbolTable.getSymbol(leftToken.tokenStr)).iParmType != Token.STRING)
+                        && (resOp2.type == Token.IDENTIFIER
+                        && ((STIdentifiers) symbolTable.getSymbol(rightToken.tokenStr)).iParmType != Token.STRING)) {
+
+                } else {
+                    switch (comparison) {
+                        case "<":
+                            if (resOp1.szValue.compareTo(resOp2.szValue) < 0) {
+                                return new ResultValue(true + "", Token.BOOLEAN);
+                            }
+                        case ">":
+                            if (resOp1.szValue.compareTo(resOp2.szValue) > 0) {
+                                return new ResultValue(true + "", Token.BOOLEAN);
+                            }
+                        case "==":
+                            return new ResultValue(resOp1.szValue.equals(resOp2.szValue) + "", Token.BOOLEAN);
+                        case "!=":
+                            return new ResultValue(!resOp1.szValue.equals(resOp2.szValue) + "", Token.BOOLEAN);
+                        case ">=":
+                            if (resOp1.szValue.compareTo(resOp2.szValue) >= 0) {
+                                return new ResultValue(true + "", Token.BOOLEAN);
+                            }
+                        case "<=":
+                            if (resOp1.szValue.compareTo(resOp2.szValue) <= 0) {
+                                return new ResultValue(true + "", Token.BOOLEAN);
+                            }
+                    }
+                    return new ResultValue(resOp1.szValue.equals(resOp2.szValue) + "", Token.BOOLEAN);
+                }
             }
 
             Numeric nOp1 = new Numeric(this, resOp1, "First Operator", comparison);
@@ -845,7 +874,7 @@ public class Parser {
                                 return new ResultValue((Float.parseFloat(storage.get(this, firstToken.tokenStr)) * -1) + "", Token.INTEGER);
                         }
                     }
-                    
+
                     rt = new ResultValue(storage.get(this, firstToken.tokenStr), Token.SEPARATOR);
 
                     return rt;
