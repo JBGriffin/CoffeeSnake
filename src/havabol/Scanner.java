@@ -98,6 +98,7 @@ public class Scanner {
 		if(currentLine.startsWith("debug"))
 		{
 			setDebug();
+			advanceLine();
 		}
 
 /*		// Not convinced this is needed, but it's here if you want
@@ -107,12 +108,6 @@ public class Scanner {
 					, "subClassif"
 					, "tokenStr");
 */
-
-		if(bShowExpr)
-			System.out.println("  " + iSourceLineNr + " " + currentLine);
-
-		if(currentLine.contains("=") && bShowAssign)
-			System.out.println("I'm going to print something here, but I don't know what or how yet.");
 
 		if(currentLine.isEmpty())
 		{
@@ -455,17 +450,56 @@ public class Scanner {
 
         currentToken = nextToken;
 
+		if(bShowToken)
+		{
+			System.out.printf("%-11s %-12s %s\n"
+                    , "primClassif"
+                    , "subClassif"
+                    , "tokenStr");
+			currentToken.printToken();
+		}
+
         return currentToken.tokenStr;
 	}
 
 	/**
+	 * Utility to reset to the beginning of a loop. Sets source line to the start of
+	 * the while loop and creates two new tokens. Because advanceline() goes off
+	 * current line number, it will set itself to the proper tokens.
+	 * @param iLoopStart Start of the loop sent in
+	 * @throws Exception If do not exist, will throw an error
+	 */
+	public void loopReset(int iLoopStart) throws Exception
+	{
+		// Set up new tokens
+		this.iSourceLineNr = iLoopStart;
+		this.currentToken = new Token();
+		this.nextToken = new Token();
+
+		// Populate the new tokens
+		advanceLine();
+		getNext();
+		getNext();
+	}
+
+	/**
 	 * Method that turns on or off the debugging setup for displaying
-	 * tokens, expressions, and assignments.
+	 * tokens, expressions, and assignments. Three debug statements can be
+	 * turned on:
+	 * <p>
+	 *
+	 *     - bShowToken: print the token information for the current token returned by scan.getNext();
+	 *     this is actually done in getNext()
+	 * <p>
+	 * 	   - bShowExpr: Print the result of each expression evaluation for expressions
+	 * 	   involving at least one operator
+	 * <p>
+	 *     - bShowAssign: Print the variable and the value for an assignment
 	 */
 	private void setDebug()
 	{
 		String debugSplitM[] = currentLine.split(" ");
-		if(debugSplitM[2].toLowerCase().matches("on"))
+		if(debugSplitM[2].toLowerCase().matches("on;"))
 		{
 			switch (debugSplitM[1].toLowerCase())
 			{
@@ -498,28 +532,8 @@ public class Scanner {
 	}
 
 	/**
-	 * Utility to reset to the beginning of a loop. Sets source line to the start of
-	 * the while loop and creates two new tokens. Because advanceline() goes off
-	 * current line number, it will set itself to the proper tokens.
-	 * @param iLoopStart Start of the loop sent in
-	 * @throws Exception If do not exist, will throw an error
-	 */
-	public void loopReset(int iLoopStart) throws Exception
-	{
-		// Set up new tokens
-		this.iSourceLineNr = iLoopStart;
-		this.currentToken = new Token();
-		this.nextToken = new Token();
-
-		// Populate the new tokens
-		advanceLine();
-		getNext();
-		getNext();
-	}
-
-	/**
 	 * Exits program and gives meaningful information at where and why the program
-	 * ended.   --
+	 * ended.
 	 * </p>
 	 * @param diagnosticTxt Text for the user to be able to debug program
 	 * @throws Exception Will show stack trace of where, when, and why the program ended.
