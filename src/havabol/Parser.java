@@ -2,9 +2,9 @@ package havabol;
 
 /**
  *
- * Parser starts by another object calling parse() Objects: SymbolTable symbolTable:
- * SymbolTable to reference all global symbols and put new user defined symbols
- * in.
+ * Parser starts by another object calling parse() Objects: SymbolTable
+ * symbolTable: SymbolTable to reference all global symbols and put new user
+ * defined symbols in.
  *
  * StorageManager storage: Storage reference for the user specified data.
  *
@@ -41,8 +41,9 @@ public class Parser {
     }
 
     /**
-     * Logical main to the interpreter. Begins executing HavaBol code. Will throw an error
-     * and kill the program if it runs into code that is unable to execute
+     * Logical main to the interpreter. Begins executing HavaBol code. Will
+     * throw an error and kill the program if it runs into code that is unable
+     * to execute
      *
      * @throws Exception should be parser exception
      */
@@ -83,7 +84,8 @@ public class Parser {
         /*if(true) {*/
         //go until all source code is empty
         while (!scanner.currentToken.tokenStr.isEmpty()) {
-            //System.out.println("In statemnts with " + scanner.currentToken.tokenStr);
+            //System.out.println("In statemnts with " + scanner.currentToken.tokenStr 
+            //        + " at line number: " + scanner.currentToken.iSourceLineNr);
             //checking for all possible primary classifications
             switch (scanner.currentToken.primClassif) {
                 //handle control
@@ -91,8 +93,7 @@ public class Parser {
                     rt = controlStatement(execute);
                     //return if it is "else" or "endif"
 
-
-                    if(rt != null && (rt.szValue.equals("else") || rt.szValue.equals("endif") || (rt.szValue.equals("endwhile")))) {
+                    if (rt != null && (rt.szValue.equals("else") || rt.szValue.equals("endif") || (rt.szValue.equals("endwhile")))) {
                         return rt;
                     }
                     break;
@@ -139,6 +140,7 @@ public class Parser {
      * @throws Exception //should be parser exception
      */
     private ResultValue controlStatement(boolean execute) throws Exception {
+        //p("control stmt: " + scanner.currentToken.tokenStr);
         ResultValue returnValue = null; //init for assignments
         //grab the current token sub class
         switch (scanner.currentToken.subClassif) {
@@ -169,20 +171,20 @@ public class Parser {
      * control - declare token and the next should be an identifier - if not
      * throw exception
      *
-     * @param execute Boolean to determine whether or not the statement needs to be executed
+     * @param execute Boolean to determine whether or not the statement needs to
+     * be executed
      * @return ResultValue to controlStatement
      * @throws Exception should be ParseException
      */
     private ResultValue declareStatement(boolean execute) throws Exception {
         ResultValue returnValue = null; //init for return
-
+        //p("declare");
         //System.out.println(scanner.currentToken.tokenStr);
         Token workingToken = scanner.currentToken;
         String sznewTokenStr = scanner.getNext();
 
         //if subClass is not an Identifer - illegal execution
-        if (scanner.currentToken.subClassif != Token.IDENTIFIER)
-        {
+        if (scanner.currentToken.subClassif != Token.IDENTIFIER) {
             errorWithContext("Subclass is not an identifier. Usage: " + scanner.currentToken.tokenStr);
         }
 
@@ -190,19 +192,19 @@ public class Parser {
             switch (workingToken.tokenStr) {
                 //if Int - put in SymbolTable as Int
                 case "Int":
-                    this.symbolTable.putSymbol(sznewTokenStr, new STIdentifiers(sznewTokenStr, Token.CONTROL, Token.INTEGER, Token.INTEGER, 0));
+                    this.symbolTable.putSymbol(sznewTokenStr, new STIdentifiers(sznewTokenStr, Token.CONTROL, Token.INTEGER, Token.INTEGER, Token.INTEGER));
                     break;
                 //if Float - put in SymbolTable as Float
                 case "Float":
-                    this.symbolTable.putSymbol(sznewTokenStr, new STIdentifiers(sznewTokenStr, Token.CONTROL, Token.FLOAT, Token.FLOAT, 0));
+                    this.symbolTable.putSymbol(sznewTokenStr, new STIdentifiers(sznewTokenStr, Token.CONTROL, Token.FLOAT, Token.FLOAT, Token.FLOAT));
                     break;
                 //if String - put in SymbolTable as String
                 case "String":
-                    this.symbolTable.putSymbol(sznewTokenStr, new STIdentifiers(sznewTokenStr, Token.CONTROL, Token.STRING, Token.STRING, 0));
+                    this.symbolTable.putSymbol(sznewTokenStr, new STIdentifiers(sznewTokenStr, Token.CONTROL, Token.STRING, Token.STRING, Token.STRING));
                     break;
                 //if nothing - throw exception (Assignment 3) - in future there will be more
                 case "Bool":
-                    this.symbolTable.putSymbol(sznewTokenStr, new STIdentifiers(sznewTokenStr, Token.CONTROL, Token.BOOLEAN, Token.BOOLEAN, 0));
+                    this.symbolTable.putSymbol(sznewTokenStr, new STIdentifiers(sznewTokenStr, Token.CONTROL, Token.BOOLEAN, Token.BOOLEAN, Token.BOOLEAN));
                     break;
                 default:
                     errorWithContext("Declaration not recognized. Given: " + workingToken.tokenStr);
@@ -220,12 +222,14 @@ public class Parser {
 
     /**
      *
-     * Called to determine what flow statement to call, e.g. if, while, for loops
+     * Called to determine what flow statement to call, e.g. if, while, for
+     * loops
      *
      * @param execute Whether or not to execute the statements
      */
     private void flowStatement(boolean execute) throws Exception {
 
+        //p("flow statement");
         ResultValue returnValue = null;
 
         switch (scanner.currentToken.tokenStr) {
@@ -240,45 +244,50 @@ public class Parser {
     }
 
     /**
-     * Method to iterate through expressions from a starting statement to a separator.
-     * Called if a previous expression has already been evaluated to false. So, if given
-     * `if i < 0:` it will skip from "if" to the ":".
-     * @param startPosition Starting statement in the thread. Provided as error checker.
-     * @param endPosition Separator to return out of.
-     * @throws Exception If a separator is never encountered, i.e. end of file is reached,
-     * error will be thrown.
+     * Method to iterate through expressions from a starting statement to a
+     * separator. Called if a previous expression has already been evaluated to
+     * false. So, if given `if i < 0:` it will skip from "if" to the ":". @param
+     * startPosition Starting st
+     *
+     * atement in the thread. Provided as error checker. @param endPosition
+     * Separator to return out of. @throws Exception If a separator is never
+     * encountered, i.e. end of file is
+     *
+     * r
+     * eached, error will be thrown.
      */
     private void skipTo(String startPosition, String endPosition) throws Exception {
         int startColPos = scanner.currentToken.iColPos;
         int startLnPos = scanner.currentToken.iSourceLineNr;
-        while(true)
-        {
+        //p("skipto");
+        while (true) {
             scanner.getNext();
 
-            if(scanner.currentToken.tokenStr.equals(endPosition))
-            {
+            if (scanner.currentToken.tokenStr.equals(endPosition)) {
                 scanner.getNext();
                 return;
             }
 
-            if(scanner.currentToken.primClassif == Token.EOF)
+            if (scanner.currentToken.primClassif == Token.EOF) {
                 errorWithContext("Separator never encountered for " + startPosition
                         + " statement found at line number " + startLnPos + ", position " + startColPos);
+            }
         }
     }
 
     /**
-     * Evaluates if/else statements. Will decide whether or not to execute the next statements. Is able to
-     * execute multi-lined if/else statements, but can not execute nested if statements.
+     * Evaluates if/else statements. Will decide whether or not to execute the
+     * next statements. Is able to execute multi-lined if/else statements, but
+     * can not execute nested if statements.
+     *
      * @param execute Boolean to decide whether or not to execute statements.
      * @throws Exception Kills the program if something goes wrong
      */
     private void ifStatement(boolean execute) throws Exception {
-
-        if(execute)
-        {
+        //p("ifStatement");
+        if (execute) {
             scanner.getNext();
-            ResultValue resultCond = evaluateEquality(execute,scanner.currentToken, scanner.getNext());
+            ResultValue resultCond = evaluateEquality(execute, scanner.currentToken, scanner.getNext());
             ResultValue toExecute = null;
             scanner.getNext();
             if (resultCond.szValue.equals("T")) {
@@ -291,12 +300,12 @@ public class Parser {
                     statements(false);
 
                 } else if (toExecute.szValue.equals("endif")) {
-                    if (scanner.getNext().equals(":"))
+                    if (scanner.getNext().equals(":")) {
                         scanner.getNext();
+                    }
                     return;
                 }
-            }
-            //if was false
+            } //if was false
             else {
                 toExecute = statements(false);
                 if (toExecute.szValue.equals("else")) {
@@ -305,14 +314,13 @@ public class Parser {
                     statements(true);
 
                 } else if (toExecute.szValue.equals("endif")) {
-                    if (scanner.getNext().equals(":"))
+                    if (scanner.getNext().equals(":")) {
                         scanner.getNext();
+                    }
                     return;
                 }
             }
-        }
-        else
-        {
+        } else {
             skipTo("if", ":");
             statements(false);
         }
@@ -320,28 +328,30 @@ public class Parser {
 
     /**
      * Loops through code until user defined exit statement
-     * @param execute Boolean to determine whether or not loop needs to be execute
+     *
+     * @param execute Boolean to determine whether or not loop needs to be
+     * execute
      * @throws Exception Kills the program if something goes wrong
      */
     private void whileStatement(boolean execute) throws Exception {
-
-        if(execute)
-        {
+        //p("whileStatement");
+        if (execute) {
             int iWhileStart = scanner.currentToken.iSourceLineNr - 1;
             int iEndWhile;
             int iColEnd;
             scanner.getNext();
-            ResultValue resultCond = evaluateEquality(execute,scanner.currentToken, scanner.getNext());
+            ResultValue resultCond = evaluateEquality(execute, scanner.currentToken, scanner.getNext());
             ResultValue toExecute = null;
             scanner.getNext();
 
             //p(iWhileStart + " " + iColPos);
             //p(scanner.sourceFileM.get(iWhileStart));
-
             // Will loop until condition is false.
             while (resultCond.szValue.equals("T")) {
                 toExecute = statements(true);
+
                 if (toExecute.szValue.equals("endwhile")) {
+                    //p("TO EXECUTE FOUND ENDWHILE");
                     iColEnd = scanner.iColPos;
                     iEndWhile = scanner.iSourceLineNr;
 
@@ -349,27 +359,28 @@ public class Parser {
 
                     resultCond = evaluateEquality(execute, scanner.currentToken, scanner.getNext());
                     scanner.getNext();
-                    if (! resultCond.szValue.equals("T")){
+                    if (!resultCond.szValue.equals("T")) {
                         scanner.iSourceLineNr = iEndWhile;
                         scanner.iColPos = iColEnd;
                         scanner.advanceLine();
                         return;
                     }
+                } else {
+                    //found endif probably.
+
+                    scanner.getNext();
                 }
             }
             //while evaluation was false
             toExecute = statements(false);
-            if (toExecute.szValue.equals("endwhile"))
-            {
+            if (toExecute.szValue.equals("endwhile")) {
                 if (scanner.getNext().equals(":")) {
 
                     scanner.getNext();
                 }
             }
 
-        }
-        else
-        {
+        } else {
             skipTo("while", ":");
             statements(false);
         }
@@ -377,20 +388,23 @@ public class Parser {
 
     /**
      *
-     * Ending statement has been encountered. Will return the proper ending statement
+     * Ending statement has been encountered. Will return the proper ending
+     * statement
      *
      * @param execute Whether or not to execute the statement
-     * @return ResultValue Value of the item given. Will return endif, endwhile, etc.
+     * @return ResultValue Value of the item given. Will return endif, endwhile,
+     * etc.
      */
-    private ResultValue endStatement(boolean execute) throws Exception{
+    private ResultValue endStatement(boolean execute) throws Exception {
 
-        if(scanner.currentToken.primClassif == Token.EOF)
+        //p("endStatement");
+        if (scanner.currentToken.primClassif == Token.EOF) {
             errorWithContext("End of file reached with no closing 'endif' statement. Last used if statement used at line "
                     + lastOpenStatement.iSourceLineNr + " , position " + lastOpenStatement.iColPos);
+        }
         ResultValue rt;
 
-        switch(scanner.currentToken.tokenStr)
-        {
+        switch (scanner.currentToken.tokenStr) {
             case "endif":
                 rt = new ResultValue("endif", Token.END);
                 return rt;
@@ -411,13 +425,12 @@ public class Parser {
      * Function currently only handles built in function "print"
      *
      * @param execute Whether or not to execute the function
-     * @return ResultValue Returns value for the function. Will only return something from
-     * user defined functions
+     * @return ResultValue Returns value for the function. Will only return
+     * something from user defined functions
      * @throws Exception If something goes wrong, kills the program
      */
     private ResultValue function(boolean execute) throws Exception {
         ResultValue rt = null; //init for assignment
-
 
         //System.out.println(scanner.currentToken.tokenStr);
         //for now only builtins are possible (Assign 3)
@@ -438,7 +451,9 @@ public class Parser {
                         //go until a necessary ; is found
                         while (!";".equals(scanner.getNext())) {
                             //check using sub class
-                            if (!execute) continue;
+                            if (!execute) {
+                                continue;
+                            }
                             switch (scanner.currentToken.subClassif) {
                                 //if idenifier - get from storage
                                 //currently, if identifier does not exist it
@@ -461,8 +476,9 @@ public class Parser {
 
                         }
                         // ; was found, print and continue parsing
-                        if (execute)
+                        if (execute) {
                             System.out.println(sb.toString());
+                        }
 
                 }
 
@@ -485,7 +501,7 @@ public class Parser {
     private ResultValue operand(boolean execute) throws Exception {
 
         ResultValue rt = null;
-        if(execute) {
+        if (execute) {
 
             //System.out.println(scanner.currentToken.tokenStr);
             switch (scanner.currentToken.subClassif) {
@@ -508,10 +524,10 @@ public class Parser {
                         return rt;
 
                     }
-                    //if it exists, continue, otherwise break
+                //if it exists, continue, otherwise break
 
-                    //if operand found as int, float or string, maybe return?? idk
-                    //so far, does not get to this point
+                //if operand found as int, float or string, maybe return?? idk
+                //so far, does not get to this point
                 case Token.INTEGER:
                 case Token.FLOAT:
                 case Token.STRING:
@@ -524,8 +540,8 @@ public class Parser {
 
     /**
      *
-     * Assignments will handle anything starting with =, +=, -=, etc.
-     * and will call expressions after determining which assignment type it is
+     * Assignments will handle anything starting with =, +=, -=, etc. and will
+     * call expressions after determining which assignment type it is
      * <p>
      * @param execute Boolean to see whether or not we execute the statement
      * @return ResultValue of completed assignment NOTE: = 2 + 3 will return 5
@@ -533,10 +549,10 @@ public class Parser {
      */
     private ResultValue assignments(boolean execute) throws Exception {
 
+        //p("in assignments");
         ResultValue rt = null;
         //save off first token when method called
         Token firstToken = scanner.currentToken;
-
 
         //check to see if it is simple assignment
         if (";".equals(scanner.getNext())) {
@@ -561,16 +577,34 @@ public class Parser {
                         //scanner.getNext();
                         //if (!";".equals(scanner.currentToken.tokenStr))
                         rt = expressions(execute);
-                        if (execute)
+                        if (execute) {
+                            switch (firstToken.subClassif) {
+                                case Token.INTEGER:
+                                    rt.szValue = ((int) Float.parseFloat(rt.szValue)) + "";
+                                    break;
+                                case Token.FLOAT:
+                                    rt.szValue = ((float) Float.parseFloat(rt.szValue)) + "";
+                                    break;
+                            }
                             this.storage.put(firstToken.tokenStr, rt.szValue + "");
-                        return new ResultValue(scanner.currentToken.tokenStr, Token.INTEGER);
+                        }
+                        return new ResultValue(scanner.currentToken.tokenStr, firstToken.subClassif);
                     //save simple float (Assign 3)
                     case Token.FLOAT:
                         Token currentFloatToken = scanner.currentToken;
                         rt = expressions(execute); //for now, throw error (Assign3)
-                        if (execute)
+                        if (execute) {
+                            switch (firstToken.subClassif) {
+                                case Token.INTEGER:
+                                    rt.szValue = ((int) Float.parseFloat(rt.szValue)) + "";
+                                    break;
+                                case Token.FLOAT:
+                                    rt.szValue = ((float) Float.parseFloat(rt.szValue)) + "";
+                                    break;
+                            }
                             this.storage.put(firstToken.tokenStr, Float.parseFloat(rt.szValue) + "");
-                        return new ResultValue(scanner.currentToken.tokenStr, Token.FLOAT);
+                        }
+                        return new ResultValue(scanner.currentToken.tokenStr, firstToken.subClassif);
                     //save simple string (Assign 3)
                     case Token.STRING:
                         Token currentStringToken = scanner.currentToken;
@@ -578,60 +612,70 @@ public class Parser {
                         if (!";".equals(scanner.currentToken.tokenStr)) {
                             return rt; //for now, throw error (Assign3)
                         }
-                        if (execute)
+                        if (execute) {
                             this.storage.put(firstToken.tokenStr, currentStringToken.tokenStr);
+                        }
                         return new ResultValue(scanner.currentToken.tokenStr, Token.STRING);
                     //System.out.println("Successfully put " + scanner.currentToken.tokenStr + " into " + firstToken.tokenStr);
                     case Token.BOOLEAN:
-                        //System.out.println("I'M HERE!!!");
+                    //System.out.println("I'M HERE!!!");
                     default:
                         Token newToken = scanner.currentToken;
                         rt = expressions(execute);
-                        System.out.println(rt.szValue);
+                        //System.out.println(rt.szValue);
 
-                        if (execute)
+                        if (execute) {
                             this.storage.put(firstToken.tokenStr, rt.szValue);
+                        }
                         return new ResultValue(scanner.currentToken.tokenStr, 0); // TODO: find what data type this is
                     //return new ResultValue(scanner.currentToken.tokenStr);
 
                 }
-                // Assumes that the token has already been initialized and put into the symbol table
-            case "+=":case "-=":case "*=":case "/=":case "^=":
+            // Assumes that the token has already been initialized and put into the symbol table
+            case "+=":
+            case "-=":
+            case "*=":
+            case "/=":
+            case "^=":
                 rt = unaryOperation(execute, firstToken, scanner.currentToken.tokenStr);
                 break;
             default:
-                errorWithContext("Bad shit happened. Given: " + scanner.currentToken.tokenStr);
+                errorWithContext("Bad stuff happened. Given: " + scanner.currentToken.tokenStr);
         }
         return rt;
 
     }
 
     /**
-     * Method to check and return an equality statement. Currently made a function because I'm not
-     * quite sure if this will only be called in one place. Note: LHS and RHS may or may not be symbols,
-     * so it needs to check for both. Will not throw an error if it doesn't exist in the storage.
+     * Method to check and return an equality statement. Currently made a
+     * function because I'm not quite sure if this will only be called in one
+     * place. Note: LHS and RHS may or may not be symbols, so it needs to check
+     * for both. Will not throw an error if it doesn't exist in the storage.
+     *
      * @param leftToken Left hand side of the equality statement
      * @param comparison Operator to compare against
      * @return True or False based on whether or not the item is equal
      * @throws Exception Exception thrown if something went seriously wrong
      */
-    private ResultValue evaluateEquality(boolean execute, Token leftToken, String comparison) throws Exception
-    {
+    private ResultValue evaluateEquality(boolean execute, Token leftToken, String comparison) throws Exception {
         ResultValue retVal = new ResultValue(null, 0);
 
-        if(comparison.equals(":")){
-            if(leftToken.subClassif == Token.BOOLEAN)
+        //p("evaluate");
+        if (comparison.equals(":")) {
+            if (leftToken.subClassif == Token.BOOLEAN) {
                 return new ResultValue(leftToken.tokenStr, Token.BOOLEAN);
-            else if (leftToken.subClassif == Token.IDENTIFIER){
-                if (execute)
+            } else if (leftToken.subClassif == Token.IDENTIFIER) {
+                if (execute) {
                     retVal.szValue = this.storage.get(this, leftToken.tokenStr);
+                }
                 retVal.type = Token.BOOLEAN;
-                if(retVal.szValue == null)
+                if (retVal.szValue == null) {
                     errorWithContext("Bad identifier given. Usage: " + leftToken.tokenStr);
+                }
                 return retVal;
-            }
-            else
+            } else {
                 errorWithContext("Lone token MUST be a boolean! Given: " + leftToken.tokenStr);
+            }
         }
 
         //there is more than just one token
@@ -643,23 +687,30 @@ public class Parser {
             ResultValue resOp2 = new ResultValue(rightToken.tokenStr, rightToken.subClassif);
 
             resOp1.szValue = this.storage.get(this, leftToken.tokenStr);
-            if(resOp1.szValue == null)
+            if (resOp1.szValue == null) {
                 resOp1.szValue = leftToken.tokenStr;
+            }
             resOp2.szValue = this.storage.get(this, rightToken.tokenStr);
-            if(resOp2.szValue == null)
+            if (resOp2.szValue == null) {
                 resOp2.szValue = rightToken.tokenStr;
+            }
+
+            if ((resOp1.type == Token.STRING || resOp1.type == Token.IDENTIFIER)
+                    && (resOp2.type == Token.STRING || resOp2.type == Token.IDENTIFIER)) {
+                //do comparison between strings
+                return new ResultValue(resOp1.szValue.equals(resOp2.szValue) + "", Token.BOOLEAN);
+            }
 
             Numeric nOp1 = new Numeric(this, resOp1, "First Operator", comparison);
             Numeric nOp2 = new Numeric(this, resOp2, "Second Operator", comparison);
 
             retVal = nOp2.equalValue(nOp1, nOp2, comparison);
         }
-        if (! ":".equals(scanner.getNext()))
-        {
+        if (!":".equals(scanner.getNext())) {
             //if there is more, do recursive call
             //4 > 3 and 3 < 4
             //^^^for future
-            switch(scanner.currentToken.tokenStr){
+            switch (scanner.currentToken.tokenStr) {
                 // Set up for later
                 case "and":
                     break;
@@ -673,44 +724,46 @@ public class Parser {
         return retVal;
     }
 
-
     /**
-     * Simple unary assignment method. Assumes that simple assignment statements have
-     * already occurred.
-     * @param leftToken Left hand side of the assignment. This is what will be returned after
-     *                   the operation has happened
-     * @return Result value of the operation given. If x += 2 were given, will return x incremented
-     * by 2.
+     * Simple unary assignment method. Assumes that simple assignment statements
+     * have already occurred.
+     *
+     * @param leftToken Left hand side of the assignment. This is what will be
+     * returned after the operation has happened
+     * @return Result value of the operation given. If x += 2 were given, will
+     * return x incremented by 2.
      */
     private ResultValue unaryOperation(boolean execute, Token leftToken, String operator) throws Exception {
         scanner.getNext();
-        
+
         Token rightToken = scanner.nextToken;
 
         ResultValue resOp1 = new ResultValue(leftToken.tokenStr, leftToken.subClassif);
-        if (execute)
+        if (execute) {
             resOp1.szValue = this.storage.get(this, leftToken.tokenStr);
-        else
+        } else {
             resOp1.szValue = "0";
-        if(resOp1.szValue == null)
+        }
+        if (resOp1.szValue == null) {
             errorWithContext("Value must be initiated before use! Given: " + leftToken.tokenStr);
-
+        }
 
         // Grab first numeric, and grab the item from the storage manager
         Numeric nOp1 = new Numeric(this, resOp1, "1st operator", operator);
-
 
         // Grab second numeric, and grab the item from the storage manager
         ResultValue resOp2 = new ResultValue(rightToken.tokenStr, rightToken.subClassif);
         // Check if the value exists in storage. If it does, we'll set it to that value
         // If it doesn't, set it back to the second token's value. Numeric will take care
         // of it if it's not a proper value
-        if (execute)
+        if (execute) {
             resOp2.szValue = this.storage.get(this, rightToken.tokenStr);
-        else
+        } else {
             resOp2.szValue = "0";
-        if(resOp2.szValue == null)
+        }
+        if (resOp2.szValue == null) {
             resOp2.szValue = rightToken.tokenStr;
+        }
 
         Numeric nOp2 = new Numeric(this, resOp2, "2nd operator", operator);
 
@@ -736,8 +789,9 @@ public class Parser {
                 errorWithContext("Bad operator given: " + operator);
         }
 
-        if (execute)
+        if (execute) {
             this.storage.put(leftToken.tokenStr, returnValue.szValue);
+        }
         return returnValue;
     }
 
@@ -753,6 +807,7 @@ public class Parser {
      */
     private ResultValue expressions(boolean execute) throws Exception {
 
+        //p("expressions");
         ResultValue rt = null;
         //save off current token
         Token firstToken = scanner.currentToken;
@@ -760,10 +815,14 @@ public class Parser {
         boolean firstIsNegative = false;
         int x = 0;
         float y = (float) 0.0;
+        int iFirstTokenType;
+        int iFirstTokenIntValue;
+        float fFirstTokenFloatValue;
 
         //get all negative signs (Unary -)
         while ("U-".equals(scanner.currentToken.tokenStr)) {
 
+            p("FOUND NEGATIVE");
             firstIsNegative = !firstIsNegative;
             scanner.getNext();
             firstToken = scanner.currentToken;
@@ -771,6 +830,473 @@ public class Parser {
         }
 
         switch (firstToken.subClassif) {
+            //LHS is an identifier
+            case Token.IDENTIFIER:
+                //set type for future evals
+                iFirstTokenType = ((STIdentifiers) this.symbolTable.getSymbol(firstToken.tokenStr)).iParmType;
+                //if negative, make negative
+
+                //means it was a simple assignment
+                if (";".equals(scanner.getNext())) {
+                    if (firstIsNegative) {
+                        switch (((STIdentifiers) symbolTable.getSymbol(firstToken.tokenStr)).iParmType) {
+                            case Token.INTEGER:
+                                return new ResultValue((Integer.parseInt(storage.get(this, firstToken.tokenStr)) * -1) + "", Token.INTEGER);
+                            case Token.FLOAT:
+                                return new ResultValue((Float.parseFloat(storage.get(this, firstToken.tokenStr)) * -1) + "", Token.INTEGER);
+                        }
+                    }
+                    
+                    rt = new ResultValue(storage.get(this, firstToken.tokenStr), Token.SEPARATOR);
+
+                    return rt;
+
+                } else if ("+".equals(scanner.currentToken.tokenStr)) {
+
+                    scanner.getNext();
+                    switch (scanner.currentToken.subClassif) {
+
+                        case Token.IDENTIFIER:
+                            switch (iFirstTokenType) {
+                                case Token.INTEGER:
+                                    x = Integer.parseInt(storage.get(this, firstToken.tokenStr));
+                                    if (firstIsNegative) {
+                                        x = x * -1;
+                                    }
+                                    if (((STIdentifiers) symbolTable.getSymbol(scanner.currentToken.tokenStr)).iParmType == Token.INTEGER) {
+                                        x = x + Integer.parseInt(expressions(execute).szValue);
+                                        rt = new ResultValue(x + "", Token.INTEGER);
+                                    } else {
+                                        y = x + Float.parseFloat(expressions(execute).szValue);
+                                        rt = new ResultValue(y + "", Token.FLOAT);
+                                    }
+                                    ///////////////////////// LEFT OFF HERE
+                                    break;
+                                case Token.FLOAT:
+                                    y = Float.parseFloat(storage.get(this, firstToken.tokenStr));
+                                    if (firstIsNegative) {
+                                        y = y * -1;
+                                    }
+                                    if (((STIdentifiers) symbolTable.getSymbol(scanner.currentToken.tokenStr)).iParmType == Token.INTEGER) {
+                                        y = y + Integer.parseInt(expressions(execute).szValue);
+                                        rt = new ResultValue(y + "", Token.FLOAT);
+                                    } else {
+                                        y = y + Float.parseFloat(expressions(execute).szValue);
+                                        rt = new ResultValue(y + "", Token.FLOAT);
+                                    }
+                                    break;
+                                default:
+                                    errorWithContext("improper number format, number must be float or int");
+                            }
+                            break;
+                        //RHS is an integer and LHS is IDENTIFIER
+                        case Token.INTEGER:
+                            switch (iFirstTokenType) {
+                                case Token.INTEGER:
+                                    x = Integer.parseInt(storage.get(this, firstToken.tokenStr));
+                                    if (firstIsNegative) {
+                                        x = x * -1;
+                                    }
+                                    x = x + Integer.parseInt(expressions(execute).szValue);
+                                    rt = new ResultValue(x + "", Token.INTEGER);
+                                    break;
+                                case Token.FLOAT:
+                                    y = Float.parseFloat(storage.get(this, firstToken.tokenStr));
+                                    if (firstIsNegative) {
+                                        y = y * -1;
+                                    }
+                                    y = y + Float.parseFloat(expressions(execute).szValue);
+                                    rt = new ResultValue(y + "", Token.FLOAT);
+                                    break;
+                                default:
+                                    errorWithContext("improper number format, number must be float or int");
+                            }
+                            break;
+                        //LHS is identifier, RHS is float
+                        case Token.FLOAT:
+                            switch (iFirstTokenType) {
+                                case Token.INTEGER:
+                                    y = Integer.parseInt(storage.get(this, firstToken.tokenStr));
+                                    if (firstIsNegative) {
+                                        y = y * -1;
+                                    }
+                                    y = y + Float.parseFloat(expressions(execute).szValue);
+                                    rt = new ResultValue(y + "", Token.FLOAT);
+                                    break;
+                                case Token.FLOAT:
+                                    y = Float.parseFloat(storage.get(this, firstToken.tokenStr));
+                                    if (firstIsNegative) {
+                                        y = y * -1;
+                                    }
+                                    y = y + Float.parseFloat(expressions(execute).szValue);
+                                    rt = new ResultValue(y + "", Token.FLOAT);
+                                    break;
+                                default:
+                                    errorWithContext("improper number format, number must be float or int");
+                            }
+                            break;
+                    }
+
+                    return rt;
+
+                } else if ("-".equals(scanner.currentToken.tokenStr)) {
+
+                    scanner.getNext();
+                    switch (scanner.currentToken.subClassif) {
+
+                        case Token.IDENTIFIER:
+                            switch (iFirstTokenType) {
+                                case Token.INTEGER:
+                                    x = Integer.parseInt(storage.get(this, firstToken.tokenStr));
+                                    if (firstIsNegative) {
+                                        x = x * -1;
+                                    }
+                                    if (((STIdentifiers) symbolTable.getSymbol(scanner.currentToken.tokenStr)).iParmType == Token.INTEGER) {
+                                        x = x - Integer.parseInt(expressions(execute).szValue);
+                                        rt = new ResultValue(x + "", Token.INTEGER);
+                                    } else {
+                                        y = x - Float.parseFloat(expressions(execute).szValue);
+                                        rt = new ResultValue(y + "", Token.FLOAT);
+                                    }
+                                    ///////////////////////// LEFT OFF HERE
+                                    break;
+                                case Token.FLOAT:
+                                    y = Float.parseFloat(storage.get(this, firstToken.tokenStr));
+                                    if (firstIsNegative) {
+                                        y = y * -1;
+                                    }
+                                    if (((STIdentifiers) symbolTable.getSymbol(scanner.currentToken.tokenStr)).iParmType == Token.INTEGER) {
+                                        y = y - Integer.parseInt(expressions(execute).szValue);
+                                        rt = new ResultValue(y + "", Token.FLOAT);
+                                    } else {
+                                        y = y - Float.parseFloat(expressions(execute).szValue);
+                                        rt = new ResultValue(y + "", Token.FLOAT);
+                                    }
+                                    break;
+                                default:
+                                    errorWithContext("improper number format, number must be float or int");
+                            }
+                            break;
+                        //RHS is an integer and LHS is IDENTIFIER
+                        case Token.INTEGER:
+                            switch (iFirstTokenType) {
+                                case Token.INTEGER:
+                                    x = Integer.parseInt(storage.get(this, firstToken.tokenStr));
+                                    if (firstIsNegative) {
+                                        x = x * -1;
+                                    }
+                                    x = x - Integer.parseInt(expressions(execute).szValue);
+                                    rt = new ResultValue(x + "", Token.INTEGER);
+                                    break;
+                                case Token.FLOAT:
+                                    y = Float.parseFloat(storage.get(this, firstToken.tokenStr));
+                                    if (firstIsNegative) {
+                                        y = y * -1;
+                                    }
+                                    y = y - Float.parseFloat(expressions(execute).szValue);
+                                    rt = new ResultValue(y + "", Token.FLOAT);
+                                    break;
+                                default:
+                                    errorWithContext("improper number format, number must be float or int");
+                            }
+                            break;
+                        //LHS is identifier, RHS is float
+                        case Token.FLOAT:
+                            switch (iFirstTokenType) {
+                                case Token.INTEGER:
+                                    y = Integer.parseInt(storage.get(this, firstToken.tokenStr));
+                                    if (firstIsNegative) {
+                                        y = y * -1;
+                                    }
+                                    y = y - Float.parseFloat(expressions(execute).szValue);
+                                    rt = new ResultValue(y + "", Token.FLOAT);
+                                    break;
+                                case Token.FLOAT:
+                                    y = Float.parseFloat(storage.get(this, firstToken.tokenStr));
+                                    if (firstIsNegative) {
+                                        y = y * -1;
+                                    }
+                                    y = y - Float.parseFloat(expressions(execute).szValue);
+                                    rt = new ResultValue(y + "", Token.FLOAT);
+                                    break;
+                                default:
+                                    errorWithContext("improper number format, number must be float or int");
+                            }
+                            break;
+                    }
+
+                    return rt;
+
+                } else if ("*".equals(scanner.currentToken.tokenStr)) {
+
+                    scanner.getNext();
+                    switch (scanner.currentToken.subClassif) {
+
+                        case Token.IDENTIFIER:
+                            switch (iFirstTokenType) {
+                                case Token.INTEGER:
+                                    x = Integer.parseInt(storage.get(this, firstToken.tokenStr));
+                                    if (firstIsNegative) {
+                                        x = x * -1;
+                                    }
+                                    if (((STIdentifiers) symbolTable.getSymbol(scanner.currentToken.tokenStr)).iParmType == Token.INTEGER) {
+                                        x = x * Integer.parseInt(expressions(execute).szValue);
+                                        rt = new ResultValue(x + "", Token.INTEGER);
+                                    } else {
+                                        y = x * Float.parseFloat(expressions(execute).szValue);
+                                        rt = new ResultValue(y + "", Token.FLOAT);
+                                    }
+                                    ///////////////////////// LEFT OFF HERE
+                                    break;
+                                case Token.FLOAT:
+                                    y = Float.parseFloat(storage.get(this, firstToken.tokenStr));
+                                    if (firstIsNegative) {
+                                        y = y * -1;
+                                    }
+                                    if (((STIdentifiers) symbolTable.getSymbol(scanner.currentToken.tokenStr)).iParmType == Token.INTEGER) {
+                                        y = y * Integer.parseInt(expressions(execute).szValue);
+                                        rt = new ResultValue(y + "", Token.FLOAT);
+                                    } else {
+                                        y = y * Float.parseFloat(expressions(execute).szValue);
+                                        rt = new ResultValue(y + "", Token.FLOAT);
+                                    }
+                                    break;
+                                default:
+                                    errorWithContext("improper number format, number must be float or int");
+                            }
+                            break;
+                        //RHS is an integer and LHS is IDENTIFIER
+                        case Token.INTEGER:
+                            switch (iFirstTokenType) {
+                                case Token.INTEGER:
+                                    x = Integer.parseInt(storage.get(this, firstToken.tokenStr));
+                                    if (firstIsNegative) {
+                                        x = x * -1;
+                                    }
+                                    x = x * Integer.parseInt(expressions(execute).szValue);
+                                    rt = new ResultValue(x + "", Token.INTEGER);
+                                    break;
+                                case Token.FLOAT:
+                                    y = Float.parseFloat(storage.get(this, firstToken.tokenStr));
+                                    if (firstIsNegative) {
+                                        y = y * -1;
+                                    }
+                                    y = y * Float.parseFloat(expressions(execute).szValue);
+                                    rt = new ResultValue(y + "", Token.FLOAT);
+                                    break;
+                                default:
+                                    errorWithContext("improper number format, number must be float or int");
+                            }
+                            break;
+                        //LHS is identifier, RHS is float
+                        case Token.FLOAT:
+                            switch (iFirstTokenType) {
+                                case Token.INTEGER:
+                                    y = Integer.parseInt(storage.get(this, firstToken.tokenStr));
+                                    if (firstIsNegative) {
+                                        y = y * -1;
+                                    }
+                                    y = y * Float.parseFloat(expressions(execute).szValue);
+                                    rt = new ResultValue(y + "", Token.FLOAT);
+                                    break;
+                                case Token.FLOAT:
+                                    y = Float.parseFloat(storage.get(this, firstToken.tokenStr));
+                                    if (firstIsNegative) {
+                                        y = y * -1;
+                                    }
+                                    y = y * Float.parseFloat(expressions(execute).szValue);
+                                    rt = new ResultValue(y + "", Token.FLOAT);
+                                    break;
+                                default:
+                                    errorWithContext("improper number format, number must be float or int");
+                            }
+                            break;
+                    }
+
+                    return rt;
+
+                } else if ("/".equals(scanner.currentToken.tokenStr)) {
+
+                    scanner.getNext();
+                    switch (scanner.currentToken.subClassif) {
+
+                        case Token.IDENTIFIER:
+                            switch (iFirstTokenType) {
+                                case Token.INTEGER:
+                                    x = Integer.parseInt(storage.get(this, firstToken.tokenStr));
+                                    if (firstIsNegative) {
+                                        x = x * -1;
+                                    }
+                                    if (((STIdentifiers) symbolTable.getSymbol(scanner.currentToken.tokenStr)).iParmType == Token.INTEGER) {
+                                        x = x / Integer.parseInt(expressions(execute).szValue);
+                                        rt = new ResultValue(x + "", Token.INTEGER);
+                                    } else {
+                                        y = x / Float.parseFloat(expressions(execute).szValue);
+                                        rt = new ResultValue(y + "", Token.FLOAT);
+                                    }
+                                    ///////////////////////// LEFT OFF HERE
+                                    break;
+                                case Token.FLOAT:
+                                    y = Float.parseFloat(storage.get(this, firstToken.tokenStr));
+                                    if (firstIsNegative) {
+                                        y = y * -1;
+                                    }
+                                    if (((STIdentifiers) symbolTable.getSymbol(scanner.currentToken.tokenStr)).iParmType == Token.INTEGER) {
+                                        y = y / Integer.parseInt(expressions(execute).szValue);
+                                        rt = new ResultValue(y + "", Token.FLOAT);
+                                    } else {
+                                        y = y / Float.parseFloat(expressions(execute).szValue);
+                                        rt = new ResultValue(y + "", Token.FLOAT);
+                                    }
+                                    break;
+                                default:
+                                    errorWithContext("improper number format, number must be float or int");
+                            }
+                            break;
+                        //RHS is an integer and LHS is IDENTIFIER
+                        case Token.INTEGER:
+                            switch (iFirstTokenType) {
+                                case Token.INTEGER:
+                                    x = Integer.parseInt(storage.get(this, firstToken.tokenStr));
+                                    if (firstIsNegative) {
+                                        x = x * -1;
+                                    }
+                                    x = x / Integer.parseInt(expressions(execute).szValue);
+                                    rt = new ResultValue(x + "", Token.INTEGER);
+                                    break;
+                                case Token.FLOAT:
+                                    y = Float.parseFloat(storage.get(this, firstToken.tokenStr));
+                                    if (firstIsNegative) {
+                                        y = y * -1;
+                                    }
+                                    y = y / Float.parseFloat(expressions(execute).szValue);
+                                    rt = new ResultValue(y + "", Token.FLOAT);
+                                    break;
+                                default:
+                                    errorWithContext("improper number format, number must be float or int");
+                            }
+                            break;
+                        //LHS is identifier, RHS is float
+                        case Token.FLOAT:
+                            switch (iFirstTokenType) {
+                                case Token.INTEGER:
+                                    y = Integer.parseInt(storage.get(this, firstToken.tokenStr));
+                                    if (firstIsNegative) {
+                                        y = y * -1;
+                                    }
+                                    y = y / Float.parseFloat(expressions(execute).szValue);
+                                    rt = new ResultValue(y + "", Token.FLOAT);
+                                    break;
+                                case Token.FLOAT:
+                                    y = Float.parseFloat(storage.get(this, firstToken.tokenStr));
+                                    if (firstIsNegative) {
+                                        y = y * -1;
+                                    }
+                                    y = y / Float.parseFloat(expressions(execute).szValue);
+                                    rt = new ResultValue(y + "", Token.FLOAT);
+                                    break;
+                                default:
+                                    errorWithContext("improper number format, number must be float or int");
+                            }
+                            break;
+                    }
+
+                    return rt;
+
+                } else if ("^".equals(scanner.currentToken.tokenStr)) {
+
+                    scanner.getNext();
+                    switch (scanner.currentToken.subClassif) {
+
+                        case Token.IDENTIFIER:
+                            switch (iFirstTokenType) {
+                                case Token.INTEGER:
+                                    x = Integer.parseInt(storage.get(this, firstToken.tokenStr));
+                                    if (firstIsNegative) {
+                                        x = x * -1;
+                                    }
+                                    if (((STIdentifiers) symbolTable.getSymbol(scanner.currentToken.tokenStr)).iParmType == Token.INTEGER) {
+                                        x = (int) Math.pow(x, Integer.parseInt(expressions(execute).szValue));
+                                        rt = new ResultValue(x + "", Token.INTEGER);
+                                    } else {
+                                        y = (float) Math.pow(x, Float.parseFloat(expressions(execute).szValue));
+                                        rt = new ResultValue(y + "", Token.FLOAT);
+                                    }
+                                    ///////////////////////// LEFT OFF HERE
+                                    break;
+                                case Token.FLOAT:
+                                    y = Float.parseFloat(storage.get(this, firstToken.tokenStr));
+                                    if (firstIsNegative) {
+                                        y = y * -1;
+                                    }
+                                    if (((STIdentifiers) symbolTable.getSymbol(scanner.currentToken.tokenStr)).iParmType == Token.INTEGER) {
+                                        y = (float) Math.pow(y, Integer.parseInt(expressions(execute).szValue));
+                                        rt = new ResultValue(y + "", Token.FLOAT);
+                                    } else {
+                                        y = (float) Math.pow(y, Float.parseFloat(expressions(execute).szValue));
+                                        rt = new ResultValue(y + "", Token.FLOAT);
+                                    }
+                                    break;
+                                default:
+                                    errorWithContext("improper number format, number must be float or int");
+                            }
+                            break;
+                        //RHS is an integer and LHS is IDENTIFIER
+                        case Token.INTEGER:
+                            switch (iFirstTokenType) {
+                                case Token.INTEGER:
+                                    x = Integer.parseInt(storage.get(this, firstToken.tokenStr));
+                                    if (firstIsNegative) {
+                                        x = x * -1;
+                                    }
+                                    x = (int) Math.pow(x, Integer.parseInt(expressions(execute).szValue));
+                                    rt = new ResultValue(x + "", Token.INTEGER);
+                                    break;
+                                case Token.FLOAT:
+                                    y = Float.parseFloat(storage.get(this, firstToken.tokenStr));
+                                    if (firstIsNegative) {
+                                        y = y * -1;
+                                    }
+                                    y = (float) Math.pow(y, Float.parseFloat(expressions(execute).szValue));
+                                    rt = new ResultValue(y + "", Token.FLOAT);
+                                    break;
+                                default:
+                                    errorWithContext("improper number format, number must be float or int");
+                            }
+                            break;
+                        //LHS is identifier, RHS is float
+                        case Token.FLOAT:
+                            switch (iFirstTokenType) {
+                                case Token.INTEGER:
+                                    y = Integer.parseInt(storage.get(this, firstToken.tokenStr));
+                                    if (firstIsNegative) {
+                                        y = y * -1;
+                                    }
+                                    y = (float) Math.pow(y, Float.parseFloat(expressions(execute).szValue));
+                                    rt = new ResultValue(y + "", Token.FLOAT);
+                                    break;
+                                case Token.FLOAT:
+                                    y = Float.parseFloat(storage.get(this, firstToken.tokenStr));
+                                    if (firstIsNegative) {
+                                        y = y * -1;
+                                    }
+                                    y = (float) Math.pow(y, Float.parseFloat(expressions(execute).szValue));
+                                    rt = new ResultValue(y + "", Token.FLOAT);
+                                    break;
+                                default:
+                                    errorWithContext("improper number format, number must be float or int");
+                            }
+                            break;
+                    }
+
+                    return rt;
+                } else // Check for equalities
+                {
+                    return rt = evaluateEquality(execute, firstToken, scanner.currentToken.tokenStr);
+                }
+
+            ///////end additions 
+            // LHS is integer, RHS could be (Identifier, Int, or Float)
             case Token.INTEGER:
                 //if negative, make negative
                 if (firstIsNegative) {
@@ -785,9 +1311,22 @@ public class Parser {
 
                 } else if ("+".equals(scanner.currentToken.tokenStr)) {
 
-                    System.out.println("Found the plus");
                     scanner.getNext();
                     switch (scanner.currentToken.subClassif) {
+                        //RHS is Identifier, LHS is Int
+                        case Token.IDENTIFIER:
+
+                            if (((STIdentifiers) symbolTable.getSymbol(scanner.currentToken.tokenStr)).iParmType == Token.INTEGER) {
+                                x = Integer.parseInt(firstToken.tokenStr);
+                                x = x + Integer.parseInt(expressions(execute).szValue);
+                                rt = new ResultValue(x + "", Token.INTEGER);
+                            } else {
+                                y = Float.parseFloat(firstToken.tokenStr);
+                                y = y + Float.parseFloat(expressions(execute).szValue);
+                                rt = new ResultValue(y + "", Token.FLOAT);
+                            }
+
+                            break;
                         case Token.INTEGER:
                             x = Integer.parseInt(firstToken.tokenStr);
                             x = x + Integer.parseInt(expressions(execute).szValue);
@@ -804,9 +1343,21 @@ public class Parser {
 
                 } else if ("-".equals(scanner.currentToken.tokenStr)) {
 
-                    System.out.println("Found the plus");
                     scanner.getNext();
                     switch (scanner.currentToken.subClassif) {
+                        case Token.IDENTIFIER:
+
+                            if (((STIdentifiers) symbolTable.getSymbol(scanner.currentToken.tokenStr)).iParmType == Token.INTEGER) {
+                                x = Integer.parseInt(firstToken.tokenStr);
+                                x = x - Integer.parseInt(expressions(execute).szValue);
+                                rt = new ResultValue(x + "", Token.INTEGER);
+                            } else {
+                                y = Float.parseFloat(firstToken.tokenStr);
+                                y = y - Float.parseFloat(expressions(execute).szValue);
+                                rt = new ResultValue(y + "", Token.FLOAT);
+                            }
+
+                            break;
                         case Token.INTEGER:
                             x = Integer.parseInt(firstToken.tokenStr);
                             x = x - Integer.parseInt(expressions(execute).szValue);
@@ -823,9 +1374,21 @@ public class Parser {
 
                 } else if ("*".equals(scanner.currentToken.tokenStr)) {
 
-                    System.out.println("Found the plus");
                     scanner.getNext();
                     switch (scanner.currentToken.subClassif) {
+                        case Token.IDENTIFIER:
+
+                            if (((STIdentifiers) symbolTable.getSymbol(scanner.currentToken.tokenStr)).iParmType == Token.INTEGER) {
+                                x = Integer.parseInt(firstToken.tokenStr);
+                                x = x * Integer.parseInt(expressions(execute).szValue);
+                                rt = new ResultValue(x + "", Token.INTEGER);
+                            } else {
+                                y = Float.parseFloat(firstToken.tokenStr);
+                                y = y * Float.parseFloat(expressions(execute).szValue);
+                                rt = new ResultValue(y + "", Token.FLOAT);
+                            }
+
+                            break;
                         case Token.INTEGER:
                             x = Integer.parseInt(firstToken.tokenStr);
                             x = x * Integer.parseInt(expressions(execute).szValue);
@@ -842,9 +1405,22 @@ public class Parser {
 
                 } else if ("/".equals(scanner.currentToken.tokenStr)) {
 
-                    System.out.println("Found the plus");
                     scanner.getNext();
                     switch (scanner.currentToken.subClassif) {
+
+                        case Token.IDENTIFIER:
+
+                            if (((STIdentifiers) symbolTable.getSymbol(scanner.currentToken.tokenStr)).iParmType == Token.INTEGER) {
+                                x = Integer.parseInt(firstToken.tokenStr);
+                                x = x / Integer.parseInt(expressions(execute).szValue);
+                                rt = new ResultValue(x + "", Token.INTEGER);
+                            } else {
+                                y = Float.parseFloat(firstToken.tokenStr);
+                                y = y / Float.parseFloat(expressions(execute).szValue);
+                                rt = new ResultValue(y + "", Token.FLOAT);
+                            }
+
+                            break;
 
                         case Token.INTEGER:
                             x = Integer.parseInt(firstToken.tokenStr);
@@ -859,8 +1435,38 @@ public class Parser {
                     }
 
                     return rt;
-                }
-                else // Check for equalities
+                } else if ("^".equals(scanner.currentToken.tokenStr)) {
+
+                    scanner.getNext();
+                    switch (scanner.currentToken.subClassif) {
+                        case Token.IDENTIFIER:
+
+                            if (((STIdentifiers) symbolTable.getSymbol(scanner.currentToken.tokenStr)).iParmType == Token.INTEGER) {
+                                x = Integer.parseInt(firstToken.tokenStr);
+                                x = (int) Math.pow(x, Integer.parseInt(expressions(execute).szValue));
+                                rt = new ResultValue(x + "", Token.INTEGER);
+                            } else {
+                                y = Float.parseFloat(firstToken.tokenStr);
+                                y = (float) Math.pow(y, Float.parseFloat(expressions(execute).szValue));
+                                rt = new ResultValue(y + "", Token.FLOAT);
+                            }
+
+                            break;
+                        case Token.INTEGER:
+                            y = Float.parseFloat(firstToken.tokenStr);
+                            //y = y / Integer.parseInt(expressions(execute).szValue);
+                            Math.pow(y, Integer.parseInt(expressions(execute).szValue));
+                            rt = new ResultValue(y + "", Token.INTEGER);
+                            break;
+                        case Token.FLOAT:
+                            y = Float.parseFloat(firstToken.tokenStr);
+                            //y = (y / Float.parseFloat(expressions(execute).szValue));
+                            Math.pow(y, Float.parseFloat(expressions(execute).szValue));
+                            rt = new ResultValue(y + "", Token.FLOAT);
+                            break;
+                    }
+                    return rt;
+                } else // Check for equalities
                 {
                     return rt = evaluateEquality(execute, firstToken, scanner.currentToken.tokenStr);
                 }
@@ -878,13 +1484,32 @@ public class Parser {
 
                 } else if ("+".equals(scanner.currentToken.tokenStr)) {
 
-                    System.out.println("Found the plus");
                     scanner.getNext();
                     switch (scanner.currentToken.subClassif) {
+                        //RHS is FLOAT, LHS is identifier
+                        case Token.IDENTIFIER:
+
+                            if (((STIdentifiers) symbolTable.getSymbol(scanner.currentToken.tokenStr)).iParmType == Token.INTEGER) {
+                                //x = Integer.parseInt(firstToken.tokenStr);
+                                //x = x + Integer.parseInt(expressions(execute).szValue);
+                                //rt = new ResultValue(x + "", Token.INTEGER);
+                                y = Float.parseFloat(firstToken.tokenStr);
+                                y = y + Integer.parseInt(expressions(execute).szValue);
+                                rt = new ResultValue(y + "", Token.FLOAT);
+                            } else {
+                                //y = Float.parseFloat(firstToken.tokenStr);
+                                //y = y + Float.parseFloat(expressions(execute).szValue);
+                                //rt = new ResultValue(y + "", Token.FLOAT);
+                                y = Float.parseFloat(firstToken.tokenStr);
+                                y = (y + Float.parseFloat(expressions(execute).szValue));
+                                rt = new ResultValue(y + "", Token.FLOAT);
+                            }
+
+                            break;
                         case Token.INTEGER:
                             y = Float.parseFloat(firstToken.tokenStr);
                             y = y + Integer.parseInt(expressions(execute).szValue);
-                            rt = new ResultValue(y + "", Token.INTEGER);
+                            rt = new ResultValue(y + "", Token.FLOAT);
                             break;
                         case Token.FLOAT:
                             y = Float.parseFloat(firstToken.tokenStr);
@@ -897,13 +1522,31 @@ public class Parser {
 
                 } else if ("-".equals(scanner.currentToken.tokenStr)) {
 
-                    System.out.println("Found the plus");
                     scanner.getNext();
                     switch (scanner.currentToken.subClassif) {
+                        case Token.IDENTIFIER:
+
+                            if (((STIdentifiers) symbolTable.getSymbol(scanner.currentToken.tokenStr)).iParmType == Token.INTEGER) {
+                                //x = Integer.parseInt(firstToken.tokenStr);
+                                //x = x + Integer.parseInt(expressions(execute).szValue);
+                                //rt = new ResultValue(x + "", Token.INTEGER);
+                                y = Float.parseFloat(firstToken.tokenStr);
+                                y = y - Integer.parseInt(expressions(execute).szValue);
+                                rt = new ResultValue(y + "", Token.FLOAT);
+                            } else {
+                                //y = Float.parseFloat(firstToken.tokenStr);
+                                //y = y + Float.parseFloat(expressions(execute).szValue);
+                                //rt = new ResultValue(y + "", Token.FLOAT);
+                                y = Float.parseFloat(firstToken.tokenStr);
+                                y = (y - Float.parseFloat(expressions(execute).szValue));
+                                rt = new ResultValue(y + "", Token.FLOAT);
+                            }
+
+                            break;
                         case Token.INTEGER:
                             y = Float.parseFloat(firstToken.tokenStr);
                             y = y - Integer.parseInt(expressions(execute).szValue);
-                            rt = new ResultValue(y + "", Token.INTEGER);
+                            rt = new ResultValue(y + "", Token.FLOAT);
                             break;
                         case Token.FLOAT:
                             y = Float.parseFloat(firstToken.tokenStr);
@@ -916,13 +1559,31 @@ public class Parser {
 
                 } else if ("*".equals(scanner.currentToken.tokenStr)) {
 
-                    System.out.println("Found the plus");
                     scanner.getNext();
                     switch (scanner.currentToken.subClassif) {
+                        case Token.IDENTIFIER:
+
+                            if (((STIdentifiers) symbolTable.getSymbol(scanner.currentToken.tokenStr)).iParmType == Token.INTEGER) {
+                                //x = Integer.parseInt(firstToken.tokenStr);
+                                //x = x + Integer.parseInt(expressions(execute).szValue);
+                                //rt = new ResultValue(x + "", Token.INTEGER);
+                                y = Float.parseFloat(firstToken.tokenStr);
+                                y = y * Integer.parseInt(expressions(execute).szValue);
+                                rt = new ResultValue(y + "", Token.FLOAT);
+                            } else {
+                                //y = Float.parseFloat(firstToken.tokenStr);
+                                //y = y + Float.parseFloat(expressions(execute).szValue);
+                                //rt = new ResultValue(y + "", Token.FLOAT);
+                                y = Float.parseFloat(firstToken.tokenStr);
+                                y = (y * Float.parseFloat(expressions(execute).szValue));
+                                rt = new ResultValue(y + "", Token.FLOAT);
+                            }
+
+                            break;
                         case Token.INTEGER:
                             y = Float.parseFloat(firstToken.tokenStr);
                             y = y * Integer.parseInt(expressions(execute).szValue);
-                            rt = new ResultValue(y + "", Token.INTEGER);
+                            rt = new ResultValue(y + "", Token.FLOAT);
                             break;
                         case Token.FLOAT:
                             y = Float.parseFloat(firstToken.tokenStr);
@@ -935,9 +1596,27 @@ public class Parser {
 
                 } else if ("/".equals(scanner.currentToken.tokenStr)) {
 
-                    System.out.println("Found the plus");
                     scanner.getNext();
                     switch (scanner.currentToken.subClassif) {
+                        case Token.IDENTIFIER:
+
+                            if (((STIdentifiers) symbolTable.getSymbol(scanner.currentToken.tokenStr)).iParmType == Token.INTEGER) {
+                                //x = Integer.parseInt(firstToken.tokenStr);
+                                //x = x + Integer.parseInt(expressions(execute).szValue);
+                                //rt = new ResultValue(x + "", Token.INTEGER);
+                                y = Float.parseFloat(firstToken.tokenStr);
+                                y = y / Integer.parseInt(expressions(execute).szValue);
+                                rt = new ResultValue(y + "", Token.INTEGER);
+                            } else {
+                                //y = Float.parseFloat(firstToken.tokenStr);
+                                //y = y + Float.parseFloat(expressions(execute).szValue);
+                                //rt = new ResultValue(y + "", Token.FLOAT);
+                                y = Float.parseFloat(firstToken.tokenStr);
+                                y = (y / Float.parseFloat(expressions(execute).szValue));
+                                rt = new ResultValue(y + "", Token.FLOAT);
+                            }
+
+                            break;
                         case Token.INTEGER:
                             y = Float.parseFloat(firstToken.tokenStr);
                             y = y / Integer.parseInt(expressions(execute).szValue);
@@ -950,8 +1629,44 @@ public class Parser {
                             break;
                     }
                     return rt;
-                }
-                else // Check for equalities
+                } else if ("^".equals(scanner.currentToken.tokenStr)) {
+
+                    scanner.getNext();
+                    switch (scanner.currentToken.subClassif) {
+                        case Token.IDENTIFIER:
+
+                            if (((STIdentifiers) symbolTable.getSymbol(scanner.currentToken.tokenStr)).iParmType == Token.INTEGER) {
+                                //x = Integer.parseInt(firstToken.tokenStr);
+                                //x = x + Integer.parseInt(expressions(execute).szValue);
+                                //rt = new ResultValue(x + "", Token.INTEGER);
+                                y = Float.parseFloat(firstToken.tokenStr);
+                                y = (float) Math.pow(y, Integer.parseInt(expressions(execute).szValue));
+                                rt = new ResultValue(y + "", Token.FLOAT);
+                            } else {
+                                //y = Float.parseFloat(firstToken.tokenStr);
+                                //y = y + Float.parseFloat(expressions(execute).szValue);
+                                //rt = new ResultValue(y + "", Token.FLOAT);
+                                y = Float.parseFloat(firstToken.tokenStr);
+                                y = (float) Math.pow(y, Float.parseFloat(expressions(execute).szValue));
+                                rt = new ResultValue(y + "", Token.FLOAT);
+                            }
+
+                            break;
+                        case Token.INTEGER:
+                            y = Float.parseFloat(firstToken.tokenStr);
+                            //y = y / Integer.parseInt(expressions(execute).szValue);
+                            y = (float) Math.pow(y, Integer.parseInt(expressions(execute).szValue));
+                            rt = new ResultValue(y + "", Token.FLOAT);
+                            break;
+                        case Token.FLOAT:
+                            y = Float.parseFloat(firstToken.tokenStr);
+                            //y = (y / Float.parseFloat(expressions(execute).szValue));
+                            y = (float) Math.pow(y, Float.parseFloat(expressions(execute).szValue));
+                            rt = new ResultValue(y + "", Token.FLOAT);
+                            break;
+                    }
+                    return rt;
+                } else // Check for equalities
                 {
                     return rt = evaluateEquality(execute, firstToken, scanner.currentToken.tokenStr);
                 }
@@ -961,8 +1676,7 @@ public class Parser {
                     firstToken.tokenStr = (Integer.parseInt(firstToken.tokenStr) * -1) + "";
                 }
                 //means it was a simple assignment
-                if (";".equals(scanner.getNext()))
-                {
+                if (";".equals(scanner.getNext())) {
                     rt = new ResultValue(firstToken.tokenStr, Token.SEPARATOR);
                     return rt;
                 }
@@ -972,10 +1686,12 @@ public class Parser {
     }
 
     /**
-     * Debugging method made by Justin. Needs to be better, but by God it gets the job done.
+     * Debugging method made by Justin. Needs to be better, but by God it gets
+     * the job done.
+     *
      * @param s
      */
-    private void p(String s){
+    private void p(String s) {
 
         System.out.println("OURDEBUGLINE::: " + s);
 
@@ -983,9 +1699,10 @@ public class Parser {
 
     /**
      * Even more janky debug statement, but it's just as useful
+     *
      * @param LineNumber Line number we're on
      */
-    private void p(int LineNumber){
+    private void p(int LineNumber) {
         System.out.println("Line Number::: " + LineNumber);
     }
 
