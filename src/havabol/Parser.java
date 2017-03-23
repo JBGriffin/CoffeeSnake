@@ -469,7 +469,7 @@ public class Parser {
      */
     private ResultValue function(boolean execute) throws Exception {
         ResultValue rt = null; //init for assignment
-
+        int parens = 0;
         //System.out.println(scanner.currentToken.tokenStr);
         //for now only builtins are possible (Assign 3)
         if (scanner.currentToken.subClassif == Token.BUILTIN) {
@@ -486,32 +486,47 @@ public class Parser {
                         //will need its own submethod
                         StringBuilder sb = new StringBuilder(); //build string to print
 
+                        scanner.getNext();
                         //go until a necessary ; is found
-                        while (!";".equals(scanner.getNext())) {
+                        while (!";".equals(scanner.currentToken.tokenStr)) {
                             //check using sub class
                             if (!execute) {
+                                scanner.getNext();
+                                continue;
+                            }
+                            //if ("(".equals(scanner.currentToken.tokenStr)) parens++;
+                            //else if (")".equals(scanner.currentToken.tokenStr)) parens--;
+                            if (",".equals(scanner.currentToken.tokenStr)){
+                                sb.append(" ");
+                                scanner.getNext();
                                 continue;
                             }
                             switch (scanner.currentToken.subClassif) {
                                 //if idenifier - get from storage
-                                //currently, if identifier does not exist it
-                                //will just be null and continue
-                                case Token.IDENTIFIER:
-                                    sb.append(this.storage.get(this, scanner.currentToken.tokenStr));
-                                    break;
                                 //if it is a string, append string to statement
                                 case Token.STRING:
                                     sb.append(scanner.currentToken.tokenStr);
                                     break;
-                                //if separator, continue
-                                case Token.SEPARATOR:
+                                //currently, if identifier does not exist it
+                                //will just be null and continue
+                                case Token.IDENTIFIER:
+                                    if (((STIdentifiers)this.symbolTable.getSymbol(scanner.currentToken.tokenStr)).iParmType == Token.STRING)
+                                        sb.append(this.storage.get(this, scanner.currentToken.tokenStr));
+                                    else 
+                                        sb.append(expressions(execute).szValue).append(" ");
                                     break;
+                                case Token.INTEGER: case Token.FLOAT:
+                                    sb.append(expressions(execute).szValue).append(" ");
+                                    break;
+                                //if separator, continue
+                                //case Token.SEPARATOR:
+                                    //break;
                                 //soon we can add '+' to also append strings
                                 default:
                                     break;
 
                             }
-
+                            scanner.getNext();
                         }
                         // ; was found, print and continue parsing
                         if (execute) {
@@ -875,7 +890,7 @@ public class Parser {
      */
     private ResultValue expressions(boolean execute) throws Exception {
 
-        //p("expressions");
+        //p("expressions: " + scanner.currentToken.tokenStr);
         ResultValue rt = null;
         //save off current token
         Token firstToken = scanner.currentToken;
@@ -895,7 +910,7 @@ public class Parser {
             firstToken = scanner.currentToken;
 
         }
-
+        //p("subClassif = " + firstToken.subClassif);
         switch (firstToken.subClassif) {
             //LHS is an identifier
             case Token.IDENTIFIER:
@@ -904,7 +919,7 @@ public class Parser {
                 //if negative, make negative
 
                 //means it was a simple assignment
-                if (";".equals(scanner.getNext())) {
+                if (";".equals(scanner.getNext()) || ",".equals(scanner.currentToken.tokenStr) || ")".equals(scanner.currentToken.tokenStr)) {
                     if (firstIsNegative) {
                         switch (((STIdentifiers) symbolTable.getSymbol(firstToken.tokenStr)).iParmType) {
                             case Token.INTEGER:
@@ -1371,7 +1386,7 @@ public class Parser {
                 }
 
                 //means it was a simple assignment
-                if (";".equals(scanner.getNext())) {
+                if (";".equals(scanner.getNext()) || ",".equals(scanner.currentToken.tokenStr) || ")".equals(scanner.currentToken.tokenStr)) {
                     rt = new ResultValue(firstToken.tokenStr, Token.SEPARATOR);
 
                     return rt;
@@ -1544,7 +1559,7 @@ public class Parser {
                 }
 
                 //means it was a simple assignment
-                if (";".equals(scanner.getNext())) {
+                if (";".equals(scanner.getNext()) || ",".equals(scanner.currentToken.tokenStr) || ")".equals(scanner.currentToken.tokenStr)) {
                     rt = new ResultValue(firstToken.tokenStr, Token.SEPARATOR);
 
                     return rt;
