@@ -452,10 +452,6 @@ public class Scanner {
 
 		if(bShowToken)
 		{
-			System.out.printf("%-11s %-12s %s\n"
-                    , "primClassif"
-                    , "subClassif"
-                    , "tokenStr");
 			currentToken.printToken();
 		}
 

@@ -114,6 +114,11 @@ public class Token
                 subClassifStr = "-";
         }
 
+        System.out.println("\t\t ... Token: ");
+        System.out.printf("%-11s %-12s %s\n"
+                , "primClassif"
+                , "subClassif"
+                , "tokenStr");
         if(subClassifStr.equals("STRING"))
         {
             System.out.printf("%-11s %-12s ", primClassifStr, subClassifStr);
