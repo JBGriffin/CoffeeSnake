@@ -745,6 +745,7 @@ public class Parser {
         ResultValue retVal = new ResultValue(null, 0);
 
         //p("evaluate");
+        //meaning there was an ending to the comparison of an if or while
         if (comparison.equals(":")) {
             if (leftToken.subClassif == Token.BOOLEAN) {
                 return new ResultValue(leftToken.tokenStr, Token.BOOLEAN);
@@ -778,7 +779,7 @@ public class Parser {
             if (resOp2.szValue == null) {
                 resOp2.szValue = rightToken.tokenStr;
             }
-
+            //if string comparison, handle here
             if ((resOp1.type == Token.STRING || resOp1.type == Token.IDENTIFIER)
                     && (resOp2.type == Token.STRING || resOp2.type == Token.IDENTIFIER)) {
                 //do comparison between strings
@@ -820,6 +821,7 @@ public class Parser {
 
             retVal = nOp2.equalValue(nOp1, nOp2, comparison);
         }
+        //if at end of if or while ---- need to add ')' is future for print statement
         if (!":".equals(scanner.getNext())) {
             //if there is more, do recursive call
             //4 > 3 and 3 < 4
