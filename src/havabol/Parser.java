@@ -244,7 +244,6 @@ public class Parser {
                 break;
             default:
                 errorWithContext("Unexpected flow statement found");
-                
 
         }
     }
@@ -302,8 +301,8 @@ public class Parser {
             ResultValue resultCond = evaluateEquality(execute, scanner.currentToken, scanner.getNext());
             ResultValue toExecute = null;
             //move past ":"
-            scanner.getNext(); 
-            
+            scanner.getNext();
+
             //if true, we want to execute statements until endif
             if (resultCond.szValue.equals("T")) {
 
@@ -318,7 +317,7 @@ public class Parser {
                     //start executing with False until endif found
                     statements(false);
 
-                //leave ifStatements once endif found
+                    //leave ifStatements once endif found
                 } else if (toExecute.szValue.equals("endif")) {
                     ////GARRETT I FOUND A BUG -> luckily it didn't affect anything
                     if (scanner.getNext().equals(";")) {
@@ -339,7 +338,7 @@ public class Parser {
                     scanner.getNext();
                     statements(true);
 
-                //stop at endif
+                    //stop at endif
                 } else if (toExecute.szValue.equals("endif")) {
                     //skip over endif and ;
                     if (scanner.getNext().equals(";")) {
@@ -400,7 +399,6 @@ public class Parser {
                 } else {
                     //found endif probably.
 
-                    
                     //need to figure out what exactly this is about
                     scanner.getNext();
                 }
@@ -496,7 +494,7 @@ public class Parser {
                             }
                             //if ("(".equals(scanner.currentToken.tokenStr)) parens++;
                             //else if (")".equals(scanner.currentToken.tokenStr)) parens--;
-                            if (",".equals(scanner.currentToken.tokenStr)){
+                            if (",".equals(scanner.currentToken.tokenStr)) {
                                 sb.append(" ");
                                 scanner.getNext();
                                 continue;
@@ -510,17 +508,19 @@ public class Parser {
                                 //currently, if identifier does not exist it
                                 //will just be null and continue
                                 case Token.IDENTIFIER:
-                                    if (((STIdentifiers)this.symbolTable.getSymbol(scanner.currentToken.tokenStr)).iParmType == Token.STRING)
+                                    if (((STIdentifiers) this.symbolTable.getSymbol(scanner.currentToken.tokenStr)).iParmType == Token.STRING) {
                                         sb.append(this.storage.get(this, scanner.currentToken.tokenStr));
-                                    else 
+                                    } else {
                                         sb.append(expressions(execute).szValue).append(" ");
+                                    }
                                     break;
-                                case Token.INTEGER: case Token.FLOAT:
+                                case Token.INTEGER:
+                                case Token.FLOAT:
                                     sb.append(expressions(execute).szValue).append(" ");
                                     break;
                                 //if separator, continue
                                 //case Token.SEPARATOR:
-                                    //break;
+                                //break;
                                 //soon we can add '+' to also append strings
                                 default:
                                     break;
@@ -630,7 +630,14 @@ public class Parser {
                         //scanner.getNext();
                         //if (!";".equals(scanner.currentToken.tokenStr))
                         rt = expressions(execute);
+
                         if (execute) {
+                            if (scanner.bShowExpr) {
+                                System.out.println("\t\tExpression = " + rt.szValue);
+                            }
+                            if (scanner.bShowAssign) {
+                                System.out.println("\t\t" + firstToken.tokenStr + " = " + rt.szValue);
+                            }
                             switch (firstToken.subClassif) {
                                 case Token.INTEGER:
                                     rt.szValue = ((int) Float.parseFloat(rt.szValue)) + "";
@@ -646,7 +653,14 @@ public class Parser {
                     case Token.FLOAT:
                         Token currentFloatToken = scanner.currentToken;
                         rt = expressions(execute); //for now, throw error (Assign3)
+
                         if (execute) {
+                            if (scanner.bShowExpr) {
+                                System.out.println("\t\tExpression = " + rt.szValue);
+                            }
+                            if (scanner.bShowAssign) {
+                                System.out.println("\t\t" + firstToken.tokenStr + " = " + rt.szValue);
+                            }
                             switch (firstToken.subClassif) {
                                 case Token.INTEGER:
                                     rt.szValue = ((int) Float.parseFloat(rt.szValue)) + "";
@@ -666,18 +680,29 @@ public class Parser {
                             return rt; //for now, throw error (Assign3)
                         }
                         if (execute) {
+                            if (scanner.bShowAssign) {
+                                System.out.println("\t\t" + firstToken.tokenStr + " = " + rt.szValue);
+                            }
                             this.storage.put(firstToken.tokenStr, currentStringToken.tokenStr);
                         }
                         return new ResultValue(scanner.currentToken.tokenStr, Token.STRING);
                     //System.out.println("Successfully put " + scanner.currentToken.tokenStr + " into " + firstToken.tokenStr);
                     case Token.BOOLEAN:
                     //System.out.println("I'M HERE!!!");
+                    //if (scanner.bShowExpr)
+                    //  System.out.println(rt.szValue);
                     default:
                         Token newToken = scanner.currentToken;
                         rt = expressions(execute);
                         //System.out.println(rt.szValue);
 
                         if (execute) {
+                            if (scanner.bShowExpr) {
+                                System.out.println("\t\tExpression = " + rt.szValue);
+                            }
+                            if (scanner.bShowAssign) {
+                                System.out.println("\t\t" + firstToken.tokenStr + " = " + rt.szValue);
+                            }
                             this.storage.put(firstToken.tokenStr, rt.szValue);
                         }
                         return new ResultValue(scanner.currentToken.tokenStr, 0); // TODO: find what data type this is
@@ -691,6 +716,12 @@ public class Parser {
             case "/=":
             case "^=":
                 rt = unaryOperation(execute, firstToken, scanner.currentToken.tokenStr);
+                if (scanner.bShowExpr) {
+                    System.out.println("\t\tExpression = " + rt.szValue);
+                }
+                if (scanner.bShowAssign) {
+                    System.out.println("\t\t" + firstToken.tokenStr + " = " + rt.szValue);
+                }
                 break;
             default:
                 errorWithContext("Bad stuff happened. Given: " + scanner.currentToken.tokenStr);
