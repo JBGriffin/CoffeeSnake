@@ -12,7 +12,6 @@ p3Input.txt
 D-A=2510
 -A=10
 -D=25
-OURDEBUGLINE::: FOUND NEGATIVE
 A=-B =-6
 >>> First If
 	Done with first if
