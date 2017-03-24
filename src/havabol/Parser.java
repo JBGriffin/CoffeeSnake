@@ -81,7 +81,7 @@ public class Parser {
 
         //init result value so methods can return into rt
         ResultValue rt = null;
-        /*if(true) {*/
+
         //go until all source code is empty
         while (!scanner.currentToken.tokenStr.isEmpty()) {
             //System.out.println("In statemnts with " + scanner.currentToken.tokenStr 
@@ -122,11 +122,7 @@ public class Parser {
             //iterate to next token
             scanner.getNext();
         }
-        //}
-        /*else {
-            rt = new ResultValue("F", Token.END);
-            return rt;
-        }*/
+
         return rt; //returns only to parse()
     }
 
@@ -242,6 +238,10 @@ public class Parser {
             case "while":
                 whileStatement(execute);
                 break;
+            case "for":
+                p("HI");
+                forStatement(execute);
+                break;
             default:
                 errorWithContext("Unexpected flow statement found");
 
@@ -281,41 +281,7 @@ public class Parser {
             }
         }
     }
-    
-    
-    
-    /**
-     * Method to iterate through expressions from a starting statement to a
-     * separator. Called if a previous expression has already been evaluated to
-     * false. So, if given `if i < 0:` it will skip from "if" to the ":". @param
-     * startPosition Starting st
-     *
-     * atement in the thread. Provided as error checker. @param endPosition
-     * Separator to return out of. @throws Exception If a separator is never
-     * encountered, i.e. end of file is
-     *
-     * r
-     * eached, error will be thrown.
-     */
-    private void skipToEndif() throws Exception {
-        int startColPos = scanner.currentToken.iColPos;
-        int startLnPos = scanner.currentToken.iSourceLineNr;
-        
-        int iIfsEncountered = 0;
-        
-        while(!scanner.currentToken.tokenStr.isEmpty()){
-            if (scanner.getNext().equals("if")) iIfsEncountered++;
-            if (scanner.currentToken.tokenStr.equals("endif")){
-                if (iIfsEncountered == 0) return;
-                iIfsEncountered--;
-            }
-            
-                errorWithContext("SkipTo error");
-            
-        }
-        
-       
-    }
+
 
     /**
      * Evaluates if/else statements. Will decide whether or not to execute the
@@ -327,6 +293,7 @@ public class Parser {
      */
     private void ifStatement(boolean execute) throws Exception {
         //p("ifStatement");
+
         //if we want to execute, go through statement
         //else, skip to next branch
         if (execute) {
@@ -478,6 +445,81 @@ public class Parser {
     }
 
     /**
+     * For loop which takes an index and a starting variable, and runs until the ending variable.
+     * Currently only increments by 1. Will be able to increment different positive numbers in the future.
+     * <p><blockquote><pre>
+     * // Example for loop execution:
+     * for controlVar = startVar to endVar
+     *      body
+     * endfor;
+     * </pre></blockquote><p>
+     * Note: The only part of the for loop expression that is able to be re-evaluated is the incrementer.
+     * <p>
+     * @param execute Boolean to determine whether or not to execute the loop.
+     */
+    private void forStatement(boolean execute) throws Exception
+    {
+        //p("for loop");
+        if (execute) {
+            int iForStart = scanner.currentToken.iSourceLineNr - 1;
+            int iEndFor;
+            int iColEnd;
+            scanner.getNext();
+            ResultValue resultCond = expressions(execute);
+            p(""+resultCond.szValue);
+            ResultValue toExecute = null;
+            scanner.getNext();
+            /*
+            //p(iWhileStart + " " + iColPos);
+            //p(scanner.sourceFileM.get(iWhileStart));
+            // Will loop until condition is false.
+            while (resultCond.szValue.equals("T")) {
+                toExecute = statements(true);
+
+                //once found, re-eval expression
+                if (toExecute.szValue.equals("endwhile")) {
+                    //p("TO EXECUTE FOUND ENDWHILE");
+                    iColEnd = scanner.iColPos;
+                    iEndFor = scanner.iSourceLineNr;
+
+                    //rewind loop
+                    scanner.loopReset(iForStart);
+
+                    //re-eval
+                    resultCond = evaluateEquality(execute, scanner.currentToken, scanner.getNext());
+                    scanner.getNext(); //move pass :
+                    //if not true, advance to end of loop
+                    if (!resultCond.szValue.equals("T")) {
+                        scanner.iSourceLineNr = iEndFor;
+                        scanner.iColPos = iColEnd;
+                        scanner.advanceLine();
+                        return;
+                    }
+                } else {
+                    //found endif probably.
+
+                    //need to figure out what exactly this is about
+                    scanner.getNext();
+                }
+            }
+            //for evaluation was false
+            toExecute = statements(false);
+            //advance past endfor and :
+            if (toExecute.szValue.equals("endfor")) {
+                if (scanner.getNext().equals(":")) {
+                    scanner.getNext();
+                }
+            }
+
+            //skip to end if needed
+        } else {
+            skipTo("for", ":");
+            statements(false);
+        */}
+
+    }
+
+    /**
      *
      * Ending statement has been encountered. Will return the proper ending
      * statement
@@ -506,6 +548,9 @@ public class Parser {
                 return rt;
             case "endwhile":
                 rt = new ResultValue("endwhile", Token.END);
+                return rt;
+            case "endfor":
+                rt = new ResultValue("endfor", Token.END);
                 return rt;
             default:
                 errorWithContext("Expected ending statement. Given: " + scanner.currentToken.tokenStr);
@@ -663,6 +708,7 @@ public class Parser {
         ResultValue rt = null;
         //save off first token when method called
         Token firstToken = scanner.currentToken;
+
 
         //check to see if it is simple assignment
         if (";".equals(scanner.getNext())) {

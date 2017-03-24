@@ -157,7 +157,7 @@ public class Scanner {
 							setClassification(Token.CONTROL, Token.FLOW, true);
                         	break;
                         case "endwhile":case "endif":case "endfor":
-						case "else":case "enddef":
+						case "else":case "enddef":case "to":
 							setClassification(Token.CONTROL, Token.END, true);
                             break;
                         // Declaration constants(Int, Bool, etc)
