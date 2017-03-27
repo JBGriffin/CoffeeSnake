@@ -747,7 +747,7 @@ public class Parser {
         }
         //p(scanner.currentToken.tokenStr + " HERE");
         if (scanner.currentToken.tokenStr.equals("[")) {
-            p(750);
+            //p(750);
             return arrayAssignments(execute, firstToken);
         }
         
@@ -971,6 +971,7 @@ public class Parser {
             if (!scanner.getNext().equals("]")) {
                 errorWithContext("Expected \"]\" not found");
             }
+            if (";".equals(scanner.currentToken.tokenStr)) return rt;
             //p(924);
             sti.iStruct = Token.ARRAY_UNBOUND;
             this.symbolTable.updateSymbol(sti.symbol, sti);
@@ -1001,7 +1002,7 @@ public class Parser {
             return rt;
         }
 
-        p(1003);
+        //p(1003);
         //integer: max elements of this integer
         if (scanner.currentToken.subClassif == Token.INTEGER) {
             STIdentifiers sti = (STIdentifiers) this.symbolTable.getSymbol(identifier.tokenStr);
@@ -1020,7 +1021,53 @@ public class Parser {
             if (!"=".equals(scanner.currentToken.tokenStr) && !";".equals(scanner.currentToken.tokenStr)) {
                 errorWithContext("Expected \"=\" or \";\" for array assignment");
             }
+            if (";".equals(scanner.currentToken.tokenStr)) return rt;
             scanner.getNext();
+            //p("SCANNER AT:" + scanner.currentToken.tokenStr);
+            ArrayList<String> resOpsM = new ArrayList<>();
+            while (!scanner.currentToken.tokenStr.equals("]") || !scanner.currentToken.tokenStr.equals(";")) {
+                //p(1025);
+                ResultValue resOp1 = expressions(execute);
+                //p(1027);
+                resOpsM.add(resOp1.szValue);
+                //p(resOp1.szValue);
+                if (scanner.currentToken.tokenStr.equals(","))
+                    scanner.getNext();
+            }
+            
+            if (resOpsM.isEmpty()) errorWithContext("Values must be given for unspecifed array length");
+            if (resOpsM.size() > sizeForArray) errorWithContext("Array not large enough to store list");
+            String[] tempM = new String[sizeForArray];
+            for (int i = 0; i < resOpsM.size(); i++)
+                tempM[i] = resOpsM.get(i);
+            
+            this.storage.putArray(identifier.tokenStr, tempM);
+            p(1040);
+            return rt;
+        }
+        
+        
+        //identifier: max elements of this identifier
+        if (scanner.currentToken.subClassif == Token.IDENTIFIER) {
+            STIdentifiers sti = (STIdentifiers) this.symbolTable.getSymbol(identifier.tokenStr);
+            sti.iStruct = Token.ARRAY_FIXED;
+            this.symbolTable.updateSymbol(sti.symbol, sti);
+
+            //p(scanner.currentToken.tokenStr);
+            rt = expressions(execute);
+            //p(rt.szValue);
+            this.storage.initArray(identifier.tokenStr,
+                     Integer.parseInt(rt.szValue), sti.iDclType, sti.iStruct);
+            int sizeForArray = Integer.parseInt(rt.szValue);
+            scanner.getNext();
+
+            //p(scanner.currentToken.tokenStr);
+            if (!"=".equals(scanner.currentToken.tokenStr) && !";".equals(scanner.currentToken.tokenStr)) {
+                errorWithContext("Expected \"=\" or \";\" for array assignment");
+            }
+            if (";".equals(scanner.currentToken.tokenStr)) return rt;
+            scanner.getNext();
+            //p("SCANNER AT:" + scanner.currentToken.tokenStr);
             ArrayList<String> resOpsM = new ArrayList<>();
             while (!scanner.currentToken.tokenStr.equals("]") || !scanner.currentToken.tokenStr.equals(";")) {
                 p(1025);
@@ -1039,11 +1086,9 @@ public class Parser {
                 tempM[i] = resOpsM.get(i);
             
             this.storage.putArray(identifier.tokenStr, tempM);
-            p(1040);
             return rt;
         }
         
-        p(1040);
         //integer: max elements of this integer
         if (scanner.currentToken.subClassif == Token.FUNCTION) {
             STIdentifiers sti = (STIdentifiers) this.symbolTable.getSymbol(identifier.tokenStr);
@@ -1292,7 +1337,7 @@ public class Parser {
      */
     private ResultValue expressions(boolean execute) throws Exception {
 
-        p("expressions: " + scanner.currentToken.tokenStr);
+        //p("expressions: " + scanner.currentToken.tokenStr);
         ResultValue rt = null;
         //save off current token
         Token firstToken = scanner.currentToken;
@@ -1799,7 +1844,7 @@ public class Parser {
             // LHS is integer, RHS could be (Identifier, Int, or Float)
             case Token.INTEGER:
                 //if negative, make negative
-                p(1802);
+                //p(1802);
                 if (firstIsNegative) {
                     firstToken.tokenStr = (Integer.parseInt(firstToken.tokenStr) * -1) + "";
                 }
@@ -1807,7 +1852,7 @@ public class Parser {
                 //means it was a simple assignment
                 if (";".equals(scanner.getNext()) || ",".equals(scanner.currentToken.tokenStr) || ")".equals(scanner.currentToken.tokenStr) || "]".equals(scanner.currentToken.tokenStr)) {
                     rt = new ResultValue(firstToken.tokenStr, Token.SEPARATOR);
-                    p(rt.szValue + " is the result");
+                    //p(rt.szValue + " is the result");
                     return rt;
 
                 } else if ("+".equals(scanner.currentToken.tokenStr)) {
