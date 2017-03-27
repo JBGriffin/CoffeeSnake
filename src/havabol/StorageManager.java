@@ -153,5 +153,15 @@ public void putArray(String key, int[] a) {
         return ((String[]) this.htStringArray.get(key))[index];
         
     }
+    
+    public void putInArray(String key, int index, String value){
+        
+        String[] newArray = (String []) this.htStringArray.get(key);
+        
+        newArray[index] = value;
+        
+        this.htStringArray.put(key, newArray);
+        
+    }
 
 }

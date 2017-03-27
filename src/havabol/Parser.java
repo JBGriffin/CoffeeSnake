@@ -724,6 +724,7 @@ public class Parser {
         if (!scanner.currentToken.tokenStr.contains("=") && !scanner.currentToken.tokenStr.equals("[")) {
             scanner.getNext();
         }
+        //p(scanner.currentToken.tokenStr + " HERE");
         if (scanner.currentToken.tokenStr.equals("[")) {
             return arrayAssignments(execute, firstToken);
         }
@@ -852,10 +853,28 @@ public class Parser {
     private ResultValue arrayAssignments(boolean execute, Token identifier) throws Exception {
         ResultValue rt = null;
 
-        p("in array assignments with identifier = " + identifier.tokenStr);
-        p("array is type " + ((STIdentifiers) this.symbolTable.getSymbol(identifier.tokenStr)).iParmType);
+        //p("in array assignments with identifier = " + identifier.tokenStr);
+        //p("array is type " + ((STIdentifiers) this.symbolTable.getSymbol(identifier.tokenStr)).iParmType);
         if (scanner.currentToken.tokenStr.equals("[")) {
             scanner.getNext();
+        }
+        
+        //if true, this has already been allocated
+        if (((STIdentifiers) this.symbolTable.getSymbol(identifier.tokenStr)).iStruct == Token.ARRAY_FIXED
+                || ((STIdentifiers) this.symbolTable.getSymbol(identifier.tokenStr)).iStruct == Token.ARRAY_UNBOUND) {
+            
+            int indexForArray;
+            //p(scanner.currentToken.tokenStr);
+            rt = expressions(execute);
+            indexForArray = Integer.parseInt(rt.szValue);
+            while(scanner.getNext().equals("=") || scanner.currentToken.tokenStr.equals("]"));
+            rt = expressions(execute);
+            //p(this.storage.getFromArray(identifier.tokenStr, Integer.parseInt(rt.szValue)));
+            this.storage.putInArray(identifier.tokenStr, indexForArray, rt.szValue);
+            //////need to get that value, then evaluate passed the = sign;
+            
+            return rt;
+            
         }
 
         //check for what is in brackets
@@ -877,7 +896,7 @@ public class Parser {
             while (!scanner.currentToken.tokenStr.equals(";")) {
                 ResultValue resOp1 = expressions(execute);
                 resOpsM.add(resOp1.szValue);
-                p(resOp1.szValue);
+                //p(resOp1.szValue);
                 if (scanner.currentToken.tokenStr.equals(","))
                     scanner.getNext();
             }
@@ -1127,7 +1146,7 @@ public class Parser {
      */
     private ResultValue expressions(boolean execute) throws Exception {
 
-        p("expressions: " + scanner.currentToken.tokenStr);
+        //p("expressions: " + scanner.currentToken.tokenStr);
         ResultValue rt = null;
         //save off current token
         Token firstToken = scanner.currentToken;
@@ -1148,13 +1167,12 @@ public class Parser {
 
         }
         //p("subClassif = " + firstToken.subClassif);
-        p(1150);
         switch (firstToken.subClassif) {
             //LHS is an identifier
             
             case Token.IDENTIFIER:
                 //set type for future evals
-                p(firstToken.tokenStr);
+                //p(firstToken.tokenStr);
                 iFirstTokenType = ((STIdentifiers) this.symbolTable.getSymbol(firstToken.tokenStr)).iParmType;
                 
                 //if referencing array value
@@ -1166,9 +1184,7 @@ public class Parser {
                     
                     scanner.getNext();
                     int indexOfArray = Integer.parseInt(expressions(execute).szValue);
-                    p(1167);
                     if (!"]".equals(scanner.currentToken.tokenStr)) errorWithContext("Expected \"]\" when referencing arrays");
-                    p(1169);
                     return new ResultValue(this.storage.getFromArray(firstToken.tokenStr, indexOfArray), Token.INTEGER);
                 }
                     
