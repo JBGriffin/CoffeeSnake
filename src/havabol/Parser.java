@@ -1127,7 +1127,7 @@ public class Parser {
      */
     private ResultValue expressions(boolean execute) throws Exception {
 
-        //p("expressions: " + scanner.currentToken.tokenStr);
+        p("expressions: " + scanner.currentToken.tokenStr);
         ResultValue rt = null;
         //save off current token
         Token firstToken = scanner.currentToken;
@@ -1148,21 +1148,40 @@ public class Parser {
 
         }
         //p("subClassif = " + firstToken.subClassif);
+        p(1150);
         switch (firstToken.subClassif) {
             //LHS is an identifier
+            
             case Token.IDENTIFIER:
                 //set type for future evals
+                p(firstToken.tokenStr);
                 iFirstTokenType = ((STIdentifiers) this.symbolTable.getSymbol(firstToken.tokenStr)).iParmType;
-                //if negative, make negative
-
+                
+                //if referencing array value
+                if (((STIdentifiers) this.symbolTable.getSymbol(firstToken.tokenStr)).iStruct == Token.ARRAY_UNBOUND 
+                        || ((STIdentifiers) this.symbolTable.getSymbol(firstToken.tokenStr)).iStruct == Token.ARRAY_FIXED) {
+                    
+                    //arrays must be followed with [ or error
+                    if (!"[".equals(scanner.getNext())) errorWithContext("Expected \"[\" when referencing arrays");
+                    
+                    scanner.getNext();
+                    int indexOfArray = Integer.parseInt(expressions(execute).szValue);
+                    p(1167);
+                    if (!"]".equals(scanner.currentToken.tokenStr)) errorWithContext("Expected \"]\" when referencing arrays");
+                    p(1169);
+                    return new ResultValue(this.storage.getFromArray(firstToken.tokenStr, indexOfArray), Token.INTEGER);
+                }
+                    
+                    
+                    
                 //means it was a simple assignment
-                if (";".equals(scanner.getNext()) || ",".equals(scanner.currentToken.tokenStr) || ")".equals(scanner.currentToken.tokenStr)) {
+                if (";".equals(scanner.getNext()) || ",".equals(scanner.currentToken.tokenStr) || ")".equals(scanner.currentToken.tokenStr) || "]".equals(scanner.currentToken.tokenStr)) {
                     if (firstIsNegative) {
                         switch (((STIdentifiers) symbolTable.getSymbol(firstToken.tokenStr)).iParmType) {
                             case Token.INTEGER:
                                 return new ResultValue((Integer.parseInt(storage.get(this, firstToken.tokenStr)) * -1) + "", Token.INTEGER);
                             case Token.FLOAT:
-                                return new ResultValue((Float.parseFloat(storage.get(this, firstToken.tokenStr)) * -1) + "", Token.INTEGER);
+                                return new ResultValue((Float.parseFloat(storage.get(this, firstToken.tokenStr)) * -1) + "", Token.FLOAT);
                         }
                     }
 
@@ -1623,7 +1642,7 @@ public class Parser {
                 }
 
                 //means it was a simple assignment
-                if (";".equals(scanner.getNext()) || ",".equals(scanner.currentToken.tokenStr) || ")".equals(scanner.currentToken.tokenStr)) {
+                if (";".equals(scanner.getNext()) || ",".equals(scanner.currentToken.tokenStr) || ")".equals(scanner.currentToken.tokenStr) || "]".equals(scanner.currentToken.tokenStr)) {
                     rt = new ResultValue(firstToken.tokenStr, Token.SEPARATOR);
 
                     return rt;
@@ -1796,7 +1815,7 @@ public class Parser {
                 }
 
                 //means it was a simple assignment
-                if (";".equals(scanner.getNext()) || ",".equals(scanner.currentToken.tokenStr) || ")".equals(scanner.currentToken.tokenStr)) {
+                if (";".equals(scanner.getNext()) || ",".equals(scanner.currentToken.tokenStr) || ")".equals(scanner.currentToken.tokenStr) || "]".equals(scanner.currentToken.tokenStr)) {
                     rt = new ResultValue(firstToken.tokenStr, Token.SEPARATOR);
 
                     return rt;

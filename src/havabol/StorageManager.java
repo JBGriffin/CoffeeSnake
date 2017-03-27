@@ -144,6 +144,14 @@ public void putArray(String key, int[] a) {
     public void putArray(String key, String[] a) {
         htStringArray.put(key, a);
 
+        
+        
+    }
+    
+    public String getFromArray(String key, int index) {
+        
+        return ((String[]) this.htStringArray.get(key))[index];
+        
     }
 
 }
