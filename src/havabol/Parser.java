@@ -638,6 +638,26 @@ public class Parser {
                             System.out.println(sb.toString());
                         }
 
+                        break;
+                        //LENGTH(string)
+                    case "LENGTH":
+                        scanner.getNext(); //move past length
+                        scanner.getNext(); //move past '('
+                        if (scanner.currentToken.subClassif == Token.IDENTIFIER) {
+                            
+                            
+                            
+                        }
+                        break;
+                        //spaces(string)
+                    case "SPACES":
+                        break;
+                        //elem(array)
+                    case "ELEM":
+                        break;
+                        //maxelem(array)
+                    case "MAXELEM":
+                        break;
                 }
 
             }
