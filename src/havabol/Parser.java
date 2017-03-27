@@ -1,5 +1,8 @@
 package havabol;
 
+import java.util.ArrayList;
+import org.omg.CORBA.IdentifierHelper;
+
 /**
  *
  * Parser starts by another object calling parse() Objects: SymbolTable
@@ -718,8 +721,11 @@ public class Parser {
         }
 
         //this should be better than above because could be +=, -=, etc.
-        if (!scanner.currentToken.tokenStr.contains("=")) {
+        if (!scanner.currentToken.tokenStr.contains("=") && !scanner.currentToken.tokenStr.equals("[")) {
             scanner.getNext();
+        }
+        if (scanner.currentToken.tokenStr.equals("[")) {
+            return arrayAssignments(execute, firstToken);
         }
 
         // Creates and assigns a value into the first token
@@ -841,6 +847,81 @@ public class Parser {
         }
         return rt;
 
+    }
+
+    private ResultValue arrayAssignments(boolean execute, Token identifier) throws Exception {
+        ResultValue rt = null;
+
+        p("in array assignments with identifier = " + identifier.tokenStr);
+        p("array is type " + ((STIdentifiers) this.symbolTable.getSymbol(identifier.tokenStr)).iParmType);
+        if (scanner.currentToken.tokenStr.equals("[")) {
+            scanner.getNext();
+        }
+
+        //check for what is in brackets
+        //empty, this will be followed by an assignment. 
+        //Max elements is number of items in following list
+        if ("]".equals(scanner.currentToken.tokenStr)) {
+            STIdentifiers sti = (STIdentifiers) this.symbolTable.getSymbol(identifier.tokenStr);
+            sti.iStruct = Token.ARRAY_FIXED;
+            this.symbolTable.updateSymbol(sti.symbol, sti);
+            this.storage.initArray(identifier.tokenStr, storage.DEFAULT_ARRAY_LENGTH, sti.iDclType, sti.iStruct);
+
+            scanner.getNext();
+
+            if (!"=".equals(scanner.currentToken.tokenStr)) {
+                errorWithContext("Expected \"=\" for array assignment");
+            }
+            scanner.getNext();
+            ArrayList<String> resOpsM = new ArrayList<>();
+            while (!scanner.currentToken.tokenStr.equals(";")) {
+                ResultValue resOp1 = expressions(execute);
+                resOpsM.add(resOp1.szValue);
+                p(resOp1.szValue);
+                if (scanner.currentToken.tokenStr.equals(","))
+                    scanner.getNext();
+            }
+            
+            if (resOpsM.isEmpty()) errorWithContext("Values must be given for unspecifed array length");
+            String[] tempM = new String[resOpsM.size()];
+            for (int i = 0; i < resOpsM.size(); i++)
+                tempM[i] = resOpsM.get(i);
+            
+            this.storage.putArray(identifier.tokenStr, tempM);
+
+        }
+
+        //unbound
+        if ("unbound".equals(scanner.currentToken.tokenStr)) {
+            STIdentifiers sti = (STIdentifiers) this.symbolTable.getSymbol(identifier.tokenStr);
+
+            //if entry not in table, something went wrong
+            if (sti == null) {
+                errorWithContext("Cannot use special word \"unbound\" as identifier");
+            }
+
+            //if array is unbound, next token must be ]
+            if (!scanner.getNext().equals("]")) {
+                errorWithContext("Expected \"]\" not found");
+            }
+
+            sti.iStruct = Token.ARRAY_UNBOUND;
+            this.symbolTable.updateSymbol(sti.symbol, sti);
+            this.storage.initArray(identifier.tokenStr, 0, sti.iDclType, sti.iStruct);
+        }
+
+        //integer: max elements of this integer
+        if (scanner.currentToken.subClassif == Token.INTEGER) {
+            STIdentifiers sti = (STIdentifiers) this.symbolTable.getSymbol(identifier.tokenStr);
+            sti.iStruct = Token.ARRAY_FIXED;
+            this.symbolTable.updateSymbol(sti.symbol, sti);
+
+            this.storage.initArray(identifier.tokenStr,
+                     Integer.parseInt(scanner.currentToken.tokenStr), sti.iDclType, sti.iStruct);
+        }
+
+        //
+        return rt;
     }
 
     /**

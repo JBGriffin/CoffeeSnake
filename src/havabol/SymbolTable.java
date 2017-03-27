@@ -46,6 +46,14 @@ public class SymbolTable {
             
         }
         
+        public void updateSymbol(String symbol, STEntry entry){
+            
+            this.ht.remove(symbol);
+            
+            this.ht.put(symbol, entry);
+            
+        }
+        
         /**
          * 
          * initGlobal initializes the hash table ht to contain all possible
