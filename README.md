@@ -35,38 +35,74 @@ Assignment 3 Due Thursday, March 23rd:
 Assignment 4 Due Thursday, April 11:
     
     1.	You must be able to execute:
+
 •	Assignment operations to 
+
 •	simple variables (Int, Float, Bool) and String variables.
+
 •	arrays as targets with scalars or arrays as sources
+
 •	array elements
+
 •	string elements
+
 •	Complex expressions involving
+
 •	many operations
+
 •	multiple data types
+
 •	simple builtin functions
-•	LENGTH(string)
+
+•	LENGTH(string) //done, needs other checking though
+
 •	SPACES(string)
+
 •	ELEM(array)
+
 •	MAXELEM(array)
+
 •	arrrays
+
 •	array element references with boundary check
+
 •	string element references with boundary check, including support for negative subscripts
+
 •	operators:
+
 •	numeric: + - * / ^ //done
+
 •	string:  #
+
 •	comparison: < > <= >= == != (note that the type of comparison is dependent on the left operand) //done
+
 •	logical: not and or
+
 •	If doing infix, identify unary minus //done
+
 •	Bool constants:  T F //done
+
 •	Simple if statements, if-then-else, nested if statements done
+
 •	while statements //done
+
 •	includes nesting of while statements, if statements, and for statements //need to do for statements
+
 •	print function //done
+
 •	Declaration statements //done 
+
 •	Int, Float, String, and Bool //done
+
 •	Arrays of Int, Float, String or Bool
+
 •	Initializations (note that this was moved from the flexible requirements)
+
 •	for statements
+
 •	counting with an optional by
+
 •	char in a string
+
 •	element in an array
+
