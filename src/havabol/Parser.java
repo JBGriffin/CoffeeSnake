@@ -282,7 +282,6 @@ public class Parser {
         }
     }
 
-
     /**
      * Evaluates if/else statements. Will decide whether or not to execute the
      * next statements. Is able to execute multi-lined if/else statements, but
@@ -346,7 +345,6 @@ public class Parser {
                         }
                     }*/
 
-                    
                 }
             } //if was false
             else {
@@ -445,20 +443,22 @@ public class Parser {
     }
 
     /**
-     * For loop which takes an index and a starting variable, and runs until the ending variable.
-     * Currently only increments by 1. Will be able to increment different positive numbers in the future.
-     * <p><blockquote><pre>
+     * For loop which takes an index and a starting variable, and runs until the
+     * ending variable. Currently only increments by 1. Will be able to
+     * increment different positive numbers in the future.
+     * <p>
+     * <blockquote><pre>
      * // Example for loop execution:
      * for controlVar = startVar to endVar
      *      body
      * endfor;
      * </pre></blockquote><p>
-     * Note: The only part of the for loop expression that is able to be re-evaluated is the incrementer.
+     * Note: The only part of the for loop expression that is able to be
+     * re-evaluated is the incrementer.
      * <p>
      * @param execute Boolean to determine whether or not to execute the loop.
      */
-    private void forStatement(boolean execute) throws Exception
-    {
+    private void forStatement(boolean execute) throws Exception {
         //p("for loop");
         if (execute) {
             int iForStart = scanner.currentToken.iSourceLineNr - 1;
@@ -466,7 +466,7 @@ public class Parser {
             int iColEnd;
             scanner.getNext();
             ResultValue resultCond = expressions(execute);
-            p(""+resultCond.szValue);
+            p("" + resultCond.szValue);
             ResultValue toExecute = null;
             scanner.getNext();
             /*
@@ -515,7 +515,8 @@ public class Parser {
         } else {
             skipTo("for", ":");
             statements(false);
-        */}
+             */
+        }
 
     }
 
@@ -709,7 +710,6 @@ public class Parser {
         //save off first token when method called
         Token firstToken = scanner.currentToken;
 
-
         //check to see if it is simple assignment
         if (";".equals(scanner.getNext())) {
 
@@ -896,7 +896,7 @@ public class Parser {
             if ((resOp1.type == Token.STRING || resOp1.type == Token.IDENTIFIER)
                     && (resOp2.type == Token.STRING || resOp2.type == Token.IDENTIFIER)) {
                 //do comparison between strings
-                
+
                 if ((resOp1.type == Token.IDENTIFIER
                         && ((STIdentifiers) symbolTable.getSymbol(leftToken.tokenStr)).iParmType != Token.STRING)
                         && (resOp2.type == Token.IDENTIFIER
@@ -918,7 +918,7 @@ public class Parser {
                                 return new ResultValue("F", Token.BOOLEAN);
                             }
                         case "==":
-                            
+
                             return new ResultValue((resOp1.szValue.equals(resOp2.szValue) + "").toUpperCase().charAt(0) + "", Token.BOOLEAN);
                         case "!=":
                             return new ResultValue((!resOp1.szValue.equals(resOp2.szValue) + "").toUpperCase().charAt(0) + "", Token.BOOLEAN);
@@ -1943,7 +1943,5 @@ public class Parser {
     private void p(int LineNumber) {
         System.out.println("Line Number::: " + LineNumber);
     }
-
-    
 
 }

@@ -24,6 +24,9 @@ public class Token
     public static final int STRING     = 5; // string constant
     public static final int DATE       = 6; // date constant
     public static final int VOID       = 7; // void
+    public static final int ARRAY_FIXED   = 8; //array types
+    public static final int ARRAY_UNBOUND = 9; //unbound array specifier
+
     // Constants for CONTROL's subClassif  (after Pgm 1)
     public static final int FLOW       = 10;// flow statement (e.g., if)
     public static final int END        = 11;// end statement (e.g., endif)
