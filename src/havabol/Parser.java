@@ -1,7 +1,6 @@
 package havabol;
 
 import java.util.ArrayList;
-import org.omg.CORBA.IdentifierHelper;
 
 /**
  *
@@ -850,6 +849,15 @@ public class Parser {
 
     }
 
+    /**
+     * handles array assignments
+     * passed to by the assignments function when seeing subscripting
+     * 
+     * @param execute
+     * @param identifier
+     * @return
+     * @throws Exception 
+     */
     private ResultValue arrayAssignments(boolean execute, Token identifier) throws Exception {
         ResultValue rt = null;
 
