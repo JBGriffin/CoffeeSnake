@@ -241,7 +241,6 @@ public class Parser {
                 whileStatement(execute);
                 break;
             case "for":
-                p("HI");
                 forStatement(execute);
                 break;
             default:
@@ -446,7 +445,46 @@ public class Parser {
 
     /**
      * For loop which takes an index and a starting variable, and runs until the
-     * ending variable. Currently only increments by 1. Will be able to
+     * ending variable. Determines which kind of for loop is given (i.e. counting,
+     * array, or string), and executes as given.
+     * @param execute Boolean to determine whether or not to execute the loop.
+     */
+    private void forStatement(boolean execute) throws Exception {
+        //p("for loop");
+        if (execute) {
+            int iForStart = scanner.currentToken.iSourceLineNr - 1;
+
+            scanner.getNext();
+            // p("For loop! ");
+
+
+
+            // Check to see if the index exists in the Symbol Table. If it doesn't, put it in
+            ResultValue resOp1 = new ResultValue(scanner.currentToken.tokenStr, scanner.currentToken.subClassif);
+            if(this.storage.get(this, scanner.currentToken.tokenStr) == null) {
+                this.storage.put(resOp1.szValue, 0 + "");
+            }
+
+            // Set start value.
+            ResultValue startIndex = expressions(execute);
+
+            // Check forloop type
+            if(scanner.currentToken.tokenStr.equals("to"))
+            {
+                countingFor(execute, startIndex, iForStart);
+            }
+            else if(scanner.currentToken.tokenStr.equals("in"))
+                p("I'm a string or array!");
+            else // Skip the token
+                errorWithContext("Unexpected token in for loop. Given: " + scanner.currentToken.tokenStr);
+
+        }
+
+    }
+
+    /**
+     * Counting for loop. The "to" token can also be seen as a "<" symbol.
+     * Currently only increments by 1. Will be able to
      * increment different positive numbers in the future.
      * <p>
      * <blockquote><pre>
@@ -458,19 +496,47 @@ public class Parser {
      * Note: The only part of the for loop expression that is able to be
      * re-evaluated is the incrementer.
      * <p>
-     * @param execute Boolean to determine whether or not to execute the loop.
+     * @param execute
+     * @param startIndex
+     * @param iForStart
+     * @throws Exception
      */
-    private void forStatement(boolean execute) throws Exception {
-        //p("for loop");
-        if (execute) {
-            int iForStart = scanner.currentToken.iSourceLineNr - 1;
-            int iEndFor;
-            int iColEnd;
-            scanner.getNext();
-            ResultValue resultCond = expressions(execute);
-            p("" + resultCond.szValue);
-            ResultValue toExecute = null;
-            scanner.getNext();
+    private void countingFor(boolean execute, ResultValue startIndex, int iForStart) throws Exception
+    {
+        if(execute) {
+            int index = 0;
+            int iEndFor = 0;
+            ResultValue toExecute;
+            p("Here");
+
+            if (startIndex.type == Token.INTEGER)
+                index = Integer.parseInt(startIndex.szValue);
+
+            ResultValue endValue = expressions(execute);
+
+
+
+            // Make sure next token is a :
+            if (!scanner.currentToken.tokenStr.equals(":"))
+                errorWithContext("Unexpected ending token in for loop. Given: " + scanner.currentToken.tokenStr);
+            else
+                scanner.getNext();
+
+
+            if (endValue.type == Token.INTEGER)
+                iEndFor = Integer.parseInt(endValue.szValue);
+
+            p("Index: " + index + " and end: " + iEndFor);
+            while(index < iEndFor)
+            {
+
+                toExecute = statements(execute);
+
+                if (toExecute.szValue.equals("endfor"))
+                {
+                    ct();
+                }
+            }
             /*
             //p(iWhileStart + " " + iColPos);
             //p(scanner.sourceFileM.get(iWhileStart));
@@ -519,7 +585,6 @@ public class Parser {
             statements(false);
              */
         }
-
     }
 
     /**
@@ -846,6 +911,7 @@ public class Parser {
                     //if (scanner.bShowExpr)
                     //  System.out.println(rt.szValue);
                     default:
+
                         Token newToken = scanner.currentToken;
                         rt = expressions(execute);
                         //System.out.println(rt.szValue);
@@ -1246,6 +1312,9 @@ public class Parser {
                     break;
                 case "or":
                     break;
+                case "to":
+                    p("Made it into switch!");
+                    break;
                 default:
                     errorWithContext("Expected ':' not found at end of statement. Given: " + scanner.currentToken.tokenStr);
             }
@@ -1357,6 +1426,7 @@ public class Parser {
             firstToken = scanner.currentToken;
 
         }
+
         //p("subClassif = " + firstToken.subClassif);
         switch (firstToken.subClassif) {
             //LHS is an identifier
@@ -1364,6 +1434,7 @@ public class Parser {
             case Token.IDENTIFIER:
                 //set type for future evals
                 //p(firstToken.tokenStr);
+
                 iFirstTokenType = ((STIdentifiers) this.symbolTable.getSymbol(firstToken.tokenStr)).iParmType;
                 
                 //if referencing array value
@@ -1378,11 +1449,9 @@ public class Parser {
                     if (!"]".equals(scanner.currentToken.tokenStr)) errorWithContext("Expected \"]\" when referencing arrays");
                     return new ResultValue(this.storage.getFromArray(firstToken.tokenStr, indexOfArray), Token.INTEGER);
                 }
-                    
-                    
-                    
+
                 //means it was a simple assignment
-                if (";".equals(scanner.getNext()) || ",".equals(scanner.currentToken.tokenStr) || ")".equals(scanner.currentToken.tokenStr) || "]".equals(scanner.currentToken.tokenStr)) {
+                if (";".equals(scanner.getNext()) ||  ",".equals(scanner.currentToken.tokenStr) || ")".equals(scanner.currentToken.tokenStr) || "]".equals(scanner.currentToken.tokenStr)) {
                     if (firstIsNegative) {
                         switch (((STIdentifiers) symbolTable.getSymbol(firstToken.tokenStr)).iParmType) {
                             case Token.INTEGER:
@@ -1850,7 +1919,7 @@ public class Parser {
                 }
 
                 //means it was a simple assignment
-                if (";".equals(scanner.getNext()) || ",".equals(scanner.currentToken.tokenStr) || ")".equals(scanner.currentToken.tokenStr) || "]".equals(scanner.currentToken.tokenStr)) {
+                if (";".equals(scanner.getNext()) || "to".equals(scanner.currentToken.tokenStr)|| ",".equals(scanner.currentToken.tokenStr) || ")".equals(scanner.currentToken.tokenStr) || "]".equals(scanner.currentToken.tokenStr)) {
                     rt = new ResultValue(firstToken.tokenStr, Token.SEPARATOR);
                     //p(rt.szValue + " is the result");
                     return rt;
@@ -2016,6 +2085,9 @@ public class Parser {
                 {
                     return rt = evaluateEquality(execute, firstToken, scanner.currentToken.tokenStr);
                 }
+            case Token.END:
+
+                break;
             case Token.FLOAT:
                 //if negative, make negative
                 if (firstIsNegative) {
@@ -2252,4 +2324,5 @@ public class Parser {
         System.out.println("Line Number::: " + LineNumber);
     }
 
+    private void ct(){ System.out.println("Current token::: " + scanner.currentToken.tokenStr);}
 }
