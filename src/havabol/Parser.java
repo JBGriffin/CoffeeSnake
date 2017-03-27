@@ -923,10 +923,34 @@ public class Parser {
             if (!scanner.getNext().equals("]")) {
                 errorWithContext("Expected \"]\" not found");
             }
-
+            //p(924);
             sti.iStruct = Token.ARRAY_UNBOUND;
             this.symbolTable.updateSymbol(sti.symbol, sti);
-            this.storage.initArray(identifier.tokenStr, 0, sti.iDclType, sti.iStruct);
+            this.storage.initArray(identifier.tokenStr, storage.DEFAULT_ARRAY_LENGTH, sti.iDclType, sti.iStruct);
+            
+            
+            scanner.getNext();
+
+            if (!"=".equals(scanner.currentToken.tokenStr) && !";".equals(scanner.currentToken.tokenStr)) {
+                errorWithContext("Expected \"=\" or \";\" for array assignment");
+            }
+            scanner.getNext();
+            ArrayList<String> resOpsM = new ArrayList<>();
+            while (!scanner.currentToken.tokenStr.equals(";")) {
+                ResultValue resOp1 = expressions(execute);
+                resOpsM.add(resOp1.szValue);
+                //p(resOp1.szValue);
+                if (scanner.currentToken.tokenStr.equals(","))
+                    scanner.getNext();
+            }
+            
+            if (resOpsM.isEmpty()) errorWithContext("Values must be given for unspecifed array length");
+            String[] tempM = new String[storage.DEFAULT_ARRAY_LENGTH];
+            for (int i = 0; i < resOpsM.size(); i++)
+                tempM[i] = resOpsM.get(i);
+            
+            this.storage.putArray(identifier.tokenStr, tempM);
+            
         }
 
         //integer: max elements of this integer
@@ -935,8 +959,36 @@ public class Parser {
             sti.iStruct = Token.ARRAY_FIXED;
             this.symbolTable.updateSymbol(sti.symbol, sti);
 
+            //p(scanner.currentToken.tokenStr);
+            rt = expressions(execute);
+            //p(rt.szValue);
             this.storage.initArray(identifier.tokenStr,
-                     Integer.parseInt(scanner.currentToken.tokenStr), sti.iDclType, sti.iStruct);
+                     Integer.parseInt(rt.szValue), sti.iDclType, sti.iStruct);
+            int sizeForArray = Integer.parseInt(rt.szValue);
+            scanner.getNext();
+
+            //p(scanner.currentToken.tokenStr);
+            if (!"=".equals(scanner.currentToken.tokenStr) && !";".equals(scanner.currentToken.tokenStr)) {
+                errorWithContext("Expected \"=\" or \";\" for array assignment");
+            }
+            scanner.getNext();
+            ArrayList<String> resOpsM = new ArrayList<>();
+            while (!scanner.currentToken.tokenStr.equals(";")) {
+                ResultValue resOp1 = expressions(execute);
+                resOpsM.add(resOp1.szValue);
+                //p(resOp1.szValue);
+                if (scanner.currentToken.tokenStr.equals(","))
+                    scanner.getNext();
+            }
+            
+            if (resOpsM.isEmpty()) errorWithContext("Values must be given for unspecifed array length");
+            if (resOpsM.size() > sizeForArray) errorWithContext("Array not large enough to store list");
+            String[] tempM = new String[sizeForArray];
+            for (int i = 0; i < resOpsM.size(); i++)
+                tempM[i] = resOpsM.get(i);
+            
+            this.storage.putArray(identifier.tokenStr, tempM);
+            
         }
 
         //
