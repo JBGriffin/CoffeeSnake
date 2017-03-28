@@ -758,10 +758,12 @@ public class Parser {
         //if (scanner.currentToken.primClassif == Token.FUNCTION)
         //    return function(execute);
 
+        String assignToken = scanner.currentToken.tokenStr;
+        scanner.getNext();
         // Creates and assigns a value into the first token
-        switch (scanner.currentToken.tokenStr) {
+        switch (assignToken) {
             case "=":
-                scanner.getNext();
+                //scanner.getNext();
                 if (scanner.currentToken.primClassif == Token.FUNCTION) {
                     int value = 0;
                     rt = function(execute);
@@ -871,6 +873,7 @@ public class Parser {
                 }
             // Assumes that the token has already been initialized and put into the symbol table
             case "+=":
+                ResultValue rightHS = new ResultValue(scanner.currentToken.tokenStr, scanner.currentToken.subClassif);
             case "-=":
             case "*=":
             case "/=":
@@ -1177,16 +1180,22 @@ public class Parser {
         Token rightToken = scanner.currentToken;    // Solely for readability
         if (execute) {
             ResultValue resOp1 = new ResultValue(leftToken.tokenStr, leftToken.subClassif);
+//            p("Resop1 Val: " + resOp1.szValue + " and class: " + Token.strSubClassifM[resOp1.type]);
             ResultValue resOp2 = new ResultValue(rightToken.tokenStr, rightToken.subClassif);
+//            p("Resop2 Val: " + resOp2.szValue + " and class: " + Token.strSubClassifM[resOp2.type]);
 
             resOp1.szValue = this.storage.get(this, leftToken.tokenStr);
             if (resOp1.szValue == null) {
                 resOp1.szValue = leftToken.tokenStr;
             }
             resOp2.szValue = this.storage.get(this, rightToken.tokenStr);
+            resOp2.type = symbolTable.getSymbol(rightToken.tokenStr).iPrimClassif;
             if (resOp2.szValue == null) {
                 resOp2.szValue = rightToken.tokenStr;
             }
+
+
+
             //if string comparison, handle here
             if ((resOp1.type == Token.STRING || resOp1.type == Token.IDENTIFIER)
                     && (resOp2.type == Token.STRING || resOp2.type == Token.IDENTIFIER)) {
@@ -1237,6 +1246,8 @@ public class Parser {
             /*Numeric nOp1 = new Numeric(this, resOp1, "First Operator", comparison);
             Numeric nOp2 = new Numeric(this, resOp2, "Second Operator", comparison);*/
 
+           /* p("ResOp1: " + resOp1.szValue + " and ResOp2: " + resOp2.szValue);
+            p("Comparison: " + comparison);*/
             retVal = numeric.equalValue(resOp1, resOp2, comparison);
         }
         //if at end of if or while ---- need to add ')' is future for print statement

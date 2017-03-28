@@ -1,5 +1,6 @@
 package havabol;
 
+import javax.xml.transform.Result;
 import java.util.DoubleSummaryStatistics;
 import java.util.IntSummaryStatistics;
 
@@ -278,6 +279,10 @@ private ResultValue toInt(ResultValue target) throws Exception{
     try {
         resultValue.szValue = Integer.parseInt(target.szValue) + "";
         return resultValue;
+    } catch (Exception e){}
+    try{
+        resultValue.szValue = ((int) Double.parseDouble(target.szValue)) + "";
+        return resultValue;
     } catch (Exception e){
         parser.errorWithContext("Could not convert " + target.szValue + " to an Int");
     }
@@ -302,6 +307,39 @@ private ResultValue toInt(ResultValue target) throws Exception{
     }
 
     /**
+     * Assignment method which bases return value on left hand side
+     * @param assignTo Item to be assigned into
+     * @param valAssign Value to be assigned
+     * @return New value of the assignment statement
+     * @throws Exception If assignment can not occur, error is thrown.
+     */
+    public ResultValue assignment(ResultValue assignTo, ResultValue valAssign) throws Exception{
+        ResultValue returnValue = null;
+
+        switch(assignTo.type)
+        {
+            case Token.INTEGER:
+                returnValue = toInt(valAssign);
+                break;
+            case Token.FLOAT:
+                returnValue = toFloat(valAssign);
+                break;
+            case Token.STRING:
+                returnValue.szValue = valAssign.szValue;
+                returnValue.type = Token.STRING;
+                break;
+            case Token.BOOLEAN:
+                returnValue.szValue = valAssign.szValue;
+                returnValue.type = Token.BOOLEAN;
+                break;
+            default:
+                parser.errorWithContext("Not a valid assignment. " + valAssign.szValue
+                        + " can't be assigned to " + assignTo.szValue);
+        }
+        return returnValue;
+    }
+
+    /**
      * Combines strings
      * @param beginning First half of string
      * @param end Second half of string
@@ -313,6 +351,28 @@ private ResultValue toInt(ResultValue target) throws Exception{
         stringBuilder.append(end.szValue);
         returnValue.szValue = stringBuilder.toString();
         return returnValue;
+    }
+
+
+    private ResultValue convertIdentifier(ResultValue value){
+        ResultValue resultValue = new ResultValue("", 0);
+        resultValue.type = Token.STRING;
+        resultValue.szValue = value.szValue;
+        try{
+            resultValue.type = Token.INTEGER;
+            resultValue.szValue = Integer.parseInt(value.szValue) + "";
+            return resultValue;
+        } catch (Exception e) {}
+        try{
+            resultValue.type = Token.FLOAT;
+            resultValue.szValue = Double.parseDouble(value.szValue) + "";
+            return resultValue;
+        } catch (Exception e) {}
+        finally {
+            /*resultValue.type = Token.STRING;
+            resultValue.szValue = value.szValue;*/
+            return resultValue;
+        }
     }
 
     /**
@@ -351,6 +411,10 @@ private ResultValue toInt(ResultValue target) throws Exception{
                         strCmp = leftOp.szValue.compareTo(rightOp.szValue);
                         returnValue.szValue = (strCmp > 0) ? "T" : "F";
                         break;
+                    case Token.IDENTIFIER:
+                        returnValue = convertIdentifier(leftOp);
+                        return equalValue(returnValue, rightOp, comparison);
+
                     default:
                         parser.errorWithContext("Bad equalities given. LHS: " + leftOp.szValue + " and RHS: " + rightOp.szValue);
                 }
@@ -375,6 +439,9 @@ private ResultValue toInt(ResultValue target) throws Exception{
                         strCmp = leftOp.szValue.compareTo(rightOp.szValue);
                         returnValue.szValue = (strCmp >= 0) ? "T" : "F";
                         break;
+                    case Token.IDENTIFIER:
+                        returnValue = convertIdentifier(leftOp);
+                        return equalValue(returnValue, rightOp, comparison);
                     default:
                         parser.errorWithContext("Bad equalities given. LHS: " + leftOp.szValue + " and RHS: " + rightOp.szValue);
                 }
@@ -399,6 +466,9 @@ private ResultValue toInt(ResultValue target) throws Exception{
                         strCmp = leftOp.szValue.compareTo(rightOp.szValue);
                         returnValue.szValue = (strCmp < 0) ? "T" : "F";
                         break;
+                    case Token.IDENTIFIER:
+                        returnValue = convertIdentifier(leftOp);
+                        return equalValue(returnValue, rightOp, comparison);
                     default:
                         parser.errorWithContext("Bad equalities given. LHS: " + leftOp.szValue + " and RHS: " + rightOp.szValue);
                 }
@@ -423,6 +493,9 @@ private ResultValue toInt(ResultValue target) throws Exception{
                         strCmp = leftOp.szValue.compareTo(rightOp.szValue);
                         returnValue.szValue = (strCmp <= 0) ? "T" : "F";
                         break;
+                    case Token.IDENTIFIER:
+                        returnValue = convertIdentifier(leftOp);
+                        return equalValue(returnValue, rightOp, comparison);
                     default:
                         parser.errorWithContext("Bad equalities given. LHS: " + leftOp.szValue + " and RHS: " + rightOp.szValue);
                 }
@@ -446,6 +519,9 @@ private ResultValue toInt(ResultValue target) throws Exception{
                     strCmp = leftOp.szValue.compareTo(rightOp.szValue);
                     returnValue.szValue = (strCmp == 0) ? "T" : "F";
                     break;
+                case Token.IDENTIFIER:
+                    returnValue = convertIdentifier(leftOp);
+                    return equalValue(returnValue, rightOp, comparison);
                 default:
                     parser.errorWithContext("Bad equalities given. LHS: " + leftOp.szValue + " and RHS: " + rightOp.szValue);
             }
@@ -470,10 +546,16 @@ private ResultValue toInt(ResultValue target) throws Exception{
                         strCmp = leftOp.szValue.compareTo(rightOp.szValue);
                         returnValue.szValue = (strCmp != 0) ? "T" : "F";
                         break;
+                    case Token.IDENTIFIER:
+                        returnValue = convertIdentifier(leftOp);
+                        return equalValue(returnValue, rightOp, comparison);
                     default:
                         parser.errorWithContext("Bad equalities given. LHS: " + leftOp.szValue + " and RHS: " + rightOp.szValue);
                 }
                 break;
+            case "#":
+                return combineStr(leftOp, rightOp);
+
         }
 
         return returnValue;
