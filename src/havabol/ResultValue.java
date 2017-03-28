@@ -22,5 +22,8 @@ public class ResultValue {
         this.szValue = value;
         this.type = dataType;
 
+        if(this.type == Token.IDENTIFIER)
+            this.type = Token.STRING;
+
     }
 }

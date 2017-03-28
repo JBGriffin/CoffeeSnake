@@ -26,6 +26,8 @@ public class Parser {
 
     Token lastOpenStatement;
 
+    Numeric numeric;
+
     /**
      * Parser will go through user source code and execute statements
      *
@@ -40,6 +42,7 @@ public class Parser {
 
         this.storage = new StorageManager(symbolTable);
 
+        this.numeric = new Numeric(this);
     }
 
     /**
@@ -872,7 +875,7 @@ public class Parser {
             case "*=":
             case "/=":
             case "^=":
-                rt = unaryOperation(execute, firstToken, scanner.currentToken.tokenStr);
+                //rt = unaryOperation(execute, firstToken, scanner.currentToken.tokenStr);
                 if (rt != null) {
                     if (scanner.bShowExpr) {
                         System.out.println("\t\t... Expression: " + rt.szValue);
@@ -1231,10 +1234,10 @@ public class Parser {
                 }
             }
 
-            Numeric nOp1 = new Numeric(this, resOp1, "First Operator", comparison);
-            Numeric nOp2 = new Numeric(this, resOp2, "Second Operator", comparison);
+            /*Numeric nOp1 = new Numeric(this, resOp1, "First Operator", comparison);
+            Numeric nOp2 = new Numeric(this, resOp2, "Second Operator", comparison);*/
 
-            retVal = nOp2.equalValue(nOp1, nOp2, comparison);
+            retVal = numeric.equalValue(resOp1, resOp2, comparison);
         }
         //if at end of if or while ---- need to add ')' is future for print statement
         if (!":".equals(scanner.getNext())) {
@@ -1256,6 +1259,9 @@ public class Parser {
     }
 
     /**
+     * TO BE MOVED INTO NUMERIC
+     *
+     *
      * Simple unary assignment method. Assumes that simple assignment statements
      * have already occurred.
      *
@@ -1264,7 +1270,7 @@ public class Parser {
      * @return Result value of the operation given. If x += 2 were given, will
      * return x incremented by 2.
      */
-    private ResultValue unaryOperation(boolean execute, Token leftToken, String operator) throws Exception {
+/*    private ResultValue unaryOperation(boolean execute, Token leftToken, String operator) throws Exception {
         scanner.getNext();
 
         Token rightToken = scanner.nextToken;
@@ -1324,7 +1330,7 @@ public class Parser {
             this.storage.put(leftToken.tokenStr, returnValue.szValue);
         }
         return returnValue;
-    }
+    }*/
 
     /**
      * expressions will handle RHS of assignment statements
