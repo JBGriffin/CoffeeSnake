@@ -50,13 +50,8 @@ public class Parser {
      * @throws Exception should be parser exception
      */
     public void parse() throws Exception {
-        //init result value as null - don't think it is necessary here though
-        ResultValue rt = new ResultValue("", 0);
-
         //begin grabbing items from scanner
         scanner.getNext();
-        rt = statements(true);
-
     }
 
     /**
@@ -176,7 +171,7 @@ public class Parser {
      * @throws Exception should be ParseException
      */
     private ResultValue declareStatement(boolean execute) throws Exception {
-        ResultValue returnValue = null; //init for return
+        ResultValue returnValue; //init for return
         //p("declare");
         //System.out.println(scanner.currentToken.tokenStr);
         Token workingToken = scanner.currentToken;
@@ -227,13 +222,10 @@ public class Parser {
      *
      * @param execute Whether or not to execute the statements
      */
-    private void flowStatement(boolean execute) throws Exception {
-
-        //p("flow statement");
-        ResultValue returnValue = null;
-
-        //currently the only possibilities here are if and while. 
-        switch (scanner.currentToken.tokenStr) {
+    private void flowStatement(boolean execute) throws Exception
+    {
+        switch (scanner.currentToken.tokenStr)
+        {
             case "if":
                 ifStatement(execute);
                 break;
@@ -244,8 +236,7 @@ public class Parser {
                 forStatement(execute);
                 break;
             default:
-                errorWithContext("Unexpected flow statement found");
-
+                errorWithContext("Incorrect flow statement found. Usage: " + ct());
         }
     }
 
@@ -429,6 +420,7 @@ public class Parser {
             //while evaluation was false
             toExecute = statements(false);
             //advance past endwhile and :
+            assert toExecute != null;
             if (toExecute.szValue.equals("endwhile")) {
                 if (scanner.getNext().equals(":")) {
 
@@ -453,20 +445,21 @@ public class Parser {
         //p("for loop");
         if (execute) {
             int iForStart = scanner.currentToken.iSourceLineNr - 1;
-
+            ResultValue rt = null;
             scanner.getNext();
-            // p("For loop! ");
 
-
+            //scanner.getNext();
 
             // Check to see if the index exists in the Symbol Table. If it doesn't, put it in
-            ResultValue resOp1 = new ResultValue(scanner.currentToken.tokenStr, scanner.currentToken.subClassif);
+           /* ResultValue resOp1 = new ResultValue(scanner.currentToken.tokenStr, scanner.currentToken.subClassif);
             if(this.storage.get(this, scanner.currentToken.tokenStr) == null) {
                 this.storage.put(resOp1.szValue, 0 + "");
-            }
+            }*/
 
             // Set start value.
             ResultValue startIndex = expressions(execute);
+
+
 
             // Check forloop type
             if(scanner.currentToken.tokenStr.equals("to"))
@@ -1214,6 +1207,7 @@ public class Parser {
     private ResultValue evaluateEquality(boolean execute, Token leftToken, String comparison) throws Exception {
         ResultValue retVal = new ResultValue(null, 0);
 
+
         //p("evaluate");
         //meaning there was an ending to the comparison of an if or while
         if (comparison.equals(":")) {
@@ -1231,6 +1225,10 @@ public class Parser {
             } else {
                 errorWithContext("Lone token MUST be a boolean! Given: " + leftToken.tokenStr);
             }
+        }
+        else if(comparison.equals("="))
+        {
+            return declareStatement(execute);
         }
 
         //there is more than just one token
@@ -2324,5 +2322,5 @@ public class Parser {
         System.out.println("Line Number::: " + LineNumber);
     }
 
-    private void ct(){ System.out.println("Current token::: " + scanner.currentToken.tokenStr);}
+    private String ct(){ return "Current token::: " + scanner.currentToken.tokenStr;}
 }
