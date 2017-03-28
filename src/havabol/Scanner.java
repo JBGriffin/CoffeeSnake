@@ -46,7 +46,7 @@ public class Scanner {
      * @param symbolTable Symbol table to be generated at a later date
      * @throws IOException Exception to be thrown if bad file is read in
      */
-    public Scanner(String sourceFileNm, SymbolTable symbolTable) throws IOException {
+    public Scanner(String sourceFileNm, SymbolTable symbolTable) throws Exception {
         this.sourceFileName = sourceFileNm;
 
         this.st = symbolTable;
@@ -70,6 +70,7 @@ public class Scanner {
         nextToken = new Token();
 
         advanceLine();
+        getNext();
     }
 
     /**
@@ -436,6 +437,8 @@ public class Scanner {
      * called methods
      */
     String getNext() throws Exception {
+        currentToken = nextToken;
+
         if (iColPos == currentLine.length()) {
             advanceLine();
         }
@@ -452,7 +455,7 @@ public class Scanner {
             nextToken.tokenStr = "U-";
         }
 
-        currentToken = nextToken;
+        //currentToken = nextToken;
 
         if (bShowToken) {
             currentToken.printToken();
