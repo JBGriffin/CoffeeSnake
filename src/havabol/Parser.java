@@ -296,84 +296,85 @@ public class Parser {
 
         //if we want to execute, go through statement
         //else, skip to next branch
-        if (execute) {
+        if (execute)
+        {
             //move past "if"
             int iIfLine = scanner.currentToken.iSourceLineNr;
             scanner.getNext();
             //returns = "T" or "F"
             ResultValue resultCond = evaluateEquality(execute, scanner.currentToken, scanner.getNext());
-            ResultValue toExecute = null;
+            ResultValue toExecute;
             //move past ":"
             scanner.getNext();
 
             //if true, we want to execute statements until endif
-            if (resultCond.szValue.equals("T")) {
+            if (resultCond.szValue.equals("T"))
+            {
                 toExecute = statements(true);
                 //do not execute this else
-                if (toExecute == null) {
+                if (toExecute == null)
+                {
                     errorWithContext("Expected \"endif\" or \"else\" near line " + iIfLine + " not found");
                 }
-                if (toExecute.szValue.equals("else")) {
+                assert toExecute != null;
+                if (toExecute.szValue.equals("else"))
+                {
                     //skip past else
                     scanner.getNext();
                     //skip past ":"
                     scanner.getNext();
                     //start executing with False until endif found
                     statements(false);
-                    if (!"endif".equals(scanner.currentToken.tokenStr)) {
+                    if (! "endif".equals(scanner.currentToken.tokenStr))
+                    {
                         errorWithContext("Expected endif near " + iIfLine + " not found");
                     }
                     //leave ifStatements once endif found
-                } else if (toExecute.szValue.equals("endif")) {
-                    ////GARRETT I FOUND A BUG -> luckily it didn't affect anything
-                    if (scanner.getNext().equals(";")) {
-                        //advance past endif and ;
-                        scanner.getNext();
+                }
+                else if (toExecute.szValue.equals("endif"))
+                {
+                    if (! scanner.getNext().equals(";"))
+                    {
+                        errorWithContext("Expected ';' at the end of statement. Usage: " + scanner.currentToken.tokenStr);
                     }
-                    return;
-                    //ResultValue r = statements(execute);
-                    /*
-                    if (scanner.currentToken.tokenStr != null) {
-                        if ("else".equals(scanner.currentToken.tokenStr)) {
-                            scanner.getNext();
-                            scanner.getNext();
-                            //statements(!execute);
-                            //skipTo("else","endif");
-                            if (execute) statements(execute);
-                            p(378);
-                            skipToEndif();
-                            return;
-                        }
-                    }*/
-
                 }
             } //if was false
-            else {
+            else
+            {
                 //skip first branch by sending false to statements
                 toExecute = statements(false);
                 //execute the else branch
-                if (toExecute.szValue.equals("else")) {
+                assert toExecute != null; // Making IntelliJ happy
+                if (toExecute.szValue.equals("else"))
+                {
                     //skip past else
                     scanner.getNext();
                     //skip past :
                     scanner.getNext();
                     statements(true);
-                    if (!"endif".equals(scanner.currentToken.tokenStr)) {
+                    if (!"endif".equals(scanner.currentToken.tokenStr))
+                    {
                         errorWithContext("Expected endif near " + iIfLine + " not found");
                     }
                     //stop at endif
-                } else if (toExecute.szValue.equals("endif")) {
-
+                }
+                else if (toExecute.szValue.equals("endif"))
+                {
                     //skip over endif and ;
-                    if (scanner.getNext().equals(";")) {
-                        //scanner.getNext();
+                    if (! scanner.getNext().equals(";"))
+                    {
+                        errorWithContext("Expected ';' at the end of endif. Usage: " + scanner.currentToken.tokenStr);
                     }
-                    return;
                 }
             }
-        } else {
+        }
+        else
+        {
             skipTo("if", ":");
             statements(false);
+            if(! scanner.currentToken.tokenStr.equals("endif") ||
+                    ! scanner.nextToken.tokenStr.equals(";"))
+                errorWithContext("Incorrect ending statement. Given: " + scanner.currentToken.tokenStr);
         }
     }
 
