@@ -241,7 +241,6 @@ public class Parser {
                 whileStatement(execute);
                 break;
             case "for":
-                p("HI");
                 forStatement(execute);
                 break;
             default:
@@ -364,9 +363,10 @@ public class Parser {
                     }
                     //stop at endif
                 } else if (toExecute.szValue.equals("endif")) {
+
                     //skip over endif and ;
                     if (scanner.getNext().equals(";")) {
-                        scanner.getNext();
+                        //scanner.getNext();
                     }
                     return;
                 }
@@ -409,12 +409,13 @@ public class Parser {
 
                     //rewind loop
                     scanner.loopReset(iWhileStart);
-
+                    scanner.getNext();  // Skip while
                     //re-eval
                     resultCond = evaluateEquality(execute, scanner.currentToken, scanner.getNext());
+
                     scanner.getNext(); //move pass :
                     //if not true, advance to end of loop
-                    if (!resultCond.szValue.equals("T")) {
+                    if (! resultCond.szValue.equals("T")) {
                         scanner.iSourceLineNr = iEndWhile;
                         scanner.iColPos = iColEnd;
                         scanner.advanceLine();
@@ -422,7 +423,6 @@ public class Parser {
                     }
                 } else {
                     //found endif probably.
-
                     //need to figure out what exactly this is about
                     scanner.getNext();
                 }
