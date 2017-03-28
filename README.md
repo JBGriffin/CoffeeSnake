@@ -72,11 +72,11 @@ Assignment 4 Due Thursday, April 11:
 
 •	numeric: + - * / ^ //done
 
-•	string:  #
+•	string:  # // Done
 
 •	comparison: < > <= >= == != (note that the type of comparison is dependent on the left operand) //done
 
-•	logical: not and or
+•	logical: not and or // and, or done. not not done
 
 •	If doing infix, identify unary minus //done
 
