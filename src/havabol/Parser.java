@@ -1238,6 +1238,9 @@ public class Parser {
                             } else {
                                 return new ResultValue("F", Token.BOOLEAN);
                             }
+                        // Temporary until we figure out what is going on above.
+                        case "#":
+                            return numeric.combineStr(resOp1, resOp2);
                     }
                     return new ResultValue((resOp1.szValue.equals(resOp2.szValue) + "").toUpperCase().charAt(0) + "", Token.BOOLEAN);
                 }

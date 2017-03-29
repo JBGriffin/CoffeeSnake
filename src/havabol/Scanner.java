@@ -231,6 +231,7 @@ public class Scanner {
                     case '=':
                     case '<':
                     case '>':
+                    case '#':
                         nextTokStr = currentLine.substring(iColPos, index + 1);
                         // Check to see if we need to combine operators
                         // If it is, add it to the token string and increment position
