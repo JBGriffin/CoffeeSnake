@@ -72,7 +72,7 @@ Assignment 4 Due Thursday, April 11:
 
 •	numeric: + - * / ^ //done
 
-•	string:  # // Done
+•	string:  # // 90% done
 
 •	comparison: < > <= >= == != (note that the type of comparison is dependent on the left operand) //done
 
