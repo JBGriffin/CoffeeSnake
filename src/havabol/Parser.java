@@ -1167,7 +1167,6 @@ public class Parser {
     private ResultValue evaluateEquality(boolean execute, Token leftToken, String comparison) throws Exception {
         ResultValue retVal = new ResultValue(null, 0);
 
-        //p("evaluate");
         //meaning there was an ending to the comparison of an if or while
         if (comparison.equals(":")) {
             if (leftToken.subClassif == Token.BOOLEAN) {
@@ -1192,19 +1191,7 @@ public class Parser {
         Token rightToken = scanner.currentToken;    // Solely for readability
         if (execute) {
             ResultValue resOp1 = new ResultValue(leftToken.tokenStr, leftToken.subClassif);
-//            p("Resop1 Val: " + resOp1.szValue + " and class: " + Token.strSubClassifM[resOp1.type]);
             ResultValue resOp2 = new ResultValue(rightToken.tokenStr, rightToken.subClassif);
-//            p("Resop2 Val: " + resOp2.szValue + " and class: " + Token.strSubClassifM[resOp2.type]);
-//
-//            resOp1.szValue = this.storage.get(this, leftToken.tokenStr);
-//            if (resOp1.szValue == null) {
-//                resOp1.szValue = leftToken.tokenStr;
-//            }
-//            resOp2.szValue = this.storage.get(this, rightToken.tokenStr);
-////            resOp2.type = symbolTable.getSymbol(rightToken.tokenStr).iPrimClassif;
-//            if (resOp2.szValue == null) {
-//                resOp2.szValue = rightToken.tokenStr;
-//            }
             if((resOp1.szValue = this.storage.get(this, leftToken.tokenStr)) == null)
                 resOp1.szValue = leftToken.tokenStr;
             if((resOp2.szValue = this.storage.get(this, rightToken.tokenStr)) == null)
@@ -1217,158 +1204,29 @@ public class Parser {
                         && ((STIdentifiers) symbolTable.getSymbol(rightToken.tokenStr)).iParmType == Token.STRING) {
                 resOp2.type = Token.STRING;
             }
-//
-//
-//            //if string comparison, handle here
-//            if ((resOp1.type == Token.STRING || resOp1.type == Token.IDENTIFIER)
-//                    && (resOp2.type == Token.STRING || resOp2.type == Token.IDENTIFIER)) {
-//                //do comparison between strings
-//
-//                if ((resOp1.type == Token.IDENTIFIER
-//                        && ((STIdentifiers) symbolTable.getSymbol(leftToken.tokenStr)).iParmType != Token.STRING)
-//                        && (resOp2.type == Token.IDENTIFIER
-//                        && ((STIdentifiers) symbolTable.getSymbol(rightToken.tokenStr)).iParmType != Token.STRING)) {
-//
-//                } else {
-//                    //handle string comparisons
-//                    switch (comparison) {
-//                        case "<":
-//                            if (resOp1.szValue.compareTo(resOp2.szValue) < 0) {
-////                                return new ResultValue("T", Token.BOOLEAN);
-////                            } else {
-////                                return new ResultValue("F", Token.BOOLEAN);
-//                                return numeric.equalValue(resOp1, resOp2, comparison);
-//                            }
-//                        case ">":
-//                            if (resOp1.szValue.compareTo(resOp2.szValue) > 0) {
-//                                return new ResultValue("T", Token.BOOLEAN);
-//                            } else {
-//                                return new ResultValue("F", Token.BOOLEAN);
-//                            }
-//                        case "==":
-//
-//                            return new ResultValue((resOp1.szValue.equals(resOp2.szValue) + "").toUpperCase().charAt(0) + "", Token.BOOLEAN);
-//                        case "!=":
-//                            return new ResultValue((!resOp1.szValue.equals(resOp2.szValue) + "").toUpperCase().charAt(0) + "", Token.BOOLEAN);
-//                        case ">=":
-//                            if (resOp1.szValue.compareTo(resOp2.szValue) >= 0) {
-//                                return new ResultValue("T", Token.BOOLEAN);
-//                            } else {
-//                                return new ResultValue("F", Token.BOOLEAN);
-//                            }
-//                        case "<=":
-//                            if (resOp1.szValue.compareTo(resOp2.szValue) <= 0) {
-//                                return new ResultValue("T", Token.BOOLEAN);
-//                            } else {
-//                                return new ResultValue("F", Token.BOOLEAN);
-//                            }
-//                        // Temporary until we figure out what is going on above.
-//                        case "#":
-//                            return numeric.combineStr(resOp1, resOp2);
-//                    }
-//                    return new ResultValue((resOp1.szValue.equals(resOp2.szValue) + "").toUpperCase().charAt(0) + "", Token.BOOLEAN);
-//                }
-//            }
-//
-//            Numeric nOp1 = new Numeric(this, resOp1, "First Operator", comparison);
-//            Numeric nOp2 = new Numeric(this, resOp2, "Second Operator", comparison);
-//
-//            p("ResOp1: " + resOp1.szValue + " and ResOp2: " + resOp2.szValue);
-//            p("Comparison: " + comparison);
             retVal = numeric.equalValue(resOp1, resOp2, comparison);
-        }
-        //if at end of if or while ---- need to add ')' is future for print statement
-//        if (!":".equals(scanner.getNext())) {
-//            //if there is more, do recursive call
-//            //4 > 3 and 3 < 4
-//            //^^^for future
-//            switch (scanner.currentToken.tokenStr) {
-//                // Set up for later
-//                case "and":
-//                    break;
-//                case "or":
-//                    break;
-//                default:
-//                    errorWithContext("Expected ':' not found at end of statement. Given: " + scanner.currentToken.tokenStr);
-//            }
-//        }
 
+            scanner.getNext();
+            ResultValue rightHS; // Just in case;
+            switch (scanner.nextToken.tokenStr){
+                case "and":
+                    scanner.getNext();
+                    rightHS = evaluateEquality(execute, scanner.currentToken, scanner.getNext());
+                    retVal = numeric.keywordAnd(retVal, rightHS);
+                    break;
+                case "or":
+                    scanner.getNext();
+                    rightHS = evaluateEquality(execute, scanner.currentToken, scanner.getNext());
+                    retVal = numeric.keywordOr(retVal, rightHS);
+                    break;
+                case ":":
+                    break;
+                default:
+                    errorWithContext("Expected ':' not found at end of statement. Given: " + scanner.currentToken.tokenStr);
+            }
+        }
         return retVal;
     }
-
-    /**
-     * TO BE MOVED INTO NUMERIC
-     *
-     *
-     * Simple unary assignment method. Assumes that simple assignment statements
-     * have already occurred.
-     *
-     * @param leftToken Left hand side of the assignment. This is what will be
-     * returned after the operation has happened
-     * @return Result value of the operation given. If x += 2 were given, will
-     * return x incremented by 2.
-     */
-/*    private ResultValue unaryOperation(boolean execute, Token leftToken, String operator) throws Exception {
-        scanner.getNext();
-
-        Token rightToken = scanner.nextToken;
-
-        ResultValue resOp1 = new ResultValue(leftToken.tokenStr, leftToken.subClassif);
-        if (execute) {
-            resOp1.szValue = this.storage.get(this, leftToken.tokenStr);
-        } else {
-            resOp1.szValue = "0";
-        }
-        if (resOp1.szValue == null) {
-            errorWithContext("Value must be initiated before use! Given: " + leftToken.tokenStr);
-        }
-
-        // Grab first numeric, and grab the item from the storage manager
-        Numeric nOp1 = new Numeric(this, resOp1, "1st operator", operator);
-
-        // Grab second numeric, and grab the item from the storage manager
-        ResultValue resOp2 = new ResultValue(rightToken.tokenStr, rightToken.subClassif);
-        // Check if the value exists in storage. If it does, we'll set it to that value
-        // If it doesn't, set it back to the second token's value. Numeric will take care
-        // of it if it's not a proper value
-        if (execute) {
-            resOp2.szValue = this.storage.get(this, rightToken.tokenStr);
-        } else {
-            resOp2.szValue = "0";
-        }
-        if (resOp2.szValue == null) {
-            resOp2.szValue = rightToken.tokenStr;
-        }
-
-        Numeric nOp2 = new Numeric(this, resOp2, "2nd operator", operator);
-
-        // Create result values from numerics
-        ResultValue returnValue = new ResultValue("", 0);
-        switch (operator) {
-            case "+=":
-                returnValue = nOp2.add(nOp1, nOp2);
-                break;
-            case "-=":
-                returnValue = nOp2.subtract(nOp1, nOp2);
-                break;
-            case "*=":
-                returnValue = nOp2.multiply(nOp1, nOp2);
-                break;
-            case "/=":
-                returnValue = nOp2.divide(nOp1, nOp2);
-                break;
-            case "^=":
-                returnValue = nOp2.power(nOp1, nOp2);
-                break;
-            default:
-                errorWithContext("Bad operator given: " + operator);
-        }
-
-        if (execute) {
-            this.storage.put(leftToken.tokenStr, returnValue.szValue);
-        }
-        return returnValue;
-    }*/
 
     /**
      * expressions will handle RHS of assignment statements
