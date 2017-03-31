@@ -558,6 +558,10 @@ private ResultValue toInt(ResultValue target) throws Exception{
                 break;
             case "#":
                 return combineStr(leftOp, rightOp);
+            case "and":
+                return keywordAnd(leftOp, rightOp);
+            case "or":
+                return keywordOr(leftOp, rightOp);
 
         }
 

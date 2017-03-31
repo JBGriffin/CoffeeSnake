@@ -1166,6 +1166,14 @@ public class Parser {
      */
     private ResultValue evaluateEquality(boolean execute, Token leftToken, String comparison) throws Exception {
         ResultValue retVal = new ResultValue(null, 0);
+        boolean notSet = false;
+        if (leftToken.tokenStr.equals("not")) {
+            scanner.getNext();
+            leftToken = scanner.currentToken;
+            comparison = scanner.nextToken.tokenStr;
+            notSet = true;
+        }
+
 
         //meaning there was an ending to the comparison of an if or while
         if (comparison.equals(":")) {
@@ -1179,6 +1187,8 @@ public class Parser {
                 if (retVal.szValue == null) {
                     errorWithContext("Bad identifier given. Usage: " + leftToken.tokenStr);
                 }
+                if(notSet)
+                    return numeric.keywordNot(retVal);
                 return retVal;
             } else {
                 errorWithContext("Lone token MUST be a boolean! Given: " + leftToken.tokenStr);
@@ -1226,6 +1236,8 @@ public class Parser {
                     errorWithContext("Expected ':' not found at end of statement. Given: " + scanner.currentToken.tokenStr);
             }
         }
+        if(notSet)
+            return numeric.keywordNot(retVal);
         return retVal;
     }
 
