@@ -761,149 +761,156 @@ public class Parser {
         String assignToken = scanner.currentToken.tokenStr;
         scanner.getNext();
         // Creates and assigns a value into the first token
-        switch (assignToken) {
-            case "=":
-                //scanner.getNext();
-                if (scanner.currentToken.primClassif == Token.FUNCTION) {
-                    int value = 0;
-                    rt = function(execute);
-                    value = Integer.parseInt(rt.szValue);
-                    p(scanner.currentToken.tokenStr);
-                    //if(!";".equals(scanner.getNext())) {
-                    //    value += Integer.parseInt(expressions(execute).szValue);
-                    //    p(value);
-                    //}
-                        
-                    this.storage.put(firstToken.tokenStr, rt.szValue + "");
-                    return rt;
-                }
-                switch (scanner.currentToken.subClassif) {
-                    //save simple integer (Assign 3)
-                    case Token.INTEGER:
-                        Token currentToken = scanner.currentToken;
-                        //scanner.getNext();
-                        //if (!";".equals(scanner.currentToken.tokenStr))
-                        rt = expressions(execute);
+//        switch (assignToken) {
+//            case "=":
+        if(assignToken.equals("=")) {
+            //scanner.getNext();
+            if (scanner.currentToken.primClassif == Token.FUNCTION) {
+                int value = 0;
+                rt = function(execute);
+                value = Integer.parseInt(rt.szValue);
+                p(scanner.currentToken.tokenStr);
+                //if(!";".equals(scanner.getNext())) {
+                //    value += Integer.parseInt(expressions(execute).szValue);
+                //    p(value);
+                //}
 
-                        if (execute) {
-                            if (rt.szValue != null) {
-                                if (scanner.bShowExpr) {
-                                    System.out.println("\t\t... Expression = " + rt.szValue);
-                                }
-                                if (scanner.bShowAssign) {
-                                    System.out.println("\t\t... Assignment: " + firstToken.tokenStr + " = " + rt.szValue);
-                                }
-                            }
-                            switch (firstToken.subClassif) {
-                                case Token.INTEGER:
-                                    rt.szValue = ((int) Float.parseFloat(rt.szValue)) + "";
-                                    break;
-                                case Token.FLOAT:
-                                    rt.szValue = ((float) Float.parseFloat(rt.szValue)) + "";
-                                    break;
-                            }
-                            this.storage.put(firstToken.tokenStr, rt.szValue + "");
-                        }
-                        return new ResultValue(scanner.currentToken.tokenStr, firstToken.subClassif);
-                    //save simple float (Assign 3)
-                    case Token.FLOAT:
-                        Token currentFloatToken = scanner.currentToken;
-                        rt = expressions(execute); //for now, throw error (Assign3)
+                this.storage.put(firstToken.tokenStr, rt.szValue + "");
+                return rt;
+            }
+            switch (scanner.currentToken.subClassif) {
+                //save simple integer (Assign 3)
+                case Token.INTEGER:
+                    Token currentToken = scanner.currentToken;
+                    //scanner.getNext();
+                    //if (!";".equals(scanner.currentToken.tokenStr))
+                    rt = expressions(execute);
 
-                        if (execute) {
-                            if (rt.szValue != null) {
-                                if (scanner.bShowExpr) {
-                                    System.out.println("\t\t... Expression = " + rt.szValue);
-                                }
-                                if (scanner.bShowAssign) {
-                                    System.out.println("\t\t" + firstToken.tokenStr + " = " + rt.szValue);
-                                }
+                    if (execute) {
+                        if (rt.szValue != null) {
+                            if (scanner.bShowExpr) {
+                                System.out.println("\t\t... Expression = " + rt.szValue);
                             }
-                            switch (firstToken.subClassif) {
-                                case Token.INTEGER:
-                                    rt.szValue = ((int) Float.parseFloat(rt.szValue)) + "";
-                                    break;
-                                case Token.FLOAT:
-                                    rt.szValue = ((float) Float.parseFloat(rt.szValue)) + "";
-                                    break;
+                            if (scanner.bShowAssign) {
+                                System.out.println("\t\t... Assignment: " + firstToken.tokenStr + " = " + rt.szValue);
                             }
-                            this.storage.put(firstToken.tokenStr, Float.parseFloat(rt.szValue) + "");
                         }
-                        return new ResultValue(scanner.currentToken.tokenStr, firstToken.subClassif);
-                    //save simple string (Assign 3)
-                    case Token.STRING:
-                        Token currentStringToken = scanner.currentToken;
-                        scanner.getNext(); //for assign3 should be ; only
-                        if (!";".equals(scanner.currentToken.tokenStr)) {
-                            return rt; //for now, throw error (Assign3)
+                        switch (firstToken.subClassif) {
+                            case Token.INTEGER:
+                                rt.szValue = ((int) Float.parseFloat(rt.szValue)) + "";
+                                break;
+                            case Token.FLOAT:
+                                rt.szValue = ((float) Float.parseFloat(rt.szValue)) + "";
+                                break;
                         }
-                        if (execute) {
-                            if (rt != null) {
-                                if (scanner.bShowAssign) {
-                                    System.out.println("\t\t" + firstToken.tokenStr + " = " + rt.szValue);
-                                }
+                        this.storage.put(firstToken.tokenStr, rt.szValue + "");
+                    }
+                    return new ResultValue(scanner.currentToken.tokenStr, firstToken.subClassif);
+                //save simple float (Assign 3)
+                case Token.FLOAT:
+                    Token currentFloatToken = scanner.currentToken;
+                    rt = expressions(execute); //for now, throw error (Assign3)
+
+                    if (execute) {
+                        if (rt.szValue != null) {
+                            if (scanner.bShowExpr) {
+                                System.out.println("\t\t... Expression = " + rt.szValue);
                             }
-                            this.storage.put(firstToken.tokenStr, currentStringToken.tokenStr);
+                            if (scanner.bShowAssign) {
+                                System.out.println("\t\t" + firstToken.tokenStr + " = " + rt.szValue);
+                            }
                         }
-                        return new ResultValue(scanner.currentToken.tokenStr, Token.STRING);
-                    //System.out.println("Successfully put " + scanner.currentToken.tokenStr + " into " + firstToken.tokenStr);
-                    case Token.BOOLEAN:
+                        switch (firstToken.subClassif) {
+                            case Token.INTEGER:
+                                rt.szValue = ((int) Float.parseFloat(rt.szValue)) + "";
+                                break;
+                            case Token.FLOAT:
+                                rt.szValue = ((float) Float.parseFloat(rt.szValue)) + "";
+                                break;
+                        }
+                        this.storage.put(firstToken.tokenStr, Float.parseFloat(rt.szValue) + "");
+                    }
+                    return new ResultValue(scanner.currentToken.tokenStr, firstToken.subClassif);
+                //save simple string (Assign 3)
+                case Token.STRING:
+                    Token currentStringToken = scanner.currentToken;
+                    scanner.getNext(); //for assign3 should be ; only
+                    if (!";".equals(scanner.currentToken.tokenStr)) {
+                        return rt; //for now, throw error (Assign3)
+                    }
+                    if (execute) {
+                        if (rt != null) {
+                            if (scanner.bShowAssign) {
+                                System.out.println("\t\t" + firstToken.tokenStr + " = " + rt.szValue);
+                            }
+                        }
+                        this.storage.put(firstToken.tokenStr, currentStringToken.tokenStr);
+                    }
+                    return new ResultValue(scanner.currentToken.tokenStr, Token.STRING);
+                //System.out.println("Successfully put " + scanner.currentToken.tokenStr + " into " + firstToken.tokenStr);
+                case Token.BOOLEAN:
                     //System.out.println("I'M HERE!!!");
                     //if (scanner.bShowExpr)
                     //  System.out.println(rt.szValue);
-                    default:
-                        Token newToken = scanner.currentToken;
-                        rt = expressions(execute);
-                        //System.out.println(rt.szValue);
+                default:
+                    Token newToken = scanner.currentToken;
+                    rt = expressions(execute);
+                    //System.out.println(rt.szValue);
 
-                        if (execute) {
-                            if (rt != null) {
-                                if (scanner.bShowExpr) {
-                                    System.out.println("\t\t... Expression = " + rt.szValue);
-                                }
-                                if (scanner.bShowAssign) {
-                                    System.out.println("\t\t" + firstToken.tokenStr + " = " + rt.szValue);
-                                }
+                    if (execute) {
+                        if (rt != null) {
+                            if (scanner.bShowExpr) {
+                                System.out.println("\t\t... Expression = " + rt.szValue);
                             }
-                            this.storage.put(firstToken.tokenStr, rt.szValue);
+                            if (scanner.bShowAssign) {
+                                System.out.println("\t\t" + firstToken.tokenStr + " = " + rt.szValue);
+                            }
                         }
-                        return new ResultValue(scanner.currentToken.tokenStr, 0); // TODO: find what data type this is
-                    //return new ResultValue(scanner.currentToken.tokenStr);
+                        this.storage.put(firstToken.tokenStr, rt.szValue);
+                    }
+                    return new ResultValue(scanner.currentToken.tokenStr, 0); // TODO: find what data type this is
+                //return new ResultValue(scanner.currentToken.tokenStr);
 
-                }
-            // Assumes that the token has already been initialized and put into the symbol table
-            case "+=":
-                ResultValue resultValue = new ResultValue(firstToken.tokenStr, firstToken.subClassif);
-                resultValue.szValue = this.storage.get(this, firstToken.tokenStr);
-//                resultValue.type = this.storage.get(this, firstToken.tokenStr).
-                resultValue.type = ((STIdentifiers)this.symbolTable.getSymbol(firstToken.tokenStr)).iPrimClassif;
-                p("Type == " + Token.strSubClassifM[resultValue.type]);
-                if(resultValue.szValue == null)
-                    errorWithContext("Item must be assigned before " + assignToken + " may be used. Given: " + firstToken.tokenStr);
-                ResultValue rightHS = new ResultValue(scanner.currentToken.tokenStr, scanner.currentToken.subClassif);
-                if((rightHS.szValue = this.storage.get(this, scanner.currentToken.tokenStr)) == null)
-                    rightHS.szValue = scanner.currentToken.tokenStr;
-                else
-                    rightHS.type = ((STIdentifiers)this.symbolTable.getSymbol(scanner.currentToken.tokenStr)).iPrimClassif;
-                rt = numeric.add(resultValue, rightHS);
-                this.storage.put(firstToken.tokenStr, rt.szValue);
-                return rt;
-            case "-=":
-            case "*=":
-            case "/=":
-            case "^=":
-                //rt = unaryOperation(execute, firstToken, scanner.currentToken.tokenStr);
-                if (rt != null) {
-                    if (scanner.bShowExpr) {
-                        System.out.println("\t\t... Expression: " + rt.szValue);
-                    }
-                    if (scanner.bShowAssign) {
-                        System.out.println("\t\t... Assignment: " + firstToken.tokenStr + " = " + rt.szValue);
-                    }
-                }
-                break;
-            default:
-                errorWithContext("Expected assignment or \";.\" Found: " + scanner.currentToken.tokenStr);
+            }
+        } else {
+            // Create left and right hand tokens, and create a new value using the assignment token.
+            // Put the new value into the storage table after calculation
+            ResultValue leftHS = new ResultValue(firstToken.tokenStr, firstToken.subClassif);
+            leftHS.szValue = this.storage.get(this, firstToken.tokenStr);
+            leftHS.type = ((STIdentifiers) this.symbolTable.getSymbol(firstToken.tokenStr)).iDclType;
+            if (leftHS.szValue == null)
+                errorWithContext("Item must be assigned before " + assignToken + " may be used. Given: " + firstToken.tokenStr);
+            ResultValue rightHS = new ResultValue(scanner.currentToken.tokenStr, scanner.currentToken.subClassif);
+            if ((rightHS.szValue = this.storage.get(this, scanner.currentToken.tokenStr)) == null)
+                rightHS.szValue = scanner.currentToken.tokenStr;
+            else
+                rightHS.type = ((STIdentifiers) this.symbolTable.getSymbol(scanner.currentToken.tokenStr)).iDclType;
+
+            switch (assignToken) {
+                // Assumes that the token has already been initialized and put into the symbol table
+                case "+=":
+                    rt = numeric.add(leftHS, rightHS);
+                    this.storage.put(firstToken.tokenStr, rt.szValue);
+                    return rt;
+                case "-=":
+                    rt = numeric.subtract(leftHS, rightHS);
+                    this.storage.put(firstToken.tokenStr, rt.szValue);
+                    return rt;
+                case "*=":
+                    rt = numeric.multiply(leftHS, rightHS);
+                    this.storage.put(firstToken.tokenStr, rt.szValue);
+                    return rt;
+                case "/=":
+                    rt = numeric.divide(leftHS, rightHS);
+                    this.storage.put(firstToken.tokenStr, rt.szValue);
+                    return rt;
+                case "^=":
+                    rt = numeric.power(leftHS, rightHS);
+                    this.storage.put(firstToken.tokenStr, rt.szValue);
+                    return rt;
+                default:
+                    errorWithContext("Expected assignment or \";.\" Found: " + scanner.currentToken.tokenStr);
+            }
         }
         return rt;
 
