@@ -873,7 +873,21 @@ public class Parser {
                 }
             // Assumes that the token has already been initialized and put into the symbol table
             case "+=":
+                ResultValue resultValue = new ResultValue(firstToken.tokenStr, firstToken.subClassif);
+                resultValue.szValue = this.storage.get(this, firstToken.tokenStr);
+//                resultValue.type = this.storage.get(this, firstToken.tokenStr).
+                resultValue.type = ((STIdentifiers)this.symbolTable.getSymbol(firstToken.tokenStr)).iPrimClassif;
+                p("Type == " + Token.strSubClassifM[resultValue.type]);
+                if(resultValue.szValue == null)
+                    errorWithContext("Item must be assigned before " + assignToken + " may be used. Given: " + firstToken.tokenStr);
                 ResultValue rightHS = new ResultValue(scanner.currentToken.tokenStr, scanner.currentToken.subClassif);
+                if((rightHS.szValue = this.storage.get(this, scanner.currentToken.tokenStr)) == null)
+                    rightHS.szValue = scanner.currentToken.tokenStr;
+                else
+                    rightHS.type = ((STIdentifiers)this.symbolTable.getSymbol(scanner.currentToken.tokenStr)).iPrimClassif;
+                rt = numeric.add(resultValue, rightHS);
+                this.storage.put(firstToken.tokenStr, rt.szValue);
+                return rt;
             case "-=":
             case "*=":
             case "/=":

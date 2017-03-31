@@ -91,9 +91,12 @@ public class Numeric
      */
     private ResultValue strToNum(ResultValue sConvert) throws Exception{
         ResultValue returnVal = null;
+
+        System.out.println("sConvert == " + sConvert.szValue + " of type: " + Token.strSubClassifM[sConvert.type]);
         try{
             returnVal.type = Token.INTEGER;
             int iTemp = Integer.parseInt(sConvert.szValue);
+            System.out.println("iTemp == " + iTemp);
             returnVal.szValue = iTemp + "";
         } catch (Exception e){}
         try{
