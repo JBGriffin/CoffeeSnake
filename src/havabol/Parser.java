@@ -1183,91 +1183,103 @@ public class Parser {
 //            p("Resop1 Val: " + resOp1.szValue + " and class: " + Token.strSubClassifM[resOp1.type]);
             ResultValue resOp2 = new ResultValue(rightToken.tokenStr, rightToken.subClassif);
 //            p("Resop2 Val: " + resOp2.szValue + " and class: " + Token.strSubClassifM[resOp2.type]);
-
-            resOp1.szValue = this.storage.get(this, leftToken.tokenStr);
-            if (resOp1.szValue == null) {
+//
+//            resOp1.szValue = this.storage.get(this, leftToken.tokenStr);
+//            if (resOp1.szValue == null) {
+//                resOp1.szValue = leftToken.tokenStr;
+//            }
+//            resOp2.szValue = this.storage.get(this, rightToken.tokenStr);
+////            resOp2.type = symbolTable.getSymbol(rightToken.tokenStr).iPrimClassif;
+//            if (resOp2.szValue == null) {
+//                resOp2.szValue = rightToken.tokenStr;
+//            }
+            if((resOp1.szValue = this.storage.get(this, leftToken.tokenStr)) == null)
                 resOp1.szValue = leftToken.tokenStr;
-            }
-            resOp2.szValue = this.storage.get(this, rightToken.tokenStr);
-            resOp2.type = symbolTable.getSymbol(rightToken.tokenStr).iPrimClassif;
-            if (resOp2.szValue == null) {
+            if((resOp2.szValue = this.storage.get(this, rightToken.tokenStr)) == null)
                 resOp2.szValue = rightToken.tokenStr;
+            if(resOp1.type == Token.IDENTIFIER
+                    && ((STIdentifiers) symbolTable.getSymbol(leftToken.tokenStr)).iParmType == Token.STRING) {
+                resOp1.type = Token.STRING;
             }
-
-
-
-            //if string comparison, handle here
-            if ((resOp1.type == Token.STRING || resOp1.type == Token.IDENTIFIER)
-                    && (resOp2.type == Token.STRING || resOp2.type == Token.IDENTIFIER)) {
-                //do comparison between strings
-
-                if ((resOp1.type == Token.IDENTIFIER
-                        && ((STIdentifiers) symbolTable.getSymbol(leftToken.tokenStr)).iParmType != Token.STRING)
-                        && (resOp2.type == Token.IDENTIFIER
-                        && ((STIdentifiers) symbolTable.getSymbol(rightToken.tokenStr)).iParmType != Token.STRING)) {
-
-                } else {
-                    //handle string comparisons
-                    switch (comparison) {
-                        case "<":
-                            if (resOp1.szValue.compareTo(resOp2.szValue) < 0) {
-                                return new ResultValue("T", Token.BOOLEAN);
-                            } else {
-                                return new ResultValue("F", Token.BOOLEAN);
-                            }
-                        case ">":
-                            if (resOp1.szValue.compareTo(resOp2.szValue) > 0) {
-                                return new ResultValue("T", Token.BOOLEAN);
-                            } else {
-                                return new ResultValue("F", Token.BOOLEAN);
-                            }
-                        case "==":
-
-                            return new ResultValue((resOp1.szValue.equals(resOp2.szValue) + "").toUpperCase().charAt(0) + "", Token.BOOLEAN);
-                        case "!=":
-                            return new ResultValue((!resOp1.szValue.equals(resOp2.szValue) + "").toUpperCase().charAt(0) + "", Token.BOOLEAN);
-                        case ">=":
-                            if (resOp1.szValue.compareTo(resOp2.szValue) >= 0) {
-                                return new ResultValue("T", Token.BOOLEAN);
-                            } else {
-                                return new ResultValue("F", Token.BOOLEAN);
-                            }
-                        case "<=":
-                            if (resOp1.szValue.compareTo(resOp2.szValue) <= 0) {
-                                return new ResultValue("T", Token.BOOLEAN);
-                            } else {
-                                return new ResultValue("F", Token.BOOLEAN);
-                            }
-                        // Temporary until we figure out what is going on above.
-                        case "#":
-                            return numeric.combineStr(resOp1, resOp2);
-                    }
-                    return new ResultValue((resOp1.szValue.equals(resOp2.szValue) + "").toUpperCase().charAt(0) + "", Token.BOOLEAN);
-                }
+            if (resOp2.type == Token.IDENTIFIER
+                        && ((STIdentifiers) symbolTable.getSymbol(rightToken.tokenStr)).iParmType == Token.STRING) {
+                resOp2.type = Token.STRING;
             }
-
-            /*Numeric nOp1 = new Numeric(this, resOp1, "First Operator", comparison);
-            Numeric nOp2 = new Numeric(this, resOp2, "Second Operator", comparison);*/
-
-           /* p("ResOp1: " + resOp1.szValue + " and ResOp2: " + resOp2.szValue);
-            p("Comparison: " + comparison);*/
+//
+//
+//            //if string comparison, handle here
+//            if ((resOp1.type == Token.STRING || resOp1.type == Token.IDENTIFIER)
+//                    && (resOp2.type == Token.STRING || resOp2.type == Token.IDENTIFIER)) {
+//                //do comparison between strings
+//
+//                if ((resOp1.type == Token.IDENTIFIER
+//                        && ((STIdentifiers) symbolTable.getSymbol(leftToken.tokenStr)).iParmType != Token.STRING)
+//                        && (resOp2.type == Token.IDENTIFIER
+//                        && ((STIdentifiers) symbolTable.getSymbol(rightToken.tokenStr)).iParmType != Token.STRING)) {
+//
+//                } else {
+//                    //handle string comparisons
+//                    switch (comparison) {
+//                        case "<":
+//                            if (resOp1.szValue.compareTo(resOp2.szValue) < 0) {
+////                                return new ResultValue("T", Token.BOOLEAN);
+////                            } else {
+////                                return new ResultValue("F", Token.BOOLEAN);
+//                                return numeric.equalValue(resOp1, resOp2, comparison);
+//                            }
+//                        case ">":
+//                            if (resOp1.szValue.compareTo(resOp2.szValue) > 0) {
+//                                return new ResultValue("T", Token.BOOLEAN);
+//                            } else {
+//                                return new ResultValue("F", Token.BOOLEAN);
+//                            }
+//                        case "==":
+//
+//                            return new ResultValue((resOp1.szValue.equals(resOp2.szValue) + "").toUpperCase().charAt(0) + "", Token.BOOLEAN);
+//                        case "!=":
+//                            return new ResultValue((!resOp1.szValue.equals(resOp2.szValue) + "").toUpperCase().charAt(0) + "", Token.BOOLEAN);
+//                        case ">=":
+//                            if (resOp1.szValue.compareTo(resOp2.szValue) >= 0) {
+//                                return new ResultValue("T", Token.BOOLEAN);
+//                            } else {
+//                                return new ResultValue("F", Token.BOOLEAN);
+//                            }
+//                        case "<=":
+//                            if (resOp1.szValue.compareTo(resOp2.szValue) <= 0) {
+//                                return new ResultValue("T", Token.BOOLEAN);
+//                            } else {
+//                                return new ResultValue("F", Token.BOOLEAN);
+//                            }
+//                        // Temporary until we figure out what is going on above.
+//                        case "#":
+//                            return numeric.combineStr(resOp1, resOp2);
+//                    }
+//                    return new ResultValue((resOp1.szValue.equals(resOp2.szValue) + "").toUpperCase().charAt(0) + "", Token.BOOLEAN);
+//                }
+//            }
+//
+//            Numeric nOp1 = new Numeric(this, resOp1, "First Operator", comparison);
+//            Numeric nOp2 = new Numeric(this, resOp2, "Second Operator", comparison);
+//
+//            p("ResOp1: " + resOp1.szValue + " and ResOp2: " + resOp2.szValue);
+//            p("Comparison: " + comparison);
             retVal = numeric.equalValue(resOp1, resOp2, comparison);
         }
         //if at end of if or while ---- need to add ')' is future for print statement
-        if (!":".equals(scanner.getNext())) {
-            //if there is more, do recursive call
-            //4 > 3 and 3 < 4
-            //^^^for future
-            switch (scanner.currentToken.tokenStr) {
-                // Set up for later
-                case "and":
-                    break;
-                case "or":
-                    break;
-                default:
-                    errorWithContext("Expected ':' not found at end of statement. Given: " + scanner.currentToken.tokenStr);
-            }
-        }
+//        if (!":".equals(scanner.getNext())) {
+//            //if there is more, do recursive call
+//            //4 > 3 and 3 < 4
+//            //^^^for future
+//            switch (scanner.currentToken.tokenStr) {
+//                // Set up for later
+//                case "and":
+//                    break;
+//                case "or":
+//                    break;
+//                default:
+//                    errorWithContext("Expected ':' not found at end of statement. Given: " + scanner.currentToken.tokenStr);
+//            }
+//        }
 
         return retVal;
     }
