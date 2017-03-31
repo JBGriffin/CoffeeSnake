@@ -1207,8 +1207,9 @@ public class Parser {
             retVal = numeric.equalValue(resOp1, resOp2, comparison);
 
             scanner.getNext();
+
             ResultValue rightHS; // Just in case;
-            switch (scanner.nextToken.tokenStr){
+            switch (scanner.currentToken.tokenStr){
                 case "and":
                     scanner.getNext();
                     rightHS = evaluateEquality(execute, scanner.currentToken, scanner.getNext());
