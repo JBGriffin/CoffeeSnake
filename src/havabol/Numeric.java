@@ -589,6 +589,16 @@ private ResultValue toInt(ResultValue target) throws Exception{
     }
 
     /**
+     * Negates given result value
+     * @param resultValue Result value to be flipped
+     * @return The negation of the given result value
+     */
+    public ResultValue keywordNot(ResultValue resultValue){
+        resultValue.szValue = resultValue.szValue.equals("T") ? "F" : "T";
+        return resultValue;
+    }
+
+    /**
      * 
      * Get priority of operator
      * 
