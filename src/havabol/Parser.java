@@ -770,11 +770,6 @@ public class Parser {
                 rt = function(execute);
                 value = Integer.parseInt(rt.szValue);
                 p(scanner.currentToken.tokenStr);
-                //if(!";".equals(scanner.getNext())) {
-                //    value += Integer.parseInt(expressions(execute).szValue);
-                //    p(value);
-                //}
-
                 this.storage.put(firstToken.tokenStr, rt.szValue + "");
                 return rt;
             }
@@ -890,30 +885,26 @@ public class Parser {
                 // Assumes that the token has already been initialized and put into the symbol table
                 case "+=":
                     rt = numeric.add(leftHS, rightHS);
-                    this.storage.put(firstToken.tokenStr, rt.szValue);
-                    return rt;
+                    break;
                 case "-=":
                     rt = numeric.subtract(leftHS, rightHS);
-                    this.storage.put(firstToken.tokenStr, rt.szValue);
-                    return rt;
+                    break;
                 case "*=":
                     rt = numeric.multiply(leftHS, rightHS);
-                    this.storage.put(firstToken.tokenStr, rt.szValue);
-                    return rt;
+                    break;
                 case "/=":
                     rt = numeric.divide(leftHS, rightHS);
-                    this.storage.put(firstToken.tokenStr, rt.szValue);
-                    return rt;
+                    break;
                 case "^=":
                     rt = numeric.power(leftHS, rightHS);
-                    this.storage.put(firstToken.tokenStr, rt.szValue);
-                    return rt;
+                    break;
                 default:
                     errorWithContext("Expected assignment or \";.\" Found: " + scanner.currentToken.tokenStr);
             }
+            if(execute)
+                this.storage.put(firstToken.tokenStr, rt.szValue);
+            return rt;
         }
-        return rt;
-
     }
 
     /**
@@ -2305,5 +2296,11 @@ public class Parser {
     private void p(int LineNumber) {
         System.out.println("Line Number::: " + LineNumber);
     }
+
+    /**
+     * Returns the current token as a string. Useful for debugging/error messages
+     * @return Current token string
+     */
+    private String ct(){ return scanner.currentToken.tokenStr;}
 
 }
