@@ -1277,6 +1277,14 @@ public class Parser {
             firstToken = scanner.currentToken;
 
         }
+        
+        rt = this.localExpression.workExpressions();
+        
+        if (rt != null) {
+            p(scanner.currentToken.tokenStr);
+            return rt;
+        }
+        
         //p("subClassif = " + firstToken.subClassif);
         switch (firstToken.subClassif) {
             //LHS is an identifier
