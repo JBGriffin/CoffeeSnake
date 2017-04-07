@@ -11,4 +11,12 @@ package havabol;
  */
 public class Expressions {
     
+    Parser parser;
+    
+    Expressions(Parser parser) {
+        
+        this.parser = parser;
+        
+    }
+    
 }

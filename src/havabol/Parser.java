@@ -27,6 +27,8 @@ public class Parser {
     Token lastOpenStatement;
 
     Numeric numeric;
+    
+    Expressions localExpression;
 
     /**
      * Parser will go through user source code and execute statements
@@ -43,6 +45,8 @@ public class Parser {
         this.storage = new StorageManager(symbolTable);
 
         this.numeric = new Numeric(this);
+        
+        this.localExpression = new Expressions(this);
     }
 
     /**
