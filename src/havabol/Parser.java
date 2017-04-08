@@ -474,8 +474,15 @@ public class Parser {
             int iForStart = scanner.currentToken.iSourceLineNr - 1;
             int iEndFor;
             int iColEnd;
+            ResultValue resultCond = null;
             scanner.getNext();
-            ResultValue resultCond = expressions(execute);
+            // Check if it is in the storage. If it isn't, set it up and call declare.
+            // If it is pre-declared, call asignments.
+            if((scanner.currentToken.tokenStr =
+                    this.storage.get(this, scanner.currentToken.tokenStr)) == null)
+                resultCond = declareStatement(execute);
+            else // Need to grab from the storage, and then call assignments
+                resultCond = assignments(execute);
             p("" + resultCond.szValue);
             ResultValue toExecute = null;
             scanner.getNext();
@@ -1234,7 +1241,7 @@ public class Parser {
                     rightHS = evaluateEquality(execute, scanner.currentToken, scanner.getNext());
                     retVal = numeric.keywordOr(retVal, rightHS);
                     break;
-                case ":":
+                case ":":case "to":case "in":
                     break;
                 default:
                     errorWithContext("Expected ':' not found at end of statement. Given: " + scanner.currentToken.tokenStr);
