@@ -41,14 +41,53 @@ public class Expressions {
         Token firstTokenEncountered = parser.scanner.currentToken;
 
         System.out.println(parser.scanner.currentToken.tokenStr);
+        /*
+        String sHold = firstTokenEncountered.tokenStr;
+        if (firstTokenEncountered.subClassif == Token.IDENTIFIER) {
+            sHold = this.parser.storage.get(parser, sHold);
+        }
+        this.TokensM.add(sHold);*/
+        while (!";".equals(parser.scanner.currentToken.tokenStr)) {
 
-        //if value or identifer is first, go until ;
-        if (firstTokenEncountered.primClassif == Token.OPERAND) {
-            String s = firstTokenEncountered.tokenStr;
-            if (firstTokenEncountered.subClassif == Token.IDENTIFIER) {
-                s = this.parser.storage.get(parser, s);
+            if ("(".equals(parser.scanner.currentToken.tokenStr)) {
+                parser.scanner.getNext();
+                rt = workExpressions();
+                this.TokensM.add(rt.szValue);
+                parser.scanner.getNext();
+                continue;
+            } else if (")".equals(parser.scanner.currentToken.tokenStr)) {
+                return this.evalExpression(TokensM);
+            } else if ("]".equals(parser.scanner.currentToken.tokenStr)) {
+                return this.evalExpression(TokensM);
+            } else {
+                String saveString = parser.scanner.currentToken.tokenStr;
+                if (parser.scanner.currentToken.subClassif == Token.IDENTIFIER) {
+                    saveString = this.parser.storage.get(parser, saveString);
+                }
+                this.TokensM.add(saveString);
             }
-            this.TokensM.add(s);
+            parser.scanner.getNext();
+        }
+        return this.evalExpression(TokensM);
+
+        /*
+            
+            
+            
+            HOLD SLOT
+            
+            
+            
+            
+         */
+        //if value or identifer is first, go until ;
+        /*
+        if (firstTokenEncountered.primClassif == Token.OPERAND) {
+            String s1 = firstTokenEncountered.tokenStr;
+            if (firstTokenEncountered.subClassif == Token.IDENTIFIER) {
+                s1 = this.parser.storage.get(parser, s1);
+            }
+            this.TokensM.add(s1);
             while (!";".equals(parser.scanner.getNext())) {
 
                 if (parser.scanner.currentToken.primClassif == Token.SEPARATOR) {
@@ -96,7 +135,7 @@ public class Expressions {
                                 this.TokensM.add(rt.szValue);
 
                                 continue;
-                                
+
                             }
 
                         }
@@ -123,7 +162,7 @@ public class Expressions {
         }
 
         return null;
-
+         */
     }
 
     public ResultValue evalExpression(ArrayList<String> TokensM) {
@@ -134,7 +173,6 @@ public class Expressions {
         while (!TokensM.isEmpty()) {
             //get first token
             String token = TokensM.remove(0);
-            System.out.println("dValue = " + dValue);
 
             //if token is an operator
             if (!isOperator(token)) {
@@ -167,7 +205,6 @@ public class Expressions {
 
         }
         dValue = valueStack.pop();
-        System.out.println("dValue = " + dValue);
 
         return new ResultValue(dValue + "", Token.FLOAT);
 
