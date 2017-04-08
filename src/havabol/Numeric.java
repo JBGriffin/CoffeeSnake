@@ -157,8 +157,8 @@ public class Numeric
         switch(leftVal.type)
         {
             case Token.INTEGER:
-                int iLeft = Integer.parseInt(leftVal.szValue);
-                int iRight = Integer.parseInt(rightVal.szValue);
+                int iLeft = (int) Float.parseFloat(leftVal.szValue);
+                int iRight = (int) Float.parseFloat(rightVal.szValue);
                 returnVal.szValue = (iLeft + iRight) + "";
                 break;
             case Token.FLOAT:

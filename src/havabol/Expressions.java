@@ -39,25 +39,22 @@ public class Expressions {
         ResultValue rt;
 
         Token firstTokenEncountered = parser.scanner.currentToken;
-
-        System.out.println(parser.scanner.currentToken.tokenStr);
-        /*
-        String sHold = firstTokenEncountered.tokenStr;
-        if (firstTokenEncountered.subClassif == Token.IDENTIFIER) {
-            sHold = this.parser.storage.get(parser, sHold);
-        }
-        this.TokensM.add(sHold);*/
+        boolean firstIsNegative = false;
+        
         while (!";".equals(parser.scanner.currentToken.tokenStr)) {
-
+            //System.out.println(parser.scanner.currentToken.tokenStr);
             if ("(".equals(parser.scanner.currentToken.tokenStr)) {
                 parser.scanner.getNext();
                 rt = workExpressions();
                 this.TokensM.add(rt.szValue);
-                parser.scanner.getNext();
                 continue;
             } else if (")".equals(parser.scanner.currentToken.tokenStr)) {
+                parser.scanner.getNext();
                 return this.evalExpression(TokensM);
             } else if ("]".equals(parser.scanner.currentToken.tokenStr)) {
+                parser.scanner.getNext();
+                return this.evalExpression(TokensM);
+            } else if (",".equals(parser.scanner.currentToken.tokenStr)) {
                 return this.evalExpression(TokensM);
             } else {
                 String saveString = parser.scanner.currentToken.tokenStr;
@@ -176,12 +173,10 @@ public class Expressions {
 
             //if token is an operator
             if (!isOperator(token)) {
-
                 dValue = Double.parseDouble(token);
                 valueStack.push(dValue);
 
             } else if (isOperator(token)) {
-
                 while (operatorStack.isEmpty() == false && (getPrio(operatorStack.peek()) >= getPrio(token))) {
                     String operator = operatorStack.pop();
                     double val1 = valueStack.pop();
@@ -204,7 +199,8 @@ public class Expressions {
             valueStack.push(dValue);
 
         }
-        dValue = valueStack.pop();
+        if (!valueStack.empty())
+            dValue = valueStack.pop();
 
         return new ResultValue(dValue + "", Token.FLOAT);
 
