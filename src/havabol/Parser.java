@@ -531,7 +531,7 @@ public class Parser {
      * endfor;
      * </pre></blockquote><p>
      * Note: The only part of the for loop expression that is able to be
-     * re-evaluated is the incrementer.
+     * re-evaluated is the control variable.
      * <p>
      * @param execute Boolean to determine whether or not to execute the loop.
      * @param controlToken Token to determine whether or not we change the
@@ -549,6 +549,16 @@ public class Parser {
 
         resultCond = expressions(execute);
         resultCond = numeric.toInt(resultCond);
+
+        // Check to see if variable had been declared previously
+        if(this.storage.get(this, controlToken.tokenStr) == null) {
+            this.symbolTable.putSymbol(controlToken.tokenStr
+                    , new STIdentifiers(controlToken.tokenStr, Token.CONTROL, Token.INTEGER, Token.INTEGER, Token.INTEGER));
+            this.storage.put(controlToken.tokenStr, resultCond.szValue);
+        }
+        else
+            this.storage.put(controlToken.tokenStr, resultCond.szValue);
+
         iControlVar = Integer.parseInt(resultCond.szValue);
         // Next token must be a "to"
         if(!scanner.currentToken.tokenStr.equals("to"))
@@ -574,7 +584,7 @@ public class Parser {
         // Move past the ":"
         scanner.getNext();
 
-        for(int i = iControlVar; i < iEndVar; i += iIncrementVar)
+        for(int i = iControlVar; i <= iEndVar; i += iIncrementVar)
         {
             toExecute = statements(execute);
 
@@ -582,8 +592,18 @@ public class Parser {
             {
                 iColEnd = scanner.iSourceLineNr;
 
-                //rewind loop
+                // Re-evaluate the incrementer
+//                resultCond.szValue = this.storage.get(this, controlToken.tokenStr);
+//                this.storage.put(controlToken.tokenStr, (resultCond.szValue + iControlVar) + "");
+
+
+                //rewind loop and re-evaluate the incrementer
                 scanner.loopReset(iForStart);
+                resultCond.szValue = this.storage.get(this, controlToken.tokenStr);
+                toExecute.szValue = iIncrementVar + "";
+                resultCond = numeric.add(resultCond, toExecute);
+                this.storage.put(controlToken.tokenStr, resultCond.szValue);
+                i = Integer.parseInt(this.storage.get(this, controlToken.tokenStr));
                 skipTo("for", ":");
             }
         }
