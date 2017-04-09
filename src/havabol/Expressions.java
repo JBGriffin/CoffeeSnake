@@ -40,10 +40,17 @@ public class Expressions {
 
         Token firstTokenEncountered = parser.scanner.currentToken;
         boolean firstIsNegative = false;
-        
+
         while (!";".equals(parser.scanner.currentToken.tokenStr)) {
             //System.out.println(parser.scanner.currentToken.tokenStr);
+            if (parser.scanner.currentToken.primClassif == Token.FUNCTION){
+                
+                this.TokensM.add(parser.function(true).szValue);
+                continue;
+                
+            }
             switch (parser.scanner.currentToken.tokenStr) {
+                case "[":
                 case "(":
                     parser.scanner.getNext();
                     rt = workExpressions();
@@ -73,7 +80,6 @@ public class Expressions {
         }
         return this.evalExpression(TokensM);
 
-        
     }
 
     public ResultValue evalExpression(ArrayList<String> TokensM) {
@@ -113,9 +119,10 @@ public class Expressions {
             valueStack.push(dValue);
 
         }
-        if (!valueStack.empty())
+        if (!valueStack.empty()) {
             dValue = valueStack.pop();
-
+        }
+        System.out.println(dValue);
         return new ResultValue(dValue + "", Token.FLOAT);
 
     }
@@ -161,6 +168,55 @@ public class Expressions {
         }
 
         return iPriority;
+    }
+
+    public ResultValue stringExpressions() throws Exception {
+
+        StringBuilder sb = new StringBuilder();
+        Token firstToken = parser.scanner.currentToken;
+
+        while (!";".equals(parser.scanner.currentToken.tokenStr)) {
+            String stringToAppend = "";
+            if ("#".equals(parser.scanner.currentToken.tokenStr) || "+".equals(parser.scanner.currentToken.tokenStr)) {
+
+                if (";".equals(parser.scanner.getNext())) {
+                    parser.errorWithContext("Missing string to concat");
+                }
+
+                continue;
+
+            } else if (parser.scanner.currentToken.subClassif == Token.STRING) {
+
+                stringToAppend = parser.scanner.currentToken.tokenStr;
+
+            } else if (parser.scanner.currentToken.subClassif == Token.IDENTIFIER) {
+
+                if (((STIdentifiers) this.parser.symbolTable.getSymbol(parser.scanner.currentToken.tokenStr)).iStruct == Token.STRING) {
+                    stringToAppend = this.parser.storage.get(parser, parser.scanner.currentToken.tokenStr);
+                } else {
+                    //it is an array (well it should be lol)
+                    String arrayName = parser.scanner.currentToken.tokenStr;
+                    parser.scanner.getNext();
+                    parser.scanner.getNext();
+                    int index = (int) Float.parseFloat(this.workExpressions().szValue);
+                    stringToAppend = this.parser.storage.getFromArray(arrayName, index);
+                    sb.append(stringToAppend);
+                    continue;
+                    
+                }
+
+            } else if (",".equals(parser.scanner.currentToken.tokenStr)) {
+                break;
+            }
+
+            sb.append(stringToAppend);
+
+            parser.scanner.getNext();
+
+        }
+
+        return new ResultValue(sb.toString(), Token.STRING);
+
     }
 
 }
