@@ -513,7 +513,7 @@ public class Parser {
         ResultValue resultValue = null;
 
         resultValue = expressions(execute);
-        p(ct());
+        //p(ct());
 
     }
 
@@ -1078,7 +1078,7 @@ public class Parser {
             scanner.getNext();
             ArrayList<String> resOpsM = new ArrayList<>();
             while (!scanner.currentToken.tokenStr.equals("]") && !scanner.currentToken.tokenStr.equals(";")) {
-                p(scanner.currentToken.tokenStr);
+                //p(scanner.currentToken.tokenStr);
                 ResultValue resOp1;
 
                 if (((STIdentifiers) this.symbolTable.getSymbol(identifier.tokenStr)).iDclType == Token.INTEGER) {
@@ -1141,7 +1141,7 @@ public class Parser {
             scanner.getNext();
             ArrayList<String> resOpsM = new ArrayList<>();
             while (!scanner.currentToken.tokenStr.equals("]") && !scanner.currentToken.tokenStr.equals(";")) {
-                p(scanner.currentToken.tokenStr);
+                //scanner.currentToken.tokenStr);
                 ResultValue resOp1;
 
                 if (((STIdentifiers) this.symbolTable.getSymbol(identifier.tokenStr)).iDclType == Token.INTEGER) {
@@ -1189,7 +1189,7 @@ public class Parser {
             int sizeForArray = (int) Float.parseFloat(rt.szValue);
             //scanner.getNext();
 
-            p(scanner.currentToken.tokenStr);
+            //scanner.currentToken.tokenStr);
             if (!"=".equals(scanner.currentToken.tokenStr) && !";".equals(scanner.currentToken.tokenStr)) {
                 errorWithContext("Expected \"=\" or \";\" for array assignment");
             }
@@ -1200,7 +1200,7 @@ public class Parser {
             //p("SCANNER AT:" + scanner.currentToken.tokenStr);
             ArrayList<String> resOpsM = new ArrayList<>();
             while (!scanner.currentToken.tokenStr.equals("]") && !scanner.currentToken.tokenStr.equals(";")) {
-                p(scanner.currentToken.tokenStr);
+                //p(scanner.currentToken.tokenStr);
                 ResultValue resOp1;
 
                 if (((STIdentifiers) this.symbolTable.getSymbol(identifier.tokenStr)).iDclType == Token.INTEGER) {

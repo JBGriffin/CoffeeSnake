@@ -71,6 +71,8 @@ public class Expressions {
                 default:
                     String saveString = parser.scanner.currentToken.tokenStr;
                     if (parser.scanner.currentToken.subClassif == Token.IDENTIFIER) {
+                        
+                        //need to get array if it is array
                         saveString = this.parser.storage.get(parser, saveString);
                     }
                     this.TokensM.add(saveString);
@@ -122,7 +124,6 @@ public class Expressions {
         if (!valueStack.empty()) {
             dValue = valueStack.pop();
         }
-        System.out.println(dValue);
         return new ResultValue(dValue + "", Token.FLOAT);
 
     }
