@@ -277,7 +277,7 @@ public class Numeric
  * @return Result value with new values set
  * @throws Exception If could not be converted, error is thrown
  */
-private ResultValue toInt(ResultValue target) throws Exception{
+public ResultValue toInt(ResultValue target) throws Exception{
     ResultValue resultValue = new ResultValue("", Token.INTEGER);
     try {
         resultValue.szValue = Integer.parseInt(target.szValue) + "";

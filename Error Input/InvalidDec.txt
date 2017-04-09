@@ -1,3 +1,0 @@
-Bool bCheck = F;
-Int iCheck = 0;
-Double dCheck = 0;

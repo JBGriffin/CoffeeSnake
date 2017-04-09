@@ -43,25 +43,31 @@ public class Expressions {
         
         while (!";".equals(parser.scanner.currentToken.tokenStr)) {
             //System.out.println(parser.scanner.currentToken.tokenStr);
-            if ("(".equals(parser.scanner.currentToken.tokenStr)) {
-                parser.scanner.getNext();
-                rt = workExpressions();
-                this.TokensM.add(rt.szValue);
-                continue;
-            } else if (")".equals(parser.scanner.currentToken.tokenStr)) {
-                parser.scanner.getNext();
-                return this.evalExpression(TokensM);
-            } else if ("]".equals(parser.scanner.currentToken.tokenStr)) {
-                parser.scanner.getNext();
-                return this.evalExpression(TokensM);
-            } else if (",".equals(parser.scanner.currentToken.tokenStr)) {
-                return this.evalExpression(TokensM);
-            } else {
-                String saveString = parser.scanner.currentToken.tokenStr;
-                if (parser.scanner.currentToken.subClassif == Token.IDENTIFIER) {
-                    saveString = this.parser.storage.get(parser, saveString);
-                }
-                this.TokensM.add(saveString);
+            switch (parser.scanner.currentToken.tokenStr) {
+                case "(":
+                    parser.scanner.getNext();
+                    rt = workExpressions();
+                    this.TokensM.add(rt.szValue);
+                    continue;
+                case ")":
+                    parser.scanner.getNext();
+                    return this.evalExpression(TokensM);
+                case "]":
+                    parser.scanner.getNext();
+                    return this.evalExpression(TokensM);
+                case ",":
+                    return this.evalExpression(TokensM);
+                case "to":
+                case "by":
+                case ":":
+                    return this.evalExpression(TokensM);
+                default:
+                    String saveString = parser.scanner.currentToken.tokenStr;
+                    if (parser.scanner.currentToken.subClassif == Token.IDENTIFIER) {
+                        saveString = this.parser.storage.get(parser, saveString);
+                    }
+                    this.TokensM.add(saveString);
+                    break;
             }
             parser.scanner.getNext();
         }

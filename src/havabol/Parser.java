@@ -102,8 +102,9 @@ public class Parser {
                     rt = controlStatement(execute);
                     //return if it is "else" or "endif"
 
-                    if (rt != null && (rt.szValue.equals("else") || rt.szValue.equals("endif") || (rt.szValue.equals("endwhile")))) {
-                        return rt;
+                    if (rt != null && (rt.szValue.equals("else") || rt.szValue.equals("endif")
+                            || (rt.szValue.equals("endwhile")) || rt.szValue.equals("endfor"))) {
+                        return rt = endStatement(execute);
                     }
                     break;
                 //handle operands
@@ -457,60 +458,74 @@ public class Parser {
         //p("for loop");
         if (execute) {
             int iForStart = scanner.currentToken.iSourceLineNr - 1;
-            int iEndFor;
-            int iColEnd;
+            int iColEnd = 0;
+            int iControlVar;
+            int iEndVar;
+            int iIncrementVar = 1;  // Default incr. val
+            ResultValue resultCond, toExecute;
             scanner.getNext();
-            ResultValue resultCond = expressions(execute);
-            p("" + resultCond.szValue);
-            ResultValue toExecute = null;
+            Token controlToken = scanner.currentToken;
+            if(controlToken.subClassif != Token.IDENTIFIER)
+                errorWithContext("Control variable not given. Usage: " + controlToken.tokenStr);
+
+            // Advance past the control variable and see
+            // what kind of for loop we're doing
             scanner.getNext();
-            /*
-            //p(iWhileStart + " " + iColPos);
-            //p(scanner.sourceFileM.get(iWhileStart));
-            // Will loop until condition is false.
-            while (resultCond.szValue.equals("T")) {
-                toExecute = statements(true);
 
-                //once found, re-eval expression
-                if (toExecute.szValue.equals("endwhile")) {
-                    //p("TO EXECUTE FOUND ENDWHILE");
-                    iColEnd = scanner.iColPos;
-                    iEndFor = scanner.iSourceLineNr;
-
-                    //rewind loop
-                    scanner.loopReset(iForStart);
-
-                    //re-eval
-                    resultCond = evaluateEquality(execute, scanner.currentToken, scanner.getNext());
-                    scanner.getNext(); //move pass :
-                    //if not true, advance to end of loop
-                    if (!resultCond.szValue.equals("T")) {
-                        scanner.iSourceLineNr = iEndFor;
-                        scanner.iColPos = iColEnd;
-                        scanner.advanceLine();
-                        return;
+            switch(scanner.currentToken.tokenStr)
+            {
+                // Counting for loop
+                case "=":
+                    // Move past equal sign
+                    scanner.getNext();
+                    resultCond = expressions(execute);
+                    resultCond = numeric.toInt(resultCond);
+                    iControlVar = Integer.parseInt(resultCond.szValue);
+                    // Next token must be a "to"
+                    if(!scanner.currentToken.tokenStr.equals("to"))
+                        errorWithContext("Expected 'to' token. Usage: " + scanner.currentToken.tokenStr);
+                    scanner.getNext();
+                    resultCond = expressions(execute);
+                    resultCond = numeric.toInt(resultCond);
+                    iEndVar = Integer.parseInt(resultCond.szValue);
+                    // Check if we have an optional incrementer
+                    if(scanner.currentToken.tokenStr.equals("by"))
+                    {
+                        scanner.getNext();
+                        resultCond = expressions(execute);
+                        resultCond = numeric.toInt(resultCond);
+                        iIncrementVar = Integer.parseInt(resultCond.szValue);
                     }
-                } else {
-                    //found endif probably.
 
-                    //need to figure out what exactly this is about
+                    // This should be a ":"
+                    if(!scanner.currentToken.tokenStr.equals(":"))
+                        errorWithContext("Expected ':' token. Usage: " + scanner.currentToken.tokenStr);
+                    // Everything checks out to here
+                    // System.out.printf("Start = %d, End = %d, Increment = %d\n", iControlVar, iEndVar, iIncrementVar);
+                    // Move past the ":"
                     scanner.getNext();
-                }
-            }
-            //for evaluation was false
-            toExecute = statements(false);
-            //advance past endfor and :
-            if (toExecute.szValue.equals("endfor")) {
-                if (scanner.getNext().equals(":")) {
-                    scanner.getNext();
-                }
-            }
 
-            //skip to end if needed
-        } else {
-            skipTo("for", ":");
-            statements(false);
-             */
+                    for(int i = iControlVar; i < iEndVar; i += iIncrementVar)
+                    {
+                        toExecute = statements(execute);
+
+                        if (toExecute.szValue.equals("endfor"))
+                        {
+//                            p("TO EXECUTE FOUND ENDFOR!");
+//                            iColEnd = scanner.iColPos;
+//                            i = scanner.iSourceLineNr;
+                            iColEnd = scanner.iSourceLineNr;
+
+                            //rewind loop
+                            scanner.loopReset(iForStart);
+                            skipTo("for", ":");
+                        }
+                    }
+                    // Made it this far
+                    scanner.iSourceLineNr = iColEnd;
+                    scanner.advanceLine();
+
+            }
         }
 
     }
@@ -547,6 +562,7 @@ public class Parser {
                 return rt;
             case "endfor":
                 rt = new ResultValue("endfor", Token.END);
+                rt.terminatingStr = "endfor";
                 return rt;
             default:
                 errorWithContext("Expected ending statement. Given: " + scanner.currentToken.tokenStr);
