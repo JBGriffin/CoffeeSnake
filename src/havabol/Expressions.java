@@ -43,11 +43,11 @@ public class Expressions {
 
         while (!";".equals(parser.scanner.currentToken.tokenStr)) {
             //System.out.println(parser.scanner.currentToken.tokenStr);
-            if (parser.scanner.currentToken.primClassif == Token.FUNCTION){
-                
+            if (parser.scanner.currentToken.primClassif == Token.FUNCTION) {
+                //System.out.println(parser.scanner.currentToken.tokenStr);
                 this.TokensM.add(parser.function(true).szValue);
                 continue;
-                
+
             }
             switch (parser.scanner.currentToken.tokenStr) {
                 case "[":
@@ -71,13 +71,28 @@ public class Expressions {
                 default:
                     String saveString = parser.scanner.currentToken.tokenStr;
                     if (parser.scanner.currentToken.subClassif == Token.IDENTIFIER) {
-                        
-                        //need to get array if it is array
-                        saveString = this.parser.storage.get(parser, saveString);
+                        if (((STIdentifiers) parser.symbolTable.getSymbol(saveString)).iStruct == Token.ARRAY_FIXED
+                                || ((STIdentifiers) parser.symbolTable.getSymbol(saveString)).iStruct == Token.ARRAY_UNBOUND) {
+
+                            //handle array
+                            String arrayName = saveString;
+                            parser.scanner.getNext();
+                            parser.scanner.getNext();
+                            int index = (int) Float.parseFloat(workExpressions().szValue);;
+                            saveString = this.parser.storage.getFromArray(arrayName, index);
+                            //System.out.println("getting from array " + saveString);
+                            //System.out.println("returned with " + parser.scanner.currentToken.tokenStr);
+                        } else {
+                            //need to get array if it is array
+                            saveString = this.parser.storage.get(parser, saveString);
+
+                        }
                     }
+                    //System.out.println("Here about to save " + saveString);
                     this.TokensM.add(saveString);
                     break;
             }
+            if (";".equals(parser.scanner.currentToken.tokenStr)) break;
             parser.scanner.getNext();
         }
         return this.evalExpression(TokensM);
@@ -203,7 +218,7 @@ public class Expressions {
                     stringToAppend = this.parser.storage.getFromArray(arrayName, index);
                     sb.append(stringToAppend);
                     continue;
-                    
+
                 }
 
             } else if (",".equals(parser.scanner.currentToken.tokenStr)) {

@@ -897,6 +897,7 @@ public class Parser {
                     Token currentToken = scanner.currentToken;
                     //scanner.getNext();
                     //if (!";".equals(scanner.currentToken.tokenStr))
+                    //p(scanner.currentToken.tokenStr);
                     rt = this.localExpression.workExpressions();
 
                     if (execute) {
