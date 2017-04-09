@@ -101,11 +101,13 @@ public class Parser {
                 case Token.CONTROL:
                     rt = controlStatement(execute);
                     //return if it is "else" or "endif"
-
+/*
                     if (rt != null && (rt.szValue.equals("else") || rt.szValue.equals("endif")
                             || (rt.szValue.equals("endwhile")) || rt.szValue.equals("endfor"))) {
                         return rt = endStatement(execute);
-                    }
+                    }*/
+                    if(rt != null && rt.type == Token.END)
+                        return rt = endStatement(execute);
                     break;
                 //handle operands
                 case Token.OPERAND:
@@ -435,34 +437,23 @@ public class Parser {
         } else {
             skipTo("while", ":");
             statements(false);
+            if (!scanner.currentToken.tokenStr.equals("endwhile")
+                    || !scanner.nextToken.tokenStr.equals(";")) {
+                errorWithContext("Incorrect ending statement. Given: " + scanner.currentToken.tokenStr);
+            }
         }
     }
 
     /**
-     * For loop which takes an index and a starting variable, and runs until the
-     * ending variable. Currently only increments by 1. Will be able to
-     * increment different positive numbers in the future.
-     * <p>
-     * <blockquote><pre>
-     * // Example for loop execution:
-     * for controlVar = startVar to endVar
-     *      body
-     * endfor;
-     * </pre></blockquote><p>
-     * Note: The only part of the for loop expression that is able to be
-     * re-evaluated is the incrementer.
+     * Executes one of three different kinds of for loops. Will move past the
+     * token that decides the loop type, then call a method. Usage for each loop
+     * is in the documentation for the method.
      * <p>
      * @param execute Boolean to determine whether or not to execute the loop.
      */
     private void forStatement(boolean execute) throws Exception {
         //p("for loop");
         if (execute) {
-            int iForStart = scanner.currentToken.iSourceLineNr - 1;
-            int iColEnd = 0;
-            int iControlVar;
-            int iEndVar;
-            int iIncrementVar = 1;  // Default incr. val
-            ResultValue resultCond, toExecute;
             scanner.getNext();
             Token controlToken = scanner.currentToken;
             if(controlToken.subClassif != Token.IDENTIFIER)
@@ -478,56 +469,126 @@ public class Parser {
                 case "=":
                     // Move past equal sign
                     scanner.getNext();
-                    resultCond = expressions(execute);
-                    resultCond = numeric.toInt(resultCond);
-                    iControlVar = Integer.parseInt(resultCond.szValue);
-                    // Next token must be a "to"
-                    if(!scanner.currentToken.tokenStr.equals("to"))
-                        errorWithContext("Expected 'to' token. Usage: " + scanner.currentToken.tokenStr);
+                    countingFor(execute, controlToken);
+                    break;
+                case "in":
                     scanner.getNext();
-                    resultCond = expressions(execute);
-                    resultCond = numeric.toInt(resultCond);
-                    iEndVar = Integer.parseInt(resultCond.szValue);
-                    // Check if we have an optional incrementer
-                    if(scanner.currentToken.tokenStr.equals("by"))
-                    {
-                        scanner.getNext();
-                        resultCond = expressions(execute);
-                        resultCond = numeric.toInt(resultCond);
-                        iIncrementVar = Integer.parseInt(resultCond.szValue);
-                    }
-
-                    // This should be a ":"
-                    if(!scanner.currentToken.tokenStr.equals(":"))
-                        errorWithContext("Expected ':' token. Usage: " + scanner.currentToken.tokenStr);
-                    // Everything checks out to here
-                    // System.out.printf("Start = %d, End = %d, Increment = %d\n", iControlVar, iEndVar, iIncrementVar);
-                    // Move past the ":"
-                    scanner.getNext();
-
-                    for(int i = iControlVar; i < iEndVar; i += iIncrementVar)
-                    {
-                        toExecute = statements(execute);
-
-                        if (toExecute.szValue.equals("endfor"))
-                        {
-//                            p("TO EXECUTE FOUND ENDFOR!");
-//                            iColEnd = scanner.iColPos;
-//                            i = scanner.iSourceLineNr;
-                            iColEnd = scanner.iSourceLineNr;
-
-                            //rewind loop
-                            scanner.loopReset(iForStart);
-                            skipTo("for", ":");
-                        }
-                    }
-                    // Made it this far
-                    scanner.iSourceLineNr = iColEnd;
-                    scanner.advanceLine();
+                    stringFor(execute, controlToken);
+                    break;
+                case "from":
+                    break;
+                default:
+                    errorWithContext("Incorrect control variable given. Usage: " + scanner.currentToken.tokenStr);
 
             }
         }
+        else
+        {
+            skipTo("for", ":");
+            statements(false);
+            if (!scanner.currentToken.tokenStr.equals("endfor")
+                    || !scanner.nextToken.tokenStr.equals(";")) {
+                errorWithContext("Incorrect ending statement. Given: " + scanner.currentToken.tokenStr);
+            }
+        }
+    }
+    /**
+     *  For loop that takes in a character and walks through the given
+     *  initialized object. Can be either an array or a string
+     * <p>
+     * <blockquote><pre>
+     * // Example for loop execution:
+     * for char in object:
+     *      body
+     * endfor;
+     * </pre></blockquote><p>
 
+     * @param execute Boolean to determine whether or not to execute the loop.
+     * @param controlToken Token to know initialized item
+     * @throws Exception Throws error if incorrect usage occurs
+     */
+    private void stringFor(Boolean execute, Token controlToken) throws Exception
+    {
+        String item = scanner.currentToken.tokenStr;
+        String object;
+        ResultValue resultValue = null;
+
+        resultValue = expressions(execute);
+        p(ct());
+
+
+    }
+
+    /**
+     *  For loop which takes an index and a starting variable, and runs until the
+     * ending variable. Incremental value defaults to 1, but can be set with an optional
+     * "by" flag.
+     * <p>
+     * <blockquote><pre>
+     * // Example for loop execution:
+     * for controlVar = startVar to endVar [by incrVal]:
+     *      body
+     * endfor;
+     * </pre></blockquote><p>
+     * Note: The only part of the for loop expression that is able to be
+     * re-evaluated is the incrementer.
+     * <p>
+     * @param execute Boolean to determine whether or not to execute the loop.
+     * @param controlToken Token to determine whether or not we change the
+     *                     incrementer value
+     * @throws Exception Throws error if incorrect usage occurs
+     */
+    private void countingFor(Boolean execute, Token controlToken) throws Exception
+    {
+        int iForStart = scanner.currentToken.iSourceLineNr - 1;
+        int iColEnd = 0;
+        int iControlVar;
+        int iEndVar;
+        int iIncrementVar = 1;  // Default incr. val
+        ResultValue resultCond, toExecute;
+
+        resultCond = expressions(execute);
+        resultCond = numeric.toInt(resultCond);
+        iControlVar = Integer.parseInt(resultCond.szValue);
+        // Next token must be a "to"
+        if(!scanner.currentToken.tokenStr.equals("to"))
+            errorWithContext("Expected 'to' token. Usage: " + scanner.currentToken.tokenStr);
+        scanner.getNext();
+        resultCond = expressions(execute);
+        resultCond = numeric.toInt(resultCond);
+        iEndVar = Integer.parseInt(resultCond.szValue);
+        // Check if we have an optional incrementer
+        if(scanner.currentToken.tokenStr.equals("by"))
+        {
+            scanner.getNext();
+            resultCond = expressions(execute);
+            resultCond = numeric.toInt(resultCond);
+            iIncrementVar = Integer.parseInt(resultCond.szValue);
+        }
+
+        // This should be a ":"
+        if(!scanner.currentToken.tokenStr.equals(":"))
+            errorWithContext("Expected ':' token. Usage: " + scanner.currentToken.tokenStr);
+        // Everything checks out to here
+        // System.out.printf("Start = %d, End = %d, Increment = %d\n", iControlVar, iEndVar, iIncrementVar);
+        // Move past the ":"
+        scanner.getNext();
+
+        for(int i = iControlVar; i < iEndVar; i += iIncrementVar)
+        {
+            toExecute = statements(execute);
+
+            if (toExecute.szValue.equals("endfor"))
+            {
+                iColEnd = scanner.iSourceLineNr;
+
+                //rewind loop
+                scanner.loopReset(iForStart);
+                skipTo("for", ":");
+            }
+        }
+        scanner.iSourceLineNr = iColEnd;
+        scanner.advanceLine();
     }
 
     /**
