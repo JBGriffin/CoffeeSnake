@@ -753,6 +753,8 @@ public class Parser {
                         scanner.getNext(); //move past '('
                         String workingString = "";
                         workingString = this.localExpression.stringExpressions(execute).szValue;//this.storage.get(this, scanner.currentToken.tokenStr);
+                        if(workingString.isEmpty())
+                            return new ResultValue(0 + "", Token.INTEGER);
                         return new ResultValue(workingString.length() + "", Token.INTEGER);
                     //spaces(string)
                     case "SPACES":
@@ -788,6 +790,8 @@ public class Parser {
                         scanner.getNext(); //move past '('
                         String[] elemArray;
                         elemArray = this.storage.getArray(scanner.currentToken.tokenStr);
+                        if(elemArray.toString().isEmpty())
+                            return new ResultValue(0 + "", Token.INTEGER);
                         scanner.getNext();
                         return new ResultValue(elemArray.length + "", Token.INTEGER);
                 }
