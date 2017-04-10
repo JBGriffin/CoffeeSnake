@@ -68,7 +68,7 @@ public class Expressions {
                     return this.evalExpression(TokensM);
                 case "to":
                 case "by":
-                case ":":
+                case ":": case">": case"<": case "==": case "!=": case ">=": case "<=":
                     return this.evalExpression(TokensM);
                 default:
                     String saveString = parser.scanner.currentToken.tokenStr;
@@ -102,6 +102,14 @@ public class Expressions {
 
     }
 
+    /**
+     * 
+     * This is passed an arraylist of token strings from a given collection.
+     * It will evaluate in infix order and return value to caller.
+     * 
+     * @param TokensM
+     * @return double value of expression given
+     */
     public ResultValue evalExpression(ArrayList<String> TokensM) {
 
         Stack<String> operatorStack = new Stack();
@@ -146,6 +154,15 @@ public class Expressions {
 
     }
 
+    /**
+     * evaluate takes to values and an operator to evaluate.
+     * It can handle +-/^* and returns value as a double
+     * 
+     * @param operator
+     * @param val1
+     * @param val2
+     * @return 
+     */
     public double evaluate(String operator, double val1, double val2) {
         double result = 0.0;
         if (operator.equals("^")) {
@@ -166,6 +183,12 @@ public class Expressions {
         return result;
     }
 
+    
+    /**
+     * Takes a String ch and returns if the character is an operator
+     * @param ch
+     * @return 
+     */
     public boolean isOperator(String ch) {
         if (ch.equals("+") || ch.equals("-") || ch.equals("*") || ch.equals("/") || ch.equals("^")) {
             return true;
@@ -173,6 +196,11 @@ public class Expressions {
         return false;
     }
 
+    /**
+     * getPrio is called to return operator priority
+     * @param ch
+     * @return 
+     */
     public int getPrio(String ch) {
         int iPriority = 0;
 
@@ -189,6 +217,14 @@ public class Expressions {
         return iPriority;
     }
 
+    
+    /**
+     * stringExpressions evaluates strings until ;
+     * handles concats, simples, and more
+     * @param execute
+     * @return value of the string
+     * @throws Exception 
+     */
     public ResultValue stringExpressions(boolean execute) throws Exception {
         StringBuilder sb = new StringBuilder();
         Token firstToken = parser.scanner.currentToken;
