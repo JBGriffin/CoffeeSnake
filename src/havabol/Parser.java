@@ -29,6 +29,8 @@ public class Parser {
     Numeric numeric;
 
     Expressions localExpression;
+    
+    boolean isStringArray = true;
 
     /**
      * Parser will go through user source code and execute statements
@@ -211,6 +213,7 @@ public class Parser {
                     break;
                 //if String - put in SymbolTable as String
                 case "String":
+                    if (scanner.nextToken.tokenStr.equals("[")) this.isStringArray = true;
                     this.symbolTable.putSymbol(sznewTokenStr, new STIdentifiers(sznewTokenStr, Token.CONTROL, Token.STRING, Token.STRING, Token.STRING));
                     break;
                 //if nothing - throw exception (Assignment 3) - in future there will be more
@@ -224,7 +227,6 @@ public class Parser {
             }
         }
 
-        //after identifier handle RHS
         returnValue = assignments(execute);
 
         return returnValue;
@@ -753,8 +755,9 @@ public class Parser {
                         scanner.getNext(); //move past '('
                         String workingString = "";
                         workingString = this.localExpression.stringExpressions(execute).szValue;//this.storage.get(this, scanner.currentToken.tokenStr);
-                        if(workingString.isEmpty())
+                        if (workingString.isEmpty()) {
                             return new ResultValue(0 + "", Token.INTEGER);
+                        }
                         return new ResultValue(workingString.length() + "", Token.INTEGER);
                     //spaces(string)
                     case "SPACES":
@@ -776,12 +779,15 @@ public class Parser {
                         scanner.getNext(); //move past '('
                         String[] workingArray;
                         workingArray = this.storage.getArray(scanner.currentToken.tokenStr);
+                        
                         scanner.getNext();
-                        for(String s : workingArray){
-                            if(s.equals(null))
+                        if (workingArray == null) return new ResultValue("0", Token.INTEGER);
+                        for (String s : workingArray) {
+                            if (s == null) {
                                 break;
-                            else
+                            } else {
                                 nonNull += 1;
+                            }
                         }
                         return new ResultValue(nonNull + "", Token.INTEGER);
                     //maxelem(array)
@@ -790,8 +796,9 @@ public class Parser {
                         scanner.getNext(); //move past '('
                         String[] elemArray;
                         elemArray = this.storage.getArray(scanner.currentToken.tokenStr);
-                        if(elemArray.toString().isEmpty())
+                        if (elemArray.toString().isEmpty()) {
                             return new ResultValue(0 + "", Token.INTEGER);
+                        }
                         scanner.getNext();
                         return new ResultValue(elemArray.length + "", Token.INTEGER);
                 }
@@ -882,7 +889,8 @@ public class Parser {
         //p(scanner.currentToken.tokenStr + " HERE");
         if (scanner.currentToken.tokenStr.equals("[")) {
 
-            if (((STIdentifiers) this.symbolTable.getSymbol(firstToken.tokenStr)).iStruct == Token.STRING) {
+            if (!isStringArray) {
+                isStringArray = true;
                 scanner.getNext();
                 String repStringName = firstToken.tokenStr;
                 String storeString = this.storage.get(this, repStringName);
@@ -891,7 +899,7 @@ public class Parser {
                 String repString = this.localExpression.stringExpressions(execute).szValue;
                 String holdString = storeString.substring(0, repIndex);
                 holdString += repString;
-                holdString += storeString.substring(repIndex+1);
+                holdString += storeString.substring(repIndex + 1);
                 this.storage.put(repStringName, holdString);
                 return new ResultValue(holdString, Token.STRING);
             } else {
@@ -1213,7 +1221,6 @@ public class Parser {
 
             //p(scanner.currentToken.tokenStr);
             rt = this.localExpression.workExpressions(execute);
-            //p(rt.szValue);
             this.storage.initArray(identifier.tokenStr,
                     (int) Float.parseFloat(rt.szValue), sti.iDclType, sti.iStruct);
             int sizeForArray = (int) Float.parseFloat(rt.szValue);
@@ -1261,7 +1268,7 @@ public class Parser {
             for (int i = 0; i < resOpsM.size(); i++) {
                 tempM[i] = resOpsM.get(i);
             }
-
+            p(sizeForArray + " " + 1270);
             this.storage.putArray(identifier.tokenStr, tempM);
             return rt;
         }
@@ -1307,7 +1314,7 @@ public class Parser {
             for (int i = 0; i < resOpsM.size(); i++) {
                 tempM[i] = resOpsM.get(i);
             }
-
+            p(sizeForArray + " " + 1316);
             this.storage.putArray(identifier.tokenStr, tempM);
             return rt;
         }
@@ -1437,15 +1444,10 @@ public class Parser {
             // Find the equality of the two numbers
             retVal = numeric.equalValue(resOp1, resOp2, comparison);
 
-
 //            p(resOp1.szValue);
 //            p(ct());
 //            p(resOp2.szValue);
-
-
-
 //            scanner.getNext();
-
             ResultValue rightHS; // Just in case;
             switch (scanner.currentToken.tokenStr) {
                 case "and":

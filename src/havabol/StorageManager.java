@@ -72,15 +72,13 @@ public class StorageManager {
             }
         } else {
             String[] array = new String[iNumElem];
+            for(int i = 0; i < iNumElem; i++) array[i] = null;
             this.htStringArray.put(key, array);
         }
     }
 
     public void putArray(String key, String[] a) {
         htStringArray.put(key, a);
-
-        
-        
     }
     /**
      * Get single element from array at index given
