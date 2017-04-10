@@ -557,6 +557,10 @@ public ResultValue toInt(ResultValue target) throws Exception{
                 }
                 break;
             case "#":
+                if(leftOp.szValue == null)
+                    leftOp.szValue = "";
+                else if(rightOp.szValue == null)
+                    rightOp.szValue = "";
                 return combineStr(leftOp, rightOp);
             case "and":
                 return keywordAnd(leftOp, rightOp);
