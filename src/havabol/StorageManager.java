@@ -16,13 +16,7 @@ public class StorageManager {
     SymbolTable st;
 
     HashMap<String, String> ht;
-    /*
-    HashMap<String, String[]> htIntArray;
 
-    HashMap<String, String[]> htFloatArray;
-
-    HashMap<String, String[]> htBoolArray;
-     */
     HashMap<String, String[]> htStringArray;
 
     public int DEFAULT_ARRAY_LENGTH = 20;
@@ -32,17 +26,16 @@ public class StorageManager {
         this.st = st;
 
         ht = new HashMap<>();
-        /*
-        htIntArray = new HashMap<>();
-
-        htFloatArray = new HashMap<>();
-
-        htBoolArray = new HashMap<>();
-         */
+        
         htStringArray = new HashMap<>();
 
     }
 
+    /**
+     * Put single element in storage
+     * @param key
+     * @param value 
+     */
     public void put(String key, String value) {
 
         //System.out.println(key + " --- " + value);
@@ -50,6 +43,12 @@ public class StorageManager {
 
     }
 
+    /**
+     * Get single element from storage
+     * @param parser
+     * @param key
+     * @return 
+     */
     public String get(Parser parser, String key) {
 
         return ht.get(key);
@@ -57,7 +56,8 @@ public class StorageManager {
     }
 
     /**
-     *
+     *  Initialize array with given parameters
+     * 
      * @param key
      * @param iNumElem
      * @param iDeclareType
@@ -69,28 +69,6 @@ public class StorageManager {
             if (iStructType == Token.ARRAY_UNBOUND) {
                 String[] array = new String[DEFAULT_ARRAY_LENGTH];
                 this.htStringArray.put(key, array);
-                /*
-                switch (iDeclareType) {
-
-                    case Token.INTEGER:
-                        String[] array = new String[iNumElem];
-                        this.htIntArray.put(key, array);
-                        break;
-
-                    case Token.FLOAT:
-                        String[] fArray = new String[iNumElem];
-                        this.htFloatArray.put(key, fArray);
-                        break;
-
-                    case Token.BOOLEAN:
-                        String[] bArray = new String[iNumElem];
-                        this.htBoolArray.put(key, bArray);
-                        break;
-
-                    default:
-                    //should return erro / thorw error here currently
-                 */
-
             }
         } else {
             String[] array = new String[iNumElem];
@@ -98,66 +76,38 @@ public class StorageManager {
         }
     }
 
-    /*
-        switch (iDeclareType) {
-
-            case Token.INTEGER:
-                String[] array = new String[iNumElem];
-                this.htIntArray.put(key, array);
-                break;
-
-            case Token.FLOAT:
-                String[] fArray = new String[iNumElem];
-                this.htFloatArray.put(key, fArray);
-                break;
-
-            case Token.BOOLEAN:
-                boolean[] bArray = new boolean[iNumElem];
-                this.htBoolArray.put(key, bArray);
-                break;
-
-            default:
-            //should return erro / thorw error here currently
-
-        }*/
- /*
-public void putArray(String key, int[] a) {
-        
-        htIntArray.put(key, a);
-
-    }
-    
-    
-    public void putArray(String key, float[] a) {
-
-        htFloatArray.put(key, a);
-
-    }
-    
-    
-    public void putArray(String key, boolean[] a) {
-
-        htBoolArray.put(key, a);
-
-    }
-     */
     public void putArray(String key, String[] a) {
         htStringArray.put(key, a);
 
         
         
     }
-    
+    /**
+     * Get single element from array at index given
+     * @param key
+     * @param index
+     * @return 
+     */
     public String getFromArray(String key, int index) {
         
         return ((String[]) this.htStringArray.get(key))[index];
         
     }
-    
+    /**
+     * Get the entire array as string[] for array name
+     * @param key
+     * @return 
+     */
     public String[] getArray(String key) {
         return this.htStringArray.get(key);
     }
     
+    /**
+     * Put value into key array at the index given.
+     * @param key
+     * @param index
+     * @param value 
+     */
     public void putInArray(String key, int index, String value){
         
         String[] newArray = (String []) this.htStringArray.get(key);
@@ -169,7 +119,14 @@ public void putArray(String key, int[] a) {
     }
     
     
-    
+    /**
+     * Get a substring from a string, return as string
+     * @param parser
+     * @param key
+     * @param startIndex
+     * @param endIndex
+     * @return 
+     */
     public String getCharsFromString(Parser parser, String key, int startIndex, int endIndex) {
         
         String returnString = this.get(parser, key);
