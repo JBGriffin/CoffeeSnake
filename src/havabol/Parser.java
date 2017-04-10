@@ -29,7 +29,7 @@ public class Parser {
     Numeric numeric;
 
     Expressions localExpression;
-    
+
     boolean isStringArray = true;
 
     /**
@@ -213,7 +213,9 @@ public class Parser {
                     break;
                 //if String - put in SymbolTable as String
                 case "String":
-                    if (scanner.nextToken.tokenStr.equals("[")) this.isStringArray = true;
+                    if (scanner.nextToken.tokenStr.equals("[")) {
+                        this.isStringArray = true;
+                    }
                     this.symbolTable.putSymbol(sznewTokenStr, new STIdentifiers(sznewTokenStr, Token.CONTROL, Token.STRING, Token.STRING, Token.STRING));
                     break;
                 //if nothing - throw exception (Assignment 3) - in future there will be more
@@ -725,6 +727,13 @@ public class Parser {
                                 case Token.FLOAT:
                                     sb.append(expressions(execute).szValue).append(" ");
                                     break;
+                                case Token.BUILTIN:
+                                    sb.append((int) Float.parseFloat(expressions(execute).szValue) + "");
+                                    if (",".equals(scanner.currentToken.tokenStr)){
+                                        scanner.getNext();
+                                        continue;
+                                    }
+                                    break;
                                 //if separator, continue
                                 //case Token.SEPARATOR:
                                 //break;
@@ -779,9 +788,11 @@ public class Parser {
                         scanner.getNext(); //move past '('
                         String[] workingArray;
                         workingArray = this.storage.getArray(scanner.currentToken.tokenStr);
-                        
+
                         scanner.getNext();
-                        if (workingArray == null) return new ResultValue("0", Token.INTEGER);
+                        if (workingArray == null) {
+                            return new ResultValue("0", Token.INTEGER);
+                        }
                         for (String s : workingArray) {
                             if (s == null) {
                                 break;
