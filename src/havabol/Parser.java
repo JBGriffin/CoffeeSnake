@@ -718,7 +718,7 @@ public class Parser {
                                     }
                                     break;
                                 case Token.INTEGER:
-                                    sb.append((int)Float.parseFloat(expressions(execute).szValue) + "").append(" ");
+                                    sb.append((int) Float.parseFloat(expressions(execute).szValue) + "").append(" ");
                                     break;
                                 case Token.FLOAT:
                                     sb.append(expressions(execute).szValue).append(" ");
@@ -855,8 +855,23 @@ public class Parser {
         }
         //p(scanner.currentToken.tokenStr + " HERE");
         if (scanner.currentToken.tokenStr.equals("[")) {
-            //p(750);
-            return arrayAssignments(execute, firstToken);
+
+            if (((STIdentifiers) this.symbolTable.getSymbol(firstToken.tokenStr)).iStruct == Token.STRING) {
+                scanner.getNext();
+                String repStringName = firstToken.tokenStr;
+                String storeString = this.storage.get(this, repStringName);
+                int repIndex = (int) Float.parseFloat(this.localExpression.workExpressions(execute).szValue);
+                scanner.getNext();
+                String repString = this.localExpression.stringExpressions(execute).szValue;
+                String holdString = storeString.substring(0, repIndex);
+                holdString += repString;
+                holdString += storeString.substring(repIndex+1);
+                this.storage.put(repStringName, holdString);
+                return new ResultValue(holdString, Token.STRING);
+            } else {
+                //array
+                return arrayAssignments(execute, firstToken);
+            }
         }
 
         //if (scanner.currentToken.primClassif == Token.FUNCTION)
