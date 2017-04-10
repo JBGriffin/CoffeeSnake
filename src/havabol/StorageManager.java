@@ -167,5 +167,17 @@ public void putArray(String key, int[] a) {
         this.htStringArray.put(key, newArray);
         
     }
+    
+    
+    
+    public String getCharsFromString(Parser parser, String key, int startIndex, int endIndex) {
+        
+        String returnString = this.get(parser, key);
+        
+        String r = returnString.substring(startIndex, endIndex+1);
+                
+        return r;
+        
+    }
 
 }

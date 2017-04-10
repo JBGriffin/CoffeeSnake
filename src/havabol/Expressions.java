@@ -210,7 +210,17 @@ public class Expressions {
             } else if (parser.scanner.currentToken.subClassif == Token.IDENTIFIER) {
 
                 if (((STIdentifiers) this.parser.symbolTable.getSymbol(parser.scanner.currentToken.tokenStr)).iStruct == Token.STRING) {
-                    stringToAppend = this.parser.storage.get(parser, parser.scanner.currentToken.tokenStr);
+                    
+                    if (parser.scanner.nextToken.tokenStr.equals("[")) {
+                        String stringName = parser.scanner.currentToken.tokenStr;
+                        parser.scanner.getNext();
+                        parser.scanner.getNext();
+                        int startIndex = (int) Float.parseFloat(this.workExpressions(execute).szValue);
+                        stringToAppend = this.parser.storage.getCharsFromString(parser, stringName, startIndex, startIndex);
+                    } else {
+                        stringToAppend = this.parser.storage.get(parser, parser.scanner.currentToken.tokenStr);
+                    }
+                                      
                 } else {
                     //it is an array (well it should be lol)
                     String arrayName = parser.scanner.currentToken.tokenStr;
@@ -229,7 +239,7 @@ public class Expressions {
             }
 
             sb.append(stringToAppend);
-
+            if (parser.scanner.currentToken.tokenStr.equals(";")) break;
             parser.scanner.getNext();
 
         }
