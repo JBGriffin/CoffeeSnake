@@ -756,18 +756,40 @@ public class Parser {
                         return new ResultValue(workingString.length() + "", Token.INTEGER);
                     //spaces(string)
                     case "SPACES":
-                        break;
+                        scanner.getNext(); //move past length
+                        scanner.getNext(); //move past '('
+                        String spaceString = "";
+                        spaceString = this.localExpression.stringExpressions(execute).szValue;//this.storage.get(this, scanner.currentToken.tokenStr);
+                        int spaceCount = 0;
+                        for (char c : spaceString.toCharArray()) {
+                            if (c == ' ') {
+                                spaceCount++;
+                            }
+                        }
+                        return new ResultValue(spaceCount + "", Token.INTEGER);
                     //elem(array)
                     case "ELEM":
+                        int nonNull = 0;
                         scanner.getNext(); //move past length
                         scanner.getNext(); //move past '('
                         String[] workingArray;
                         workingArray = this.storage.getArray(scanner.currentToken.tokenStr);
                         scanner.getNext();
-                        return new ResultValue(workingArray.length + "", Token.INTEGER);
+                        for(String s : workingArray){
+                            if(s.equals(null))
+                                break;
+                            else
+                                nonNull += 1;
+                        }
+                        return new ResultValue(nonNull + "", Token.INTEGER);
                     //maxelem(array)
                     case "MAXELEM":
-                        break;
+                        scanner.getNext(); //move past length
+                        scanner.getNext(); //move past '('
+                        String[] elemArray;
+                        elemArray = this.storage.getArray(scanner.currentToken.tokenStr);
+                        scanner.getNext();
+                        return new ResultValue(elemArray.length + "", Token.INTEGER);
                 }
 
             }
