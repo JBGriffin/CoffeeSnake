@@ -309,7 +309,7 @@ public class Parser {
         if (execute) {
             //move past "if"
             int iIfLine = scanner.currentToken.iSourceLineNr;
-            scanner.getNext();
+//            scanner.getNext();
             //returns = "T" or "F"
             ResultValue resultCond = evaluateEquality(execute, scanner.currentToken, scanner.getNext());
             ResultValue toExecute;
@@ -405,7 +405,7 @@ public class Parser {
 
                     //rewind loop
                     scanner.loopReset(iWhileStart);
-                    scanner.getNext();  // Skip while
+//                    scanner.getNext();  // Skip while
                     //re-eval
                     resultCond = evaluateEquality(execute, scanner.currentToken, scanner.getNext());
 
@@ -1399,28 +1399,48 @@ public class Parser {
 
         //there is more than just one token
         // Advance the cursor
-        scanner.getNext();
+        //scanner.getNext();
         Token rightToken = scanner.currentToken;    // Solely for readability
         if (execute) {
-            ResultValue resOp1 = new ResultValue(leftToken.tokenStr, leftToken.subClassif);
-            ResultValue resOp2 = new ResultValue(rightToken.tokenStr, rightToken.subClassif);
-            if ((resOp1.szValue = this.storage.get(this, leftToken.tokenStr)) == null) {
-                resOp1.szValue = leftToken.tokenStr;
-            }
-            if ((resOp2.szValue = this.storage.get(this, rightToken.tokenStr)) == null) {
-                resOp2.szValue = rightToken.tokenStr;
-            }
-            if (resOp1.type == Token.IDENTIFIER
-                    && ((STIdentifiers) symbolTable.getSymbol(leftToken.tokenStr)).iParmType == Token.STRING) {
-                resOp1.type = Token.STRING;
-            }
-            if (resOp2.type == Token.IDENTIFIER
-                    && ((STIdentifiers) symbolTable.getSymbol(rightToken.tokenStr)).iParmType == Token.STRING) {
-                resOp2.type = Token.STRING;
-            }
+//            ResultValue resOp1 = new ResultValue(leftToken.tokenStr, leftToken.subClassif);
+//            ResultValue resOp2 = new ResultValue(rightToken.tokenStr, rightToken.subClassif);
+//            if ((resOp1.szValue = this.storage.get(this, leftToken.tokenStr)) == null) {
+//                resOp1.szValue = leftToken.tokenStr;
+//            }
+//            if ((resOp2.szValue = this.storage.get(this, rightToken.tokenStr)) == null) {
+//                resOp2.szValue = rightToken.tokenStr;
+//            }
+//            if (resOp1.type == Token.IDENTIFIER
+//                    && ((STIdentifiers) symbolTable.getSymbol(leftToken.tokenStr)).iParmType == Token.STRING) {
+//                resOp1.type = Token.STRING;
+//            }
+//            if (resOp2.type == Token.IDENTIFIER
+//                    && ((STIdentifiers) symbolTable.getSymbol(rightToken.tokenStr)).iParmType == Token.STRING) {
+//                resOp2.type = Token.STRING;
+//            }
+//            retVal = numeric.equalValue(resOp1, resOp2, comparison);
+            ResultValue resOp1;
+            ResultValue resOp2;
+
+            // Evaluate the left hand side
+            resOp1 = expressions(execute);
+            // set the comparison operator and move past it
+            comparison = scanner.currentToken.tokenStr;
+            scanner.getNext();
+            // Evaluate the right hand side
+            resOp2 = expressions(execute);
+
+            // Find the equality of the two numbers
             retVal = numeric.equalValue(resOp1, resOp2, comparison);
 
-            scanner.getNext();
+
+//            p(resOp1.szValue);
+//            p(ct());
+//            p(resOp2.szValue);
+
+
+
+//            scanner.getNext();
 
             ResultValue rightHS; // Just in case;
             switch (scanner.currentToken.tokenStr) {
