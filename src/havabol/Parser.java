@@ -303,7 +303,6 @@ public class Parser {
      * @throws Exception Kills the program if something goes wrong
      */
     private void ifStatement(boolean execute) throws Exception {
-        //p("ifStatement");
 
         //if we want to execute, go through statement
         //else, skip to next branch
@@ -514,8 +513,6 @@ public class Parser {
 
         resultValue = expressions(execute);
         //p(ct());
-        
-        
 
     }
 
@@ -707,20 +704,22 @@ public class Parser {
                                         int index = 0;
                                         scanner.getNext();
                                         scanner.getNext();
-                                        index = (int) Float.parseFloat(this.localExpression.workExpressions().szValue);
+                                        index = (int) Float.parseFloat(this.localExpression.workExpressions(execute).szValue);
                                         sb.append(this.storage.getFromArray(key, index));
                                     } else if (((STIdentifiers) this.symbolTable.getSymbol(scanner.currentToken.tokenStr)).iStruct == Token.ARRAY_UNBOUND) {
                                         String key = scanner.currentToken.tokenStr;
                                         int index = 0;
                                         scanner.getNext();
                                         scanner.getNext();
-                                        index = (int) Float.parseFloat(this.localExpression.workExpressions().szValue);
+                                        index = (int) Float.parseFloat(this.localExpression.workExpressions(execute).szValue);
                                         sb.append(this.storage.getFromArray(key, index));
                                     } else {
-                                        sb.append(this.localExpression.workExpressions().szValue + "");
+                                        sb.append(this.localExpression.workExpressions(execute).szValue + "");
                                     }
                                     break;
                                 case Token.INTEGER:
+                                    sb.append((int)Float.parseFloat(expressions(execute).szValue) + "").append(" ");
+                                    break;
                                 case Token.FLOAT:
                                     sb.append(expressions(execute).szValue).append(" ");
                                     break;
@@ -752,35 +751,20 @@ public class Parser {
                     case "LENGTH":
                         scanner.getNext(); //move past length
                         scanner.getNext(); //move past '('
-                        if (scanner.currentToken.subClassif == Token.IDENTIFIER) {
-                            String workingString = "";
-                            workingString = this.storage.get(this, scanner.currentToken.tokenStr);
-
-                            if (((STIdentifiers) symbolTable.getSymbol(scanner.currentToken.tokenStr)).iStruct == Token.STRING) {
-                                workingString = this.storage.get(this, scanner.currentToken.tokenStr);
-                                scanner.getNext();
-                                scanner.getNext();
-                            } else {
-                                //it is an array (well it should be lol)
-                                String arrayName = scanner.currentToken.tokenStr;
-                                scanner.getNext();
-                                //p("current token going into expr " + scanner.getNext());
-                                int index = (int) Float.parseFloat(this.localExpression.workExpressions().szValue);
-                                //p("Index " + index);
-                                //p("Array name " + arrayName);
-                                workingString = storage.getFromArray(arrayName, index);
-                                scanner.getNext();
-                            }
-
-                            return new ResultValue(workingString.length() + "", Token.INTEGER);
-                        }
-                        break;
+                        String workingString = "";
+                        workingString = this.localExpression.stringExpressions(execute).szValue;//this.storage.get(this, scanner.currentToken.tokenStr);
+                        return new ResultValue(workingString.length() + "", Token.INTEGER);
                     //spaces(string)
                     case "SPACES":
                         break;
                     //elem(array)
                     case "ELEM":
-                        break;
+                        scanner.getNext(); //move past length
+                        scanner.getNext(); //move past '('
+                        String[] workingArray;
+                        workingArray = this.storage.getArray(scanner.currentToken.tokenStr);
+                        scanner.getNext();
+                        return new ResultValue(workingArray.length + "", Token.INTEGER);
                     //maxelem(array)
                     case "MAXELEM":
                         break;
@@ -883,12 +867,11 @@ public class Parser {
 //        switch (assignToken) {
 //            case "=":
         if (assignToken.equals("=")) {
-
             //scanner.getNext();
             if (scanner.currentToken.primClassif == Token.FUNCTION) {
                 int value = 0;
                 rt = function(execute);
-                value = Integer.parseInt(rt.szValue);
+                value = (int) Float.parseFloat(rt.szValue);
                 this.storage.put(firstToken.tokenStr, rt.szValue + "");
                 return rt;
             }
@@ -900,7 +883,7 @@ public class Parser {
                     //scanner.getNext();
                     //if (!";".equals(scanner.currentToken.tokenStr))
                     //p(scanner.currentToken.tokenStr);
-                    rt = this.localExpression.workExpressions();
+                    rt = this.localExpression.workExpressions(execute);
 
                     if (execute) {
                         if (rt.szValue != null) {
@@ -946,31 +929,34 @@ public class Parser {
                     return new ResultValue(scanner.currentToken.tokenStr, firstToken.subClassif);
                 //save simple string (Assign 3)
                 case Token.STRING:
+                    //p("HERE with " + scanner.currentToken.tokenStr);
                     Token currentStringToken = scanner.currentToken;
-                    scanner.getNext(); //for assign3 should be ; only
+                    //scanner.getNext(); //for assign3 should be ; only
+                    String saveString = localExpression.stringExpressions(execute).szValue;
                     if (!";".equals(scanner.currentToken.tokenStr)) {
                         return rt; //for now, throw error (Assign3)
                     }
                     if (execute) {
                         if (rt != null) {
                             if (scanner.bShowAssign) {
-                                System.out.println("\t\t" + firstToken.tokenStr + " = " + rt.szValue);
+                                System.out.println("\t\t" + firstToken.tokenStr + " = " + saveString);
                             }
                         }
-                        this.storage.put(firstToken.tokenStr, currentStringToken.tokenStr);
+                        this.storage.put(firstToken.tokenStr, saveString);
                     }
-                    return new ResultValue(scanner.currentToken.tokenStr, Token.STRING);
+                    return new ResultValue(saveString, Token.STRING);
                 //System.out.println("Successfully put " + scanner.currentToken.tokenStr + " into " + firstToken.tokenStr);
                 case Token.BOOLEAN:
                 //System.out.println("I'M HERE!!!");
                 //if (scanner.bShowExpr)
                 //  System.out.println(rt.szValue);
                 default:
+
                     Token newToken = scanner.currentToken;
                     //p(newToken.tokenStr);
                     //rt = expressions(execute);
                     //System.out.println(rt.szValue);
-                    rt = this.localExpression.stringExpressions();
+                    rt = this.localExpression.stringExpressions(execute);
                     if (execute) {
                         if (rt != null) {
                             if (scanner.bShowExpr) {
@@ -1052,10 +1038,10 @@ public class Parser {
 
             int indexForArray;
             //p(scanner.currentToken.tokenStr);
-            rt = this.localExpression.workExpressions();
+            rt = this.localExpression.workExpressions(execute);
             indexForArray = (int) Float.parseFloat(rt.szValue);
             while (scanner.getNext().equals("=") || scanner.currentToken.tokenStr.equals("]"));
-            rt = this.localExpression.workExpressions();
+            rt = this.localExpression.workExpressions(execute);
             //p(this.storage.getFromArray(identifier.tokenStr, Integer.parseInt(rt.szValue)));
             this.storage.putInArray(identifier.tokenStr, indexForArray, rt.szValue);
             //////need to get that value, then evaluate passed the = sign;
@@ -1085,13 +1071,13 @@ public class Parser {
                 ResultValue resOp1;
 
                 if (((STIdentifiers) this.symbolTable.getSymbol(identifier.tokenStr)).iDclType == Token.INTEGER) {
-                    resOp1 = this.localExpression.workExpressions();
+                    resOp1 = this.localExpression.workExpressions(execute);
                     resOpsM.add(((int) Float.parseFloat(resOp1.szValue)) + "");
                 } else if (((STIdentifiers) this.symbolTable.getSymbol(identifier.tokenStr)).iDclType == Token.FLOAT) {
-                    resOp1 = this.localExpression.workExpressions();
+                    resOp1 = this.localExpression.workExpressions(execute);
                     resOpsM.add(resOp1.szValue);
                 } else if (((STIdentifiers) this.symbolTable.getSymbol(identifier.tokenStr)).iDclType == Token.STRING) {
-                    resOp1 = this.localExpression.stringExpressions();
+                    resOp1 = this.localExpression.stringExpressions(execute);
                     resOpsM.add(resOp1.szValue);
                 }
 
@@ -1148,13 +1134,13 @@ public class Parser {
                 ResultValue resOp1;
 
                 if (((STIdentifiers) this.symbolTable.getSymbol(identifier.tokenStr)).iDclType == Token.INTEGER) {
-                    resOp1 = this.localExpression.workExpressions();
+                    resOp1 = this.localExpression.workExpressions(execute);
                     resOpsM.add(((int) Float.parseFloat(resOp1.szValue)) + "");
                 } else if (((STIdentifiers) this.symbolTable.getSymbol(identifier.tokenStr)).iDclType == Token.FLOAT) {
-                    resOp1 = this.localExpression.workExpressions();
+                    resOp1 = this.localExpression.workExpressions(execute);
                     resOpsM.add(resOp1.szValue);
                 } else if (((STIdentifiers) this.symbolTable.getSymbol(identifier.tokenStr)).iDclType == Token.STRING) {
-                    resOp1 = this.localExpression.stringExpressions();
+                    resOp1 = this.localExpression.stringExpressions(execute);
                     resOpsM.add(resOp1.szValue);
                 }
 
@@ -1185,7 +1171,7 @@ public class Parser {
             this.symbolTable.updateSymbol(sti.symbol, sti);
 
             //p(scanner.currentToken.tokenStr);
-            rt = this.localExpression.workExpressions();
+            rt = this.localExpression.workExpressions(execute);
             //p(rt.szValue);
             this.storage.initArray(identifier.tokenStr,
                     (int) Float.parseFloat(rt.szValue), sti.iDclType, sti.iStruct);
@@ -1207,13 +1193,13 @@ public class Parser {
                 ResultValue resOp1;
 
                 if (((STIdentifiers) this.symbolTable.getSymbol(identifier.tokenStr)).iDclType == Token.INTEGER) {
-                    resOp1 = this.localExpression.workExpressions();
+                    resOp1 = this.localExpression.workExpressions(execute);
                     resOpsM.add(((int) Float.parseFloat(resOp1.szValue)) + "");
                 } else if (((STIdentifiers) this.symbolTable.getSymbol(identifier.tokenStr)).iDclType == Token.FLOAT) {
-                    resOp1 = this.localExpression.workExpressions();
+                    resOp1 = this.localExpression.workExpressions(execute);
                     resOpsM.add(resOp1.szValue);
                 } else if (((STIdentifiers) this.symbolTable.getSymbol(identifier.tokenStr)).iDclType == Token.STRING) {
-                    resOp1 = this.localExpression.stringExpressions();
+                    resOp1 = this.localExpression.stringExpressions(execute);
                     resOpsM.add(resOp1.szValue);
                 }
 
@@ -1246,7 +1232,7 @@ public class Parser {
             this.symbolTable.updateSymbol(sti.symbol, sti);
 
             //p(scanner.currentToken.tokenStr);
-            rt = this.localExpression.workExpressions();            //p(rt.szValue);
+            rt = this.localExpression.workExpressions(execute);            //p(rt.szValue);
             this.storage.initArray(identifier.tokenStr,
                     (int) Float.parseFloat(rt.szValue), sti.iDclType, sti.iStruct);
             int sizeForArray = (int) Float.parseFloat(rt.szValue);
@@ -1263,7 +1249,7 @@ public class Parser {
             //p("SCANNER AT:" + scanner.currentToken.tokenStr);
             ArrayList<String> resOpsM = new ArrayList<>();
             while (!scanner.currentToken.tokenStr.equals("]") && !scanner.currentToken.tokenStr.equals(";")) {
-                ResultValue resOp1 = this.localExpression.workExpressions();
+                ResultValue resOp1 = this.localExpression.workExpressions(execute);
                 resOpsM.add(resOp1.szValue);
                 if (scanner.currentToken.tokenStr.equals(",")) {
                     scanner.getNext();
@@ -1292,7 +1278,7 @@ public class Parser {
             this.symbolTable.updateSymbol(sti.symbol, sti);
 
             //p(scanner.currentToken.tokenStr);
-            rt = this.localExpression.workExpressions();
+            rt = this.localExpression.workExpressions(execute);
             this.storage.initArray(identifier.tokenStr,
                     Integer.parseInt(rt.szValue), sti.iDclType, sti.iStruct);
             int sizeForArray = Integer.parseInt(rt.szValue);
@@ -1305,7 +1291,7 @@ public class Parser {
             scanner.getNext();
             ArrayList<String> resOpsM = new ArrayList<>();
             while (!scanner.currentToken.tokenStr.equals(";")) {
-                ResultValue resOp1 = this.localExpression.workExpressions();
+                ResultValue resOp1 = this.localExpression.workExpressions(execute);
                 resOpsM.add(resOp1.szValue);
                 //p(resOp1.szValue);
                 if (scanner.currentToken.tokenStr.equals(",")) {
@@ -1455,8 +1441,9 @@ public class Parser {
             firstToken = scanner.currentToken;
 
         }
-
-        rt = this.localExpression.workExpressions();
+        if (execute) {
+            rt = this.localExpression.workExpressions(execute);
+        }
 
         if (rt != null) {
             return rt;

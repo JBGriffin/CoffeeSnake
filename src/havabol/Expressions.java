@@ -28,9 +28,11 @@ public class Expressions {
      *
      *
      *
+     * @param execute
      * @return
+     * @throws java.lang.Exception
      */
-    public ResultValue workExpressions() throws Exception {
+    public ResultValue workExpressions(boolean execute) throws Exception {
 
         int iCountParen = 0;
 
@@ -45,7 +47,7 @@ public class Expressions {
             //System.out.println(parser.scanner.currentToken.tokenStr);
             if (parser.scanner.currentToken.primClassif == Token.FUNCTION) {
                 //System.out.println(parser.scanner.currentToken.tokenStr);
-                this.TokensM.add(parser.function(true).szValue);
+                this.TokensM.add(parser.function(execute).szValue);
                 continue;
 
             }
@@ -53,7 +55,7 @@ public class Expressions {
                 case "[":
                 case "(":
                     parser.scanner.getNext();
-                    rt = workExpressions();
+                    rt = workExpressions(execute);
                     this.TokensM.add(rt.szValue);
                     continue;
                 case ")":
@@ -78,7 +80,8 @@ public class Expressions {
                             String arrayName = saveString;
                             parser.scanner.getNext();
                             parser.scanner.getNext();
-                            int index = (int) Float.parseFloat(workExpressions().szValue);;
+                            int index = (int) Float.parseFloat(workExpressions(true).szValue);;
+                            //if (":".equals(parser.scanner.currentToken.tokenStr)) break;
                             saveString = this.parser.storage.getFromArray(arrayName, index);
                             //System.out.println("getting from array " + saveString);
                             //System.out.println("returned with " + parser.scanner.currentToken.tokenStr);
@@ -186,8 +189,7 @@ public class Expressions {
         return iPriority;
     }
 
-    public ResultValue stringExpressions() throws Exception {
-
+    public ResultValue stringExpressions(boolean execute) throws Exception {
         StringBuilder sb = new StringBuilder();
         Token firstToken = parser.scanner.currentToken;
 
@@ -214,14 +216,15 @@ public class Expressions {
                     String arrayName = parser.scanner.currentToken.tokenStr;
                     parser.scanner.getNext();
                     parser.scanner.getNext();
-                    int index = (int) Float.parseFloat(this.workExpressions().szValue);
+                    int index = (int) Float.parseFloat(this.workExpressions(true).szValue);
                     stringToAppend = this.parser.storage.getFromArray(arrayName, index);
                     sb.append(stringToAppend);
                     continue;
 
                 }
 
-            } else if (",".equals(parser.scanner.currentToken.tokenStr)) {
+            } else if (",".equals(parser.scanner.currentToken.tokenStr) 
+                    || ")".equals(parser.scanner.currentToken.tokenStr)) {
                 break;
             }
 
@@ -230,7 +233,6 @@ public class Expressions {
             parser.scanner.getNext();
 
         }
-
         return new ResultValue(sb.toString(), Token.STRING);
 
     }
