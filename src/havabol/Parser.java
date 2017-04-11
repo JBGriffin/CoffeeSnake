@@ -702,7 +702,16 @@ public class Parser {
                                 //will just be null and continue
                                 case Token.IDENTIFIER:
                                     if (((STIdentifiers) this.symbolTable.getSymbol(scanner.currentToken.tokenStr)).iStruct == Token.STRING) {
-                                        sb.append(this.storage.get(this, scanner.currentToken.tokenStr));
+                                        if (scanner.nextToken.tokenStr.equals("[")) {
+                                            String key = scanner.currentToken.tokenStr;
+                                            int index = 0;
+                                            scanner.getNext();
+                                            scanner.getNext();
+                                            index = (int) Float.parseFloat(this.localExpression.workExpressions(execute).szValue);
+                                            sb.append(this.storage.get(this, key).charAt(index));
+                                        } else {
+                                            sb.append(this.storage.get(this, scanner.currentToken.tokenStr));
+                                        }
                                     } else if (((STIdentifiers) this.symbolTable.getSymbol(scanner.currentToken.tokenStr)).iStruct == Token.ARRAY_FIXED) {
                                         String key = scanner.currentToken.tokenStr;
                                         int index = 0;
@@ -718,17 +727,17 @@ public class Parser {
                                         index = (int) Float.parseFloat(this.localExpression.workExpressions(execute).szValue);
                                         sb.append(this.storage.getFromArray(key, index));
                                     } else {
-                                        sb.append(this.localExpression.workExpressions(execute).szValue + "");
+                                        sb.append((int) Float.parseFloat(expressions(execute).szValue));
                                     }
                                     break;
                                 case Token.INTEGER:
-                                    sb.append((int) Float.parseFloat(expressions(execute).szValue) + "").append(" ");
+                                    sb.append((int) Float.parseFloat(expressions(execute).szValue)).append(" ");
                                     break;
                                 case Token.FLOAT:
                                     sb.append(expressions(execute).szValue).append(" ");
                                     break;
                                 case Token.BUILTIN:
-                                    sb.append((int) Float.parseFloat(expressions(execute).szValue) + "");
+                                    sb.append((int) Float.parseFloat(expressions(execute).szValue));
                                     if (",".equals(scanner.currentToken.tokenStr)) {
                                         scanner.getNext();
                                         continue;
