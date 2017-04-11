@@ -43,7 +43,18 @@ public class Expressions {
         Token firstTokenEncountered = parser.scanner.currentToken;
         boolean firstIsNegative = false;
         while (!";".equals(parser.scanner.currentToken.tokenStr)) {
-            //System.out.println(parser.scanner.currentToken.tokenStr);
+
+            Token firstToken = parser.scanner.currentToken;
+
+            firstIsNegative = false;
+
+            while ("U-".equals(parser.scanner.currentToken.tokenStr)) {
+                firstIsNegative = !firstIsNegative;
+                parser.scanner.getNext();
+                firstToken = parser.scanner.currentToken;
+
+            }
+
             if (parser.scanner.currentToken.primClassif == Token.FUNCTION) {
                 //System.out.println(parser.scanner.currentToken.tokenStr);
                 TokensM.add(parser.function(execute).szValue);
@@ -96,6 +107,11 @@ public class Expressions {
 
                         }
                     }
+                    
+                    if (firstIsNegative) {
+                        double dHold = -1 * Float.parseFloat(saveString);
+                        saveString = dHold + "";
+                    }
                     TokensM.add(saveString);
                     break;
             }
@@ -127,7 +143,9 @@ public class Expressions {
 
             //if token is an operator
             if (!isOperator(token)) {
-                if (token.isEmpty()) break;
+                if (token.isEmpty()) {
+                    break;
+                }
                 dValue = Double.parseDouble(token);
                 valueStack.push(dValue);
 
@@ -293,16 +311,13 @@ public class Expressions {
         return new ResultValue(sb.toString(), Token.STRING);
 
     }
-    
-    
-    
-    
+
     public String[] arrayExpressions(boolean execute, String targetArrayName) throws Exception {
-        
+
         int iNewArraySize = 0;
-        
+
         int iMaxSize = 0;
-        
+
         String[] tempM = this.parser.storage.getArray(targetArrayName);
         iMaxSize = tempM.length;
         /*
@@ -310,18 +325,20 @@ public class Expressions {
             if (s == null) break;
             iNewArraySize++;
         }*/
-        
+
         iNewArraySize = tempM.length;
-        
+
         String[] srcArrayM = new String[iNewArraySize];
-        
-        if("=".equals(parser.scanner.currentToken.tokenStr)) parser.scanner.getNext();
-        
+
+        if ("=".equals(parser.scanner.currentToken.tokenStr)) {
+            parser.scanner.getNext();
+        }
+
         Token srcArrayToken = parser.scanner.currentToken;
-        
+
         int i = 0;
         String workingString;
-        
+
         //handle string
         if (srcArrayToken.subClassif == Token.STRING) {
             workingString = srcArrayToken.tokenStr;
@@ -330,19 +347,21 @@ public class Expressions {
                     tempM[i++] = c + "";
                 }
             } else {
-                
+
                 //workingString size is great than iMaxSize
                 //go while i < maxSize
                 for (char c : workingString.toCharArray()) {
-                    if (i >= iMaxSize) break;
+                    if (i >= iMaxSize) {
+                        break;
+                    }
                     tempM[i++] = c + "";
                 }
-                
+
             }
-            
+
             return tempM;
-            
-        } else if (((STIdentifiers)this.parser.symbolTable.getSymbol(srcArrayToken.tokenStr)).iStruct == Token.STRING) {
+
+        } else if (((STIdentifiers) this.parser.symbolTable.getSymbol(srcArrayToken.tokenStr)).iStruct == Token.STRING) {
             //handle string identifier
             workingString = srcArrayToken.tokenStr;
             workingString = parser.storage.get(parser, workingString);
@@ -351,21 +370,23 @@ public class Expressions {
                     tempM[i++] = c + "";
                 }
             } else {
-                
+
                 //workingString size is great than iMaxSize
                 //go while i < maxSize
                 for (char c : workingString.toCharArray()) {
-                    if (i >= iMaxSize) break;
+                    if (i >= iMaxSize) {
+                        break;
+                    }
                     tempM[i++] = c + "";
                 }
-                
+
             }
-            
+
             return tempM;
-            
+
         } else {
             //handle array copy
-            
+
             workingString = srcArrayToken.tokenStr;
             srcArrayM = parser.storage.getArray(workingString);
             if (srcArrayM.length <= iMaxSize) {
@@ -373,20 +394,22 @@ public class Expressions {
                     tempM[i++] = c;
                 }
             } else {
-                
+
                 //workingString size is great than iMaxSize
                 //go while i < maxSize
                 for (String c : srcArrayM) {
-                    if (i >= iMaxSize) break;
+                    if (i >= iMaxSize) {
+                        break;
+                    }
                     tempM[i++] = c;
                 }
-                
+
             }
-            
+
             return tempM;
-            
+
         }
-        
+
     }
 
 }
