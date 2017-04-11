@@ -1457,12 +1457,28 @@ public class Parser {
             ResultValue resOp2;
 
             // Evaluate the left hand side
-            resOp1 = expressions(execute);
+            if (scanner.currentToken.subClassif == Token.STRING) {
+                resOp1 = localExpression.stringExpressions(execute);
+            } else if (scanner.currentToken.subClassif == Token.IDENTIFIER 
+                    && ((STIdentifiers)symbolTable.getSymbol(scanner.currentToken.tokenStr)).iDclType == Token.STRING) {
+                resOp1 = localExpression.stringExpressions(execute);
+            } else {
+                //should be numbers
+                resOp1 = expressions(execute);
+            }
             // set the comparison operator and move past it
             comparison = scanner.currentToken.tokenStr;
             scanner.getNext();
             // Evaluate the right hand side
-            resOp2 = expressions(execute);
+            if (scanner.currentToken.subClassif == Token.STRING) {
+                resOp2 = localExpression.stringExpressions(execute);
+            } else if (scanner.currentToken.subClassif == Token.IDENTIFIER 
+                    && ((STIdentifiers)symbolTable.getSymbol(scanner.currentToken.tokenStr)).iDclType == Token.STRING) {
+                resOp2 = localExpression.stringExpressions(execute);
+            } else {
+                //should be numbers
+                resOp2 = expressions(execute);
+            }
 
             // Find the equality of the two numbers
             retVal = numeric.equalValue(resOp1, resOp2, comparison);

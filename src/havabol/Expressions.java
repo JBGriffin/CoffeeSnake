@@ -297,7 +297,13 @@ public class Expressions {
                 }
 
             } else if (",".equals(parser.scanner.currentToken.tokenStr)
-                    || ")".equals(parser.scanner.currentToken.tokenStr)) {
+                    || ")".equals(parser.scanner.currentToken.tokenStr)
+                    || ">".equals(parser.scanner.currentToken.tokenStr)
+                    || "<".equals(parser.scanner.currentToken.tokenStr)
+                    || ">=".equals(parser.scanner.currentToken.tokenStr)
+                    || "<=".equals(parser.scanner.currentToken.tokenStr)
+                    || "==".equals(parser.scanner.currentToken.tokenStr)
+                    || "!=".equals(parser.scanner.currentToken.tokenStr)) {
                 break;
             }
 
