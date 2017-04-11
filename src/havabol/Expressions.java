@@ -9,13 +9,19 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 /**
- *
- * @author Justin Hooge
+ * Expressions class: Wrapper for the expressions method in the Parser.
+ * Will handle complex infix expressions.
  */
 public class Expressions {
 
     Parser parser;
 
+    /**
+     * Simple constructor for the class. Brings in the Parser solely for
+     * error trapping.
+     * @param parser Parser instance to be able to call parser.errorWithContext(String msg)
+     *               to give error data
+     */
     Expressions(Parser parser) {
 
         this.parser = parser;
@@ -23,12 +29,10 @@ public class Expressions {
     }
 
     /**
-     *
-     *
-     *
-     * @param execute
-     * @return
-     * @throws java.lang.Exception
+     * Creates an array list of items to be used in evaluateExpressions.
+     * @param execute Whether or not to execute the method
+     * @return Final result of the worked expressions
+     * @throws Exception Kills the program on error.
      */
     public ResultValue workExpressions(boolean execute) throws Exception {
 
@@ -129,7 +133,7 @@ public class Expressions {
      * This is passed an arraylist of token strings from a given collection. It
      * will evaluate in infix order and return value to caller.
      *
-     * @param LocalTokensM
+     * @param LocalTokensM Tokens to be evaluated
      * @return double value of expression given
      */
     public ResultValue evalExpression(ArrayList<String> LocalTokensM) {
@@ -184,10 +188,10 @@ public class Expressions {
      * evaluate takes to values and an operator to evaluate. It can handle +-/^*
      * and returns value as a double
      *
-     * @param operator
-     * @param val1
-     * @param val2
-     * @return
+     * @param operator Operator to evaluate the doubles on
+     * @param val1 Left hand side operand
+     * @param val2 Right hand side operand
+     * @return Value of the operator with the left and right hand side
      */
     public double evaluate(String operator, double val1, double val2) {
         double result = 0.0;
@@ -212,8 +216,8 @@ public class Expressions {
     /**
      * Takes a String ch and returns if the character is an operator
      *
-     * @param ch
-     * @return
+     * @param ch Character to be checked
+     * @return Whether or not the item is an operator
      */
     public boolean isOperator(String ch) {
         if (ch.equals("+") || ch.equals("-") || ch.equals("*") || ch.equals("/") || ch.equals("^")) {
@@ -225,8 +229,9 @@ public class Expressions {
     /**
      * getPrio is called to return operator priority
      *
-     * @param ch
-     * @return
+     * @param ch Item to check the priority of.
+     * @return Priority of the given item. Priority can change based on
+     * whether or not it is in the stack
      */
     public int getPrio(String ch) {
         int iPriority = 0;
@@ -248,9 +253,9 @@ public class Expressions {
      * stringExpressions evaluates strings until ; handles concats, simples, and
      * more
      *
-     * @param execute
+     * @param execute Boolean to see whether or not we will execute the statement
      * @return value of the string
-     * @throws Exception
+     * @throws Exception If we are missing an operator, kill the program
      */
     public ResultValue stringExpressions(boolean execute) throws Exception {
         StringBuilder sb = new StringBuilder();
@@ -318,6 +323,14 @@ public class Expressions {
 
     }
 
+    /**
+     * Expression method to establish an array. Will either initiate an array, or
+     * copy an array if needed.
+     * @param execute Boolean on whether or not to execute the code
+     * @param targetArrayName Name of the array to be returned
+     * @return Array set based on items given. Will be named based on passed in parameter
+     * @throws Exception Kills the program on error
+     */
     public String[] arrayExpressions(boolean execute, String targetArrayName) throws Exception {
 
         int iNewArraySize = 0;
