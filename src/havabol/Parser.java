@@ -519,7 +519,7 @@ public class Parser {
 
         int iTypeOfArrayElement = 0;
 
-        int iForStart = 0;
+        int iForStart = scanner.currentToken.iSourceLineNr - 1;
         int iForEnd = 0;
         ResultValue toExecute;
         int iColEnd = 0;
