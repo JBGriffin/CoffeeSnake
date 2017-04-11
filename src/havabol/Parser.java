@@ -608,7 +608,6 @@ public class Parser {
 
             if (((STIdentifiers) this.symbolTable.getSymbol(srcArrayToken.tokenStr)).iDclType == Token.INTEGER) {
                 this.symbolTable.putSymbol(controlToken.tokenStr, new STIdentifiers(controlToken.tokenStr, Token.CONTROL, Token.INTEGER, Token.INTEGER, Token.INTEGER));
-
             } else if (((STIdentifiers) this.symbolTable.getSymbol(srcArrayToken.tokenStr)).iDclType == Token.FLOAT) {
                 this.symbolTable.putSymbol(controlToken.tokenStr, new STIdentifiers(controlToken.tokenStr, Token.CONTROL, Token.FLOAT, Token.FLOAT, Token.FLOAT));
 
@@ -619,14 +618,13 @@ public class Parser {
 
         }
 
-        System.out.println(Arrays.toString(tempM));
         for (String x : tempM) {
-            p("x " + x);
             this.storage.put(controlToken.tokenStr, x);
-            toExecute = statements(execute);
+            
             if (x == null) {
                 break;
             }
+            toExecute = statements(execute);
             if (toExecute.szValue.equals("endfor")) {
                 iColEnd = scanner.iSourceLineNr;
                 scanner.loopReset(iForStart);
@@ -634,7 +632,6 @@ public class Parser {
 
             }
         }
-        p("Got out with = " + ct());
         scanner.iSourceLineNr = iColEnd;
         scanner.advanceLine();
         return;
