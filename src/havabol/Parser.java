@@ -114,7 +114,7 @@ public class Parser {
                     }
                     break;
                 //handle operands
-                case Token.OPERAND:
+                case Token.OPERAND:                    
                     rt = operand(execute);
                     break;
                 //handle functions - currently only built in (Assign 3)
@@ -709,7 +709,6 @@ public class Parser {
 
         for (int i = iControlVar; i <= iEndVar; i += iIncrementVar) {
             toExecute = statements(execute);
-
             if (toExecute.szValue.equals("endfor")) {
                 iColEnd = scanner.iSourceLineNr;
 
@@ -1055,6 +1054,7 @@ public class Parser {
         // Creates and assigns a value into the first token
 //        switch (assignToken) {
 //            case "=":
+//p("in assignments 1061 with token " + scanner.currentToken.tokenStr);
         if (assignToken.equals("=")) {
             //scanner.getNext();
             if (scanner.currentToken.primClassif == Token.FUNCTION) {
@@ -1459,7 +1459,6 @@ public class Parser {
             for (int i = 0; i < resOpsM.size(); i++) {
                 tempM[i] = resOpsM.get(i);
             }
-            p(sizeForArray + " " + 1316);
             this.storage.putArray(identifier.tokenStr, tempM);
             return rt;
         }
@@ -1525,7 +1524,7 @@ public class Parser {
     private ResultValue evaluateEquality(boolean execute, Token leftToken, String comparison) throws Exception {
         ResultValue retVal = new ResultValue(null, 0);
         boolean notSet = false;
-        if (leftToken.tokenStr.equals("not")) {
+        if (scanner.currentToken.tokenStr.equals("not")) {
             scanner.getNext();
             leftToken = scanner.currentToken;
             comparison = scanner.nextToken.tokenStr;
