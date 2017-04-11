@@ -109,12 +109,13 @@ public class Parser {
                             || (rt.szValue.equals("endwhile")) || rt.szValue.equals("endfor"))) {
                         return rt = endStatement(execute);
                     }*/
+                    
                     if (rt != null && rt.type == Token.END) {
                         return rt = endStatement(execute);
                     }
                     break;
                 //handle operands
-                case Token.OPERAND:                    
+                case Token.OPERAND:     
                     rt = operand(execute);
                     break;
                 //handle functions - currently only built in (Assign 3)
@@ -252,12 +253,14 @@ public class Parser {
         switch (scanner.currentToken.tokenStr) {
             case "if":
                 ifStatement(execute);
+                //scanner.getNext();
                 break;
             case "while":
                 whileStatement(execute);
                 break;
             case "for":
                 forStatement(execute);
+                scanner.getNext();
                 break;
             default:
                 errorWithContext("Unexpected flow statement found");
@@ -709,6 +712,7 @@ public class Parser {
 
         for (int i = iControlVar; i <= iEndVar; i += iIncrementVar) {
             toExecute = statements(execute);
+            if (toExecute == null) break;
             if (toExecute.szValue.equals("endfor")) {
                 iColEnd = scanner.iSourceLineNr;
 
@@ -839,14 +843,14 @@ public class Parser {
                                         scanner.getNext();
                                         scanner.getNext();
                                         index = (int) Float.parseFloat(this.localExpression.workExpressions(execute).szValue);
-                                        sb.append(this.storage.getFromArray(key, index));
+                                        sb.append((int) Float.parseFloat(this.storage.getFromArray(key, index)));
                                     } else if (((STIdentifiers) this.symbolTable.getSymbol(scanner.currentToken.tokenStr)).iStruct == Token.ARRAY_UNBOUND) {
                                         String key = scanner.currentToken.tokenStr;
                                         int index = 0;
                                         scanner.getNext();
                                         scanner.getNext();
                                         index = (int) Float.parseFloat(this.localExpression.workExpressions(execute).szValue);
-                                        sb.append(this.storage.getFromArray(key, index));
+                                        sb.append((int) Float.parseFloat(this.storage.getFromArray(key, index)));
                                     } else {
                                         sb.append((int) Float.parseFloat(expressions(execute).szValue));
                                     }
