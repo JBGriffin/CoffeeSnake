@@ -6,6 +6,7 @@
 package havabol;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Stack;
 
 /**
@@ -144,7 +145,7 @@ public class Expressions {
         while (!LocalTokensM.isEmpty()) {
             //get first token
             String token = LocalTokensM.remove(0);
-
+            
             //if token is an operator
             if (!isOperator(token)) {
                 if (token.isEmpty()) {
