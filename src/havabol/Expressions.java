@@ -57,7 +57,6 @@ public class Expressions {
             }
 
             if (parser.scanner.currentToken.primClassif == Token.FUNCTION) {
-                //System.out.println(parser.scanner.currentToken.tokenStr);
                 TokensM.add(parser.function(execute).szValue);
                 continue;
 
@@ -419,4 +418,102 @@ public class Expressions {
 
     }
 
+    
+    
+    public ResultValue workExpressionsJanky(boolean execute, String szValueToAdd) throws Exception {
+
+        ArrayList<String> TokensM = new ArrayList();
+
+        int iCountParen = 0;
+
+        int iCountBracket = 0;
+
+        ResultValue rt;
+
+        Token firstTokenEncountered = parser.scanner.currentToken;
+        TokensM.add(szValueToAdd);
+        boolean firstIsNegative = false;
+        while (!";".equals(parser.scanner.currentToken.tokenStr)) {
+
+            Token firstToken = parser.scanner.currentToken;
+
+            firstIsNegative = false;
+
+            while ("U-".equals(parser.scanner.currentToken.tokenStr)) {
+                firstIsNegative = !firstIsNegative;
+                parser.scanner.getNext();
+                firstToken = parser.scanner.currentToken;
+
+            }
+
+            if (parser.scanner.currentToken.primClassif == Token.FUNCTION) {
+                //System.out.println(parser.scanner.currentToken.tokenStr);
+                TokensM.add(parser.function(execute).szValue);
+                continue;
+
+            }
+            switch (parser.scanner.currentToken.tokenStr) {
+                case "[":
+                case "(":
+                    parser.scanner.getNext();
+                    rt = workExpressions(execute);
+                    TokensM.add(rt.szValue);
+                    continue;
+                case ")":
+                    parser.scanner.getNext();
+                    return this.evalExpression(TokensM);
+                case "]":
+                    parser.scanner.getNext();
+                    return this.evalExpression(TokensM);
+                case ",":
+                    return this.evalExpression(TokensM);
+                case "to":
+                case "by":
+                case ":":
+                case ">":
+                case "<":
+                case "==":
+                case "!=":
+                case ">=":
+                case "<=":
+                    return this.evalExpression(TokensM);
+                default:
+                    String saveString = parser.scanner.currentToken.tokenStr;
+                    if (parser.scanner.currentToken.subClassif == Token.IDENTIFIER) {
+                        if (((STIdentifiers) parser.symbolTable.getSymbol(saveString)).iStruct == Token.ARRAY_FIXED
+                                || ((STIdentifiers) parser.symbolTable.getSymbol(saveString)).iStruct == Token.ARRAY_UNBOUND) {
+
+                            //handle array
+                            String arrayName = saveString;
+                            parser.scanner.getNext();
+                            parser.scanner.getNext();
+                            int index = (int) Float.parseFloat(workExpressions(true).szValue);;
+                            //if (":".equals(parser.scanner.currentToken.tokenStr)) break;
+                            saveString = this.parser.storage.getFromArray(arrayName, index);
+                            //System.out.println("getting from array " + saveString);
+                            //System.out.println("returned with " + parser.scanner.currentToken.tokenStr);
+                        } else {
+                            //need to get array if it is array
+                            saveString = this.parser.storage.get(parser, saveString);
+
+                        }
+                    }
+                    
+                    if (firstIsNegative) {
+                        double dHold = -1 * Float.parseFloat(saveString);
+                        saveString = dHold + "";
+                    }
+                    TokensM.add(saveString);
+                    break;
+            }
+            if (";".equals(parser.scanner.currentToken.tokenStr)) {
+                break;
+            }
+            parser.scanner.getNext();
+        }
+        return this.evalExpression(TokensM);
+
+    }
+    
+    
 }

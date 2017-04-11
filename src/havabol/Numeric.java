@@ -453,9 +453,9 @@ public ResultValue toInt(ResultValue target) throws Exception{
                 switch(leftOp.type) {
                     case Token.INTEGER:
                         rightOp = toInt(rightOp);
-                        iOp1 = Integer.parseInt(leftOp.szValue);
+                        iOp1 = (int) Float.parseFloat(leftOp.szValue);
                         assert rightOp != null;
-                        iOp2 = Integer.parseInt(rightOp.szValue);
+                        iOp2 = (int) Float.parseFloat(rightOp.szValue);
                         returnValue.szValue = (iOp1 < iOp2) ? "T" : "F";
                         break;
                     case Token.FLOAT:

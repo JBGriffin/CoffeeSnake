@@ -620,7 +620,7 @@ public class Parser {
 
         for (String x : tempM) {
             this.storage.put(controlToken.tokenStr, x);
-            
+
             if (x == null) {
                 break;
             }
@@ -685,7 +685,11 @@ public class Parser {
         scanner.getNext();
         resultCond = expressions(execute);
         resultCond = numeric.toInt(resultCond);
-        iEndVar = Integer.parseInt(resultCond.szValue);
+        if (!scanner.currentToken.tokenStr.equals("by") && !scanner.currentToken.tokenStr.equals(":")) {
+            resultCond = this.localExpression.workExpressionsJanky(execute, resultCond.szValue);
+        }
+        iEndVar = (int) Float.parseFloat(resultCond.szValue);
+
         // Check if we have an optional incrementer
         if (scanner.currentToken.tokenStr.equals("by")) {
             scanner.getNext();
@@ -718,7 +722,7 @@ public class Parser {
                 toExecute.szValue = iIncrementVar + "";
                 resultCond = numeric.add(resultCond, toExecute);
                 this.storage.put(controlToken.tokenStr, resultCond.szValue);
-                i = Integer.parseInt(this.storage.get(this, controlToken.tokenStr));
+                i = (int) Float.parseFloat(this.storage.get(this, controlToken.tokenStr));
                 skipTo("for", ":");
             }
         }
@@ -1571,15 +1575,29 @@ public class Parser {
 //                resOp2.type = Token.STRING;
 //            }
 //            retVal = numeric.equalValue(resOp1, resOp2, comparison);
-            ResultValue resOp1;
-            ResultValue resOp2;
+            ResultValue resOp1 = new ResultValue("", 0);
+            ResultValue resOp2 = new ResultValue("", 0);
 
             // Evaluate the left hand side
             if (scanner.currentToken.subClassif == Token.STRING) {
                 resOp1 = localExpression.stringExpressions(execute);
-            } else if (scanner.currentToken.subClassif == Token.IDENTIFIER
-                    && ((STIdentifiers) symbolTable.getSymbol(scanner.currentToken.tokenStr)).iDclType == Token.STRING) {
-                resOp1 = localExpression.stringExpressions(execute);
+            } else if (scanner.currentToken.subClassif == Token.IDENTIFIER) {
+                
+                if (((STIdentifiers) symbolTable.getSymbol(scanner.currentToken.tokenStr)).iStruct == Token.ARRAY_FIXED) {
+                    String key = scanner.currentToken.tokenStr;
+                    int index = 0;
+                    scanner.getNext();
+                    scanner.getNext();
+                    index = (int) Float.parseFloat(this.localExpression.workExpressions(execute).szValue);
+                    resOp1.szValue = this.storage.getFromArray(key, index);
+                    resOp1.type = ((STIdentifiers) symbolTable.getSymbol(key)).iDclType;
+                } else if (((STIdentifiers) symbolTable.getSymbol(scanner.currentToken.tokenStr)).iDclType == Token.STRING) {
+                    resOp1 = localExpression.stringExpressions(execute);
+                } else {
+                    resOp1 = expressions(execute);
+                }
+                
+                
             } else {
                 //should be numbers
                 resOp1 = expressions(execute);
@@ -1590,9 +1608,23 @@ public class Parser {
             // Evaluate the right hand side
             if (scanner.currentToken.subClassif == Token.STRING) {
                 resOp2 = localExpression.stringExpressions(execute);
-            } else if (scanner.currentToken.subClassif == Token.IDENTIFIER
-                    && ((STIdentifiers) symbolTable.getSymbol(scanner.currentToken.tokenStr)).iDclType == Token.STRING) {
-                resOp2 = localExpression.stringExpressions(execute);
+            } else if (scanner.currentToken.subClassif == Token.IDENTIFIER) {
+                
+                if (((STIdentifiers) symbolTable.getSymbol(scanner.currentToken.tokenStr)).iStruct == Token.ARRAY_FIXED) {
+                    String key = scanner.currentToken.tokenStr;
+                    int index = 0;
+                    scanner.getNext();
+                    scanner.getNext();
+                    index = (int) Float.parseFloat(this.localExpression.workExpressions(execute).szValue);
+                    resOp2.szValue = this.storage.getFromArray(key, index);
+                    resOp2.type = ((STIdentifiers) symbolTable.getSymbol(key)).iDclType;
+                } else if (((STIdentifiers) symbolTable.getSymbol(scanner.currentToken.tokenStr)).iDclType == Token.STRING) {
+                    resOp2 = localExpression.stringExpressions(execute);
+                } else {
+                    resOp2 = expressions(execute);
+                }
+                
+                
             } else {
                 //should be numbers
                 resOp2 = expressions(execute);
