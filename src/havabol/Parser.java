@@ -836,7 +836,7 @@ public class Parser {
 
                 case Token.IDENTIFIER:
                     //recall identifier
-                    STEntry ste = (STIdentifiers) symbolTable.getSymbol(scanner.currentToken.tokenStr);
+                    STIdentifiers ste = (STIdentifiers) symbolTable.getSymbol(scanner.currentToken.tokenStr);
                     // if does not exist, throw error
                     if (ste == null) {
 
@@ -847,7 +847,7 @@ public class Parser {
                         //it does exist so call assignments to handle the rest
                     } else {
 
-                        if (scanner.nextToken.tokenStr.equals("[")) {
+                        if (scanner.nextToken.tokenStr.equals("[") && ste.iStruct == Token.STRING) {
                             this.isStringArray = false;
                         }
                         rt = assignments(execute);
