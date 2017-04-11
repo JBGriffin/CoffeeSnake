@@ -1,6 +1,7 @@
 package havabol;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  *
@@ -512,11 +513,131 @@ public class Parser {
      */
     private void stringFor(Boolean execute, Token controlToken) throws Exception {
         String item = scanner.currentToken.tokenStr;
-        String object;
-        ResultValue resultValue = null;
+        int iNewArraySize = 0;
 
-        resultValue = expressions(execute);
-        //p(ct());
+        int iMaxSize = 0;
+
+        int iTypeOfArrayElement = 0;
+
+        int iForStart = 0;
+        int iForEnd = 0;
+        ResultValue toExecute;
+        int iColEnd = 0;
+        String[] tempM = this.storage.getArray(item);
+        iMaxSize = tempM.length;
+        iNewArraySize = tempM.length;
+        String[] srcArrayM = new String[iNewArraySize];
+        Token srcArrayToken = scanner.currentToken;
+        int i = 0;
+        String workingString;
+        //handle string
+        if (srcArrayToken.subClassif == Token.STRING) {
+            iTypeOfArrayElement = Token.STRING;
+            workingString = srcArrayToken.tokenStr;
+            if (workingString.length() <= iMaxSize) {
+                for (char c : workingString.toCharArray()) {
+                    tempM[i++] = c + "";
+                }
+            } else {
+                //workingString size is great than iMaxSize
+                //go while i < maxSize
+                for (char c : workingString.toCharArray()) {
+                    if (i >= iMaxSize) {
+                        break;
+                    }
+                    tempM[i++] = c + "";
+                }
+            }
+        } else if (((STIdentifiers) this.symbolTable.getSymbol(srcArrayToken.tokenStr)).iStruct == Token.STRING) {
+            //handle string identifier
+            iTypeOfArrayElement = Token.STRING;
+            workingString = srcArrayToken.tokenStr;
+            workingString = this.storage.get(this, workingString);
+            if (workingString.length() <= iMaxSize) {
+                for (char c : workingString.toCharArray()) {
+                    tempM[i++] = c + "";
+                }
+            } else {
+                //workingString size is great than iMaxSize
+                //go while i < maxSize
+                for (char c : workingString.toCharArray()) {
+                    if (i >= iMaxSize) {
+                        break;
+                    }
+                    tempM[i++] = c + "";
+                }
+            }
+        } else {
+            //handle array copy
+            iTypeOfArrayElement = Token.ARRAY_FIXED;
+            workingString = srcArrayToken.tokenStr;
+            srcArrayM = this.storage.getArray(workingString);
+            if (srcArrayM.length <= iMaxSize) {
+                for (String c : srcArrayM) {
+                    tempM[i++] = c;
+                }
+            } else {
+
+                //workingString size is great than iMaxSize
+                //go while i < maxSize
+                for (String c : srcArrayM) {
+                    if (i >= iMaxSize) {
+                        break;
+                    }
+                    tempM[i++] = c;
+                }
+
+            }
+
+        }
+        scanner.getNext();
+        if (!scanner.currentToken.tokenStr.equals(":")) {
+            errorWithContext("Expected ':' token. Usage: " + scanner.currentToken.tokenStr);
+        }
+        // Everything checks out to here
+        // System.out.printf("Start = %d, End = %d, Increment = %d\n", iControlVar, iEndVar, iIncrementVar);
+        // Move past the ":"
+        scanner.getNext();
+
+        if (iTypeOfArrayElement == Token.STRING) {
+
+            //creat symbol table from control variable
+            this.symbolTable.putSymbol(controlToken.tokenStr, new STIdentifiers(controlToken.tokenStr, Token.CONTROL, Token.STRING, Token.STRING, Token.STRING));
+
+        } else {
+
+            if (((STIdentifiers) this.symbolTable.getSymbol(srcArrayToken.tokenStr)).iDclType == Token.INTEGER) {
+                this.symbolTable.putSymbol(controlToken.tokenStr, new STIdentifiers(controlToken.tokenStr, Token.CONTROL, Token.INTEGER, Token.INTEGER, Token.INTEGER));
+
+            } else if (((STIdentifiers) this.symbolTable.getSymbol(srcArrayToken.tokenStr)).iDclType == Token.FLOAT) {
+                this.symbolTable.putSymbol(controlToken.tokenStr, new STIdentifiers(controlToken.tokenStr, Token.CONTROL, Token.FLOAT, Token.FLOAT, Token.FLOAT));
+
+            } else if (((STIdentifiers) this.symbolTable.getSymbol(srcArrayToken.tokenStr)).iDclType == Token.STRING) {
+                this.symbolTable.putSymbol(controlToken.tokenStr, new STIdentifiers(controlToken.tokenStr, Token.CONTROL, Token.STRING, Token.STRING, Token.STRING));
+
+            }
+
+        }
+
+        System.out.println(Arrays.toString(tempM));
+        for (String x : tempM) {
+            p("x " + x);
+            this.storage.put(controlToken.tokenStr, x);
+            toExecute = statements(execute);
+            if (x == null) {
+                break;
+            }
+            if (toExecute.szValue.equals("endfor")) {
+                iColEnd = scanner.iSourceLineNr;
+                scanner.loopReset(iForStart);
+                skipTo("for", ":");
+
+            }
+        }
+        p("Got out with = " + ct());
+        scanner.iSourceLineNr = iColEnd;
+        scanner.advanceLine();
+        return;
 
     }
 
@@ -1459,8 +1580,8 @@ public class Parser {
             // Evaluate the left hand side
             if (scanner.currentToken.subClassif == Token.STRING) {
                 resOp1 = localExpression.stringExpressions(execute);
-            } else if (scanner.currentToken.subClassif == Token.IDENTIFIER 
-                    && ((STIdentifiers)symbolTable.getSymbol(scanner.currentToken.tokenStr)).iDclType == Token.STRING) {
+            } else if (scanner.currentToken.subClassif == Token.IDENTIFIER
+                    && ((STIdentifiers) symbolTable.getSymbol(scanner.currentToken.tokenStr)).iDclType == Token.STRING) {
                 resOp1 = localExpression.stringExpressions(execute);
             } else {
                 //should be numbers
@@ -1472,8 +1593,8 @@ public class Parser {
             // Evaluate the right hand side
             if (scanner.currentToken.subClassif == Token.STRING) {
                 resOp2 = localExpression.stringExpressions(execute);
-            } else if (scanner.currentToken.subClassif == Token.IDENTIFIER 
-                    && ((STIdentifiers)symbolTable.getSymbol(scanner.currentToken.tokenStr)).iDclType == Token.STRING) {
+            } else if (scanner.currentToken.subClassif == Token.IDENTIFIER
+                    && ((STIdentifiers) symbolTable.getSymbol(scanner.currentToken.tokenStr)).iDclType == Token.STRING) {
                 resOp2 = localExpression.stringExpressions(execute);
             } else {
                 //should be numbers
