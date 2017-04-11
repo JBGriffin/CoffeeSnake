@@ -702,7 +702,16 @@ public class Parser {
                                 //will just be null and continue
                                 case Token.IDENTIFIER:
                                     if (((STIdentifiers) this.symbolTable.getSymbol(scanner.currentToken.tokenStr)).iStruct == Token.STRING) {
-                                        sb.append(this.storage.get(this, scanner.currentToken.tokenStr));
+                                        if (scanner.nextToken.tokenStr.equals("[")) {
+                                            String key = scanner.currentToken.tokenStr;
+                                            int index = 0;
+                                            scanner.getNext();
+                                            scanner.getNext();
+                                            index = (int) Float.parseFloat(this.localExpression.workExpressions(execute).szValue);
+                                            sb.append(this.storage.get(this, key).charAt(index));
+                                        } else {
+                                            sb.append(this.storage.get(this, scanner.currentToken.tokenStr));
+                                        }
                                     } else if (((STIdentifiers) this.symbolTable.getSymbol(scanner.currentToken.tokenStr)).iStruct == Token.ARRAY_FIXED) {
                                         String key = scanner.currentToken.tokenStr;
                                         int index = 0;
