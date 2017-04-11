@@ -933,6 +933,12 @@ public class Parser {
                 this.storage.put(firstToken.tokenStr, rt.szValue + "");
                 return rt;
             }
+            if (((STIdentifiers) symbolTable.getSymbol(firstToken.tokenStr)).iStruct == Token.ARRAY_FIXED) {
+                //scalar assignment to array or array assignment to array
+                String[] newArray = this.localExpression.arrayExpressions(execute, firstToken.tokenStr);
+                this.storage.putArray(firstToken.tokenStr, newArray);
+                return new ResultValue(newArray[0], Token.ARRAY_FIXED);
+            }
             switch (scanner.currentToken.subClassif) {
                 //save simple integer (Assign 3)
                 case Token.INTEGER:
