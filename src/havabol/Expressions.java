@@ -16,8 +16,6 @@ public class Expressions {
 
     Parser parser;
 
-    ArrayList<String> TokensM = new ArrayList();
-
     Expressions(Parser parser) {
 
         this.parser = parser;
@@ -34,6 +32,8 @@ public class Expressions {
      */
     public ResultValue workExpressions(boolean execute) throws Exception {
 
+        ArrayList<String> TokensM = new ArrayList();
+
         int iCountParen = 0;
 
         int iCountBracket = 0;
@@ -42,12 +42,11 @@ public class Expressions {
 
         Token firstTokenEncountered = parser.scanner.currentToken;
         boolean firstIsNegative = false;
-
         while (!";".equals(parser.scanner.currentToken.tokenStr)) {
             //System.out.println(parser.scanner.currentToken.tokenStr);
             if (parser.scanner.currentToken.primClassif == Token.FUNCTION) {
                 //System.out.println(parser.scanner.currentToken.tokenStr);
-                this.TokensM.add(parser.function(execute).szValue);
+                TokensM.add(parser.function(execute).szValue);
                 continue;
 
             }
@@ -56,7 +55,7 @@ public class Expressions {
                 case "(":
                     parser.scanner.getNext();
                     rt = workExpressions(execute);
-                    this.TokensM.add(rt.szValue);
+                    TokensM.add(rt.szValue);
                     continue;
                 case ")":
                     parser.scanner.getNext();
@@ -68,7 +67,13 @@ public class Expressions {
                     return this.evalExpression(TokensM);
                 case "to":
                 case "by":
-                case ":": case">": case"<": case "==": case "!=": case ">=": case "<=":
+                case ":":
+                case ">":
+                case "<":
+                case "==":
+                case "!=":
+                case ">=":
+                case "<=":
                     return this.evalExpression(TokensM);
                 default:
                     String saveString = parser.scanner.currentToken.tokenStr;
@@ -91,11 +96,12 @@ public class Expressions {
 
                         }
                     }
-                    //System.out.println("Here about to save " + saveString);
-                    this.TokensM.add(saveString);
+                    TokensM.add(saveString);
                     break;
             }
-            if (";".equals(parser.scanner.currentToken.tokenStr)) break;
+            if (";".equals(parser.scanner.currentToken.tokenStr)) {
+                break;
+            }
             parser.scanner.getNext();
         }
         return this.evalExpression(TokensM);
@@ -103,24 +109,25 @@ public class Expressions {
     }
 
     /**
-     * 
-     * This is passed an arraylist of token strings from a given collection.
-     * It will evaluate in infix order and return value to caller.
-     * 
-     * @param TokensM
+     *
+     * This is passed an arraylist of token strings from a given collection. It
+     * will evaluate in infix order and return value to caller.
+     *
+     * @param LocalTokensM
      * @return double value of expression given
      */
-    public ResultValue evalExpression(ArrayList<String> TokensM) {
+    public ResultValue evalExpression(ArrayList<String> LocalTokensM) {
 
         Stack<String> operatorStack = new Stack();
         Stack<Double> valueStack = new Stack();
         Double dValue = 0.0;
-        while (!TokensM.isEmpty()) {
+        while (!LocalTokensM.isEmpty()) {
             //get first token
-            String token = TokensM.remove(0);
+            String token = LocalTokensM.remove(0);
 
             //if token is an operator
             if (!isOperator(token)) {
+                if (token.isEmpty()) break;
                 dValue = Double.parseDouble(token);
                 valueStack.push(dValue);
 
@@ -150,18 +157,19 @@ public class Expressions {
         if (!valueStack.empty()) {
             dValue = valueStack.pop();
         }
+        //System.out.println(dValue);
         return new ResultValue(dValue + "", Token.FLOAT);
 
     }
 
     /**
-     * evaluate takes to values and an operator to evaluate.
-     * It can handle +-/^* and returns value as a double
-     * 
+     * evaluate takes to values and an operator to evaluate. It can handle +-/^*
+     * and returns value as a double
+     *
      * @param operator
      * @param val1
      * @param val2
-     * @return 
+     * @return
      */
     public double evaluate(String operator, double val1, double val2) {
         double result = 0.0;
@@ -183,11 +191,11 @@ public class Expressions {
         return result;
     }
 
-    
     /**
      * Takes a String ch and returns if the character is an operator
+     *
      * @param ch
-     * @return 
+     * @return
      */
     public boolean isOperator(String ch) {
         if (ch.equals("+") || ch.equals("-") || ch.equals("*") || ch.equals("/") || ch.equals("^")) {
@@ -198,8 +206,9 @@ public class Expressions {
 
     /**
      * getPrio is called to return operator priority
+     *
      * @param ch
-     * @return 
+     * @return
      */
     public int getPrio(String ch) {
         int iPriority = 0;
@@ -217,13 +226,13 @@ public class Expressions {
         return iPriority;
     }
 
-    
     /**
-     * stringExpressions evaluates strings until ;
-     * handles concats, simples, and more
+     * stringExpressions evaluates strings until ; handles concats, simples, and
+     * more
+     *
      * @param execute
      * @return value of the string
-     * @throws Exception 
+     * @throws Exception
      */
     public ResultValue stringExpressions(boolean execute) throws Exception {
         StringBuilder sb = new StringBuilder();
@@ -246,7 +255,7 @@ public class Expressions {
             } else if (parser.scanner.currentToken.subClassif == Token.IDENTIFIER) {
 
                 if (((STIdentifiers) this.parser.symbolTable.getSymbol(parser.scanner.currentToken.tokenStr)).iStruct == Token.STRING) {
-                    
+
                     if (parser.scanner.nextToken.tokenStr.equals("[")) {
                         String stringName = parser.scanner.currentToken.tokenStr;
                         parser.scanner.getNext();
@@ -256,7 +265,7 @@ public class Expressions {
                     } else {
                         stringToAppend = this.parser.storage.get(parser, parser.scanner.currentToken.tokenStr);
                     }
-                                      
+
                 } else {
                     //it is an array (well it should be lol)
                     String arrayName = parser.scanner.currentToken.tokenStr;
@@ -269,13 +278,15 @@ public class Expressions {
 
                 }
 
-            } else if (",".equals(parser.scanner.currentToken.tokenStr) 
+            } else if (",".equals(parser.scanner.currentToken.tokenStr)
                     || ")".equals(parser.scanner.currentToken.tokenStr)) {
                 break;
             }
 
             sb.append(stringToAppend);
-            if (parser.scanner.currentToken.tokenStr.equals(";")) break;
+            if (parser.scanner.currentToken.tokenStr.equals(";")) {
+                break;
+            }
             parser.scanner.getNext();
 
         }

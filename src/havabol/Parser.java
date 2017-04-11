@@ -729,15 +729,11 @@ public class Parser {
                                     break;
                                 case Token.BUILTIN:
                                     sb.append((int) Float.parseFloat(expressions(execute).szValue) + "");
-                                    if (",".equals(scanner.currentToken.tokenStr)){
+                                    if (",".equals(scanner.currentToken.tokenStr)) {
                                         scanner.getNext();
                                         continue;
                                     }
                                     break;
-                                //if separator, continue
-                                //case Token.SEPARATOR:
-                                //break;
-                                //soon we can add '+' to also append strings
                                 default:
                                     break;
 
@@ -760,8 +756,8 @@ public class Parser {
                         break;
                     //LENGTH(string)
                     case "LENGTH":
-                        scanner.getNext(); //move past length
-                        scanner.getNext(); //move past '('
+                        //scanner.getNext(); //move past length
+                        //scanner.getNext(); //move past '('
                         String workingString = "";
                         workingString = this.localExpression.stringExpressions(execute).szValue;//this.storage.get(this, scanner.currentToken.tokenStr);
                         if (workingString.isEmpty()) {
@@ -771,7 +767,7 @@ public class Parser {
                     //spaces(string)
                     case "SPACES":
                         scanner.getNext(); //move past length
-                        scanner.getNext(); //move past '('
+                        //scanner.getNext(); //move past '('
                         String spaceString = "";
                         spaceString = this.localExpression.stringExpressions(execute).szValue;//this.storage.get(this, scanner.currentToken.tokenStr);
                         int spaceCount = 0;
@@ -851,7 +847,9 @@ public class Parser {
                         //it does exist so call assignments to handle the rest
                     } else {
 
-                        //System.out.println("Success so far!");
+                        if (scanner.nextToken.tokenStr.equals("[")) {
+                            this.isStringArray = false;
+                        }
                         rt = assignments(execute);
                         return rt;
 
@@ -1279,7 +1277,6 @@ public class Parser {
             for (int i = 0; i < resOpsM.size(); i++) {
                 tempM[i] = resOpsM.get(i);
             }
-            p(sizeForArray + " " + 1270);
             this.storage.putArray(identifier.tokenStr, tempM);
             return rt;
         }
