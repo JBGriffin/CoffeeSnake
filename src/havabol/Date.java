@@ -67,7 +67,7 @@ public class Date {
     {
 
         if(dateCheck.szValue.length() != 10)
-            errParse.errorWithContext("Invalid formate due to length. Usage: "
+            errParse.errorWithContext("Invalid format due to length. Usage: "
                     + dateCheck.szValue);
         // String is the correct length. Grab out the day, month, and year
         setNumerics(dateCheck);
@@ -78,7 +78,7 @@ public class Date {
 
         // validate day
         if(day < 1 || day > daysPerMonth[month])
-            errParse.errorWithContext("Invalid day given. Usage: " + day);
+            errParse.errorWithContext("Invalid day given. Usage: Day " + day + " used with Month " + month);
 
         // check for leap year
         if(day == 29 && month ==2)

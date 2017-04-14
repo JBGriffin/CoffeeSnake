@@ -31,6 +31,8 @@ public class Parser {
 
     Expressions localExpression;
 
+    Date date;
+
     boolean isStringArray = true;
 
     /**
@@ -50,6 +52,8 @@ public class Parser {
         this.numeric = new Numeric(this);
 
         this.localExpression = new Expressions(this);
+
+        this.date = new Date(this);
     }
 
     /**
@@ -115,7 +119,7 @@ public class Parser {
                     }
                     break;
                 //handle operands
-                case Token.OPERAND:     
+                case Token.OPERAND:
                     rt = operand(execute);
                     break;
                 //handle functions - currently only built in (Assign 3)
@@ -170,6 +174,9 @@ public class Parser {
             case Token.END:
                 returnValue = endStatement(execute);
                 return returnValue;
+            case Token.DATE:
+                returnValue = dateStatement(execute);
+                return returnValue;
             //should not be possible (Throw Parser Exception)
             default:
                 errorWithContext("Something went seriously wrong in the control statement. Given: " + scanner.currentToken.tokenStr);
@@ -178,6 +185,30 @@ public class Parser {
         //return rt to controlStatement method
         return returnValue;
 
+    }
+
+    private ResultValue dateStatement(boolean execute) throws Exception{
+
+
+        return null;
+    }
+
+    /**
+     * Validates the given Date variable.
+     * @param execute Boolean to determine whether or not to set the variable
+     * @return Result Value of the new Date
+     * @throws Exception If anything goes wrong, program dies
+     */
+    private ResultValue setDate(boolean execute) throws Exception{
+//        if(! scanner.currentToken.tokenStr.equals("="))
+//            errorWithContext("Incorrect assignment token given. Usage: " + scanner.currentToken.tokenStr);
+//        scanner.getNext();
+        ResultValue resultValue = new ResultValue(scanner.currentToken.tokenStr, Token.DATE);
+
+        date.validDate(resultValue);
+//        p(resultValue.szValue);
+
+        return resultValue;
     }
 
     /**
@@ -223,6 +254,10 @@ public class Parser {
                 //if nothing - throw exception (Assignment 3) - in future there will be more
                 case "Bool":
                     this.symbolTable.putSymbol(sznewTokenStr, new STIdentifiers(sznewTokenStr, Token.CONTROL, Token.BOOLEAN, Token.BOOLEAN, Token.BOOLEAN));
+                    break;
+                case "Date":
+                    this.symbolTable.putSymbol(sznewTokenStr, new STIdentifiers(sznewTokenStr, Token.CONTROL, Token.DATE, Token.DATE, Token.DATE));
+                    scanner.currentToken.subClassif = Token.DATE;
                     break;
                 default:
                     errorWithContext("Declaration not recognized. Given: " + workingToken.tokenStr);
@@ -984,6 +1019,7 @@ public class Parser {
                         if (scanner.nextToken.tokenStr.equals("[") && ste.iStruct == Token.STRING) {
                             this.isStringArray = false;
                         }
+
                         rt = assignments(execute);
                         return rt;
 
@@ -1074,6 +1110,9 @@ public class Parser {
                 this.storage.putArray(firstToken.tokenStr, newArray);
                 return new ResultValue(newArray[0], Token.ARRAY_FIXED);
             }
+            if (((STIdentifiers) symbolTable.getSymbol(firstToken.tokenStr)).iDclType == Token.DATE) {
+                return setDate(execute);
+            }
             switch (scanner.currentToken.subClassif) {
                 //save simple integer (Assign 3)
                 case Token.INTEGER:
@@ -1145,10 +1184,6 @@ public class Parser {
                     }
                     return new ResultValue(saveString, Token.STRING);
                 //System.out.println("Successfully put " + scanner.currentToken.tokenStr + " into " + firstToken.tokenStr);
-                case Token.BOOLEAN:
-                //System.out.println("I'M HERE!!!");
-                //if (scanner.bShowExpr)
-                //  System.out.println(rt.szValue);
                 default:
 
                     Token newToken = scanner.currentToken;

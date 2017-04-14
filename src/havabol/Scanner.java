@@ -187,7 +187,7 @@ public class Scanner {
                             setClassification(Token.FUNCTION, Token.BUILTIN, true);
                             break;
                         case "Date":
-                            setClassification(Token.CONTROL, Token.DATE, true);
+                            setClassification(Token.CONTROL, Token.DECLARE, true);
                             break;
                         case "Void":
                             setClassification(Token.CONTROL, Token.VOID, true);
