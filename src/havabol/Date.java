@@ -93,4 +93,21 @@ public class Date {
         // If it makes it this far, it's a valid date
         return true;
     }
+
+    public ResultValue dateDiff(ResultValue date1, ResultValue date2) throws Exception
+    {
+        return null;
+    }
+
+    public ResultValue dateAdj(ResultValue date1, ResultValue date2) throws Exception
+    {
+        return null;
+    }
+
+    public ResultValue dateAge(ResultValue date1, ResultValue date2) throws Exception
+    {
+        return null;
+    }
+
+
 }

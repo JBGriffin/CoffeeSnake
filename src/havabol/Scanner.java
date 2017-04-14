@@ -193,6 +193,9 @@ public class Scanner {
                             setClassification(Token.CONTROL, Token.VOID, true);
                             break;
                         case "print":
+                        case "dateAdj":
+                        case "dateDiff":
+                        case "dateAge":
                             setClassification(Token.FUNCTION, Token.BUILTIN, true);
                             break;
                         default:

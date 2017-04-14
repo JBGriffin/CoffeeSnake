@@ -977,6 +977,26 @@ public class Parser {
                         }
                         scanner.getNext();
                         return new ResultValue(elemArray.length + "", Token.INTEGER);
+                    case "dateAdj":
+                        ResultValue date1 = null;
+                        ResultValue date2 = null;
+                        // Move past the function name, and check for a left paren
+                        // Then move past it
+                        scanner.getNext();
+                        if(! scanner.getNext().equals("("))
+                            errorWithContext("Function must have an opening paren! Usage: " + ct());
+                        scanner.getNext();
+                        // Get the two dates
+
+                        date1.szValue = storage.get(this, scanner.currentToken.tokenStr);
+                        // Next token should be a ','. Check and move past it
+                        if(! scanner.getNext().equals(","))
+                            errorWithContext("Function must be separated by a ','! Usage: " + ct());
+                        scanner.getNext();
+                        date2.szValue = storage.get(this, scanner.currentToken.tokenStr);
+
+                        rt = date.dateAdj(date1, date2);
+
                 }
 
             }
