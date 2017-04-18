@@ -257,7 +257,6 @@ public class Parser {
                     break;
                 case "Date":
                     this.symbolTable.putSymbol(sznewTokenStr, new STIdentifiers(sznewTokenStr, Token.CONTROL, Token.DATE, Token.DATE, Token.DATE));
-                    scanner.currentToken.subClassif = Token.DATE;
                     break;
                 default:
                     errorWithContext("Declaration not recognized. Given: " + workingToken.tokenStr);
@@ -825,6 +824,7 @@ public class Parser {
         if (scanner.currentToken.subClassif == Token.BUILTIN) {
             //make sure symbol exists in global table
             if (((STFunction) this.symbolTable.getSymbol(scanner.currentToken.tokenStr)) != null) {
+                p(ct());
                 //if it does, get it
                 STFunction stf = (STFunction) this.symbolTable.getSymbol(scanner.currentToken.tokenStr);
                 //find out which function is being called
@@ -861,7 +861,8 @@ public class Parser {
                                 //currently, if identifier does not exist it
                                 //will just be null and continue
                                 case Token.IDENTIFIER:
-                                    if (((STIdentifiers) this.symbolTable.getSymbol(scanner.currentToken.tokenStr)).iStruct == Token.STRING) {
+                                    if (((STIdentifiers) this.symbolTable.getSymbol(scanner.currentToken.tokenStr)).iStruct == Token.STRING
+                                            || ((STIdentifiers) this.symbolTable.getSymbol(scanner.currentToken.tokenStr)).iStruct == Token.DATE) {
                                         if (scanner.nextToken.tokenStr.equals("[")) {
                                             String key = scanner.currentToken.tokenStr;
                                             int index = 0;
@@ -978,8 +979,10 @@ public class Parser {
                         scanner.getNext();
                         return new ResultValue(elemArray.length + "", Token.INTEGER);
                     case "dateAdj":
+                        p(981);
                         ResultValue date1 = null;
                         ResultValue date2 = null;
+                        p(ct());
                         // Move past the function name, and check for a left paren
                         // Then move past it
                         scanner.getNext();
@@ -1073,7 +1076,6 @@ public class Parser {
         ResultValue rt = null;
         //save off first token when method called
         Token firstToken = scanner.currentToken;
-
         //check to see if it is simple assignment
         if (";".equals(scanner.getNext())) {
 
@@ -1120,6 +1122,7 @@ public class Parser {
             if (scanner.currentToken.primClassif == Token.FUNCTION) {
                 int value = 0;
                 rt = function(execute);
+                p(rt.szValue);
                 value = (int) Float.parseFloat(rt.szValue);
                 this.storage.put(firstToken.tokenStr, rt.szValue + "");
                 return rt;
@@ -1131,7 +1134,9 @@ public class Parser {
                 return new ResultValue(newArray[0], Token.ARRAY_FIXED);
             }
             if (((STIdentifiers) symbolTable.getSymbol(firstToken.tokenStr)).iDclType == Token.DATE) {
-                return setDate(execute);
+                rt =  setDate(execute);
+                this.storage.put(firstToken.tokenStr, rt.szValue);
+                return rt;
             }
             switch (scanner.currentToken.subClassif) {
                 //save simple integer (Assign 3)
@@ -1204,6 +1209,8 @@ public class Parser {
                     }
                     return new ResultValue(saveString, Token.STRING);
                 //System.out.println("Successfully put " + scanner.currentToken.tokenStr + " into " + firstToken.tokenStr);
+                case Token.DATE:
+                    p(ct());
                 default:
 
                     Token newToken = scanner.currentToken;

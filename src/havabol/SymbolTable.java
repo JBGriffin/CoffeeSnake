@@ -80,7 +80,7 @@ public class SymbolTable {
             this.ht.put("Date", new STControl("Date", Token.CONTROL, Token.DECLARE));
             this.ht.put("String", new STControl("String", Token.CONTROL, Token.DECLARE));
             this.ht.put("Bool", new STControl("Bool", Token.CONTROL, Token.DECLARE));
-            
+            this.ht.put("Date", new STControl("Date", Token.CONTROL, Token.DECLARE));
             
             //STEntries
             this.ht.put("and", new STEntry("and", Token.OPERATOR));
@@ -102,7 +102,12 @@ public class SymbolTable {
                     , Token.INTEGER, Token.BUILTIN));
             this.ht.put("MAXELEM", new STFunction("MAXELEM", Token.FUNCTION
                     , Token.INTEGER, Token.BUILTIN));
-
+            this.ht.put("dateAdj", new STFunction("dateAdj", Token.FUNCTION
+                    , Token.DATE, Token.BUILTIN));
+            this.ht.put("dateDiff", new STFunction("dateDiff", Token.FUNCTION
+                    , Token.DATE, Token.BUILTIN));
+            this.ht.put("dateAge", new STFunction("dateAge", Token.FUNCTION
+                    , Token.DATE, Token.BUILTIN));
             
             //STIdentifiers
             
