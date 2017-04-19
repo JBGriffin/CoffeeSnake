@@ -188,6 +188,23 @@ public class Parser {
 
     }
 
+    /**
+     * Method to handle date functions. Usage would be as follows:
+     * <blockquote><pre>
+     * // Example Date execution:
+     * Date date1 = '2016-12-31';
+     * Date date2 = '2016-02-29';      // valid
+     * date3 = dateDiff(date1, date2);
+     * </pre></blockquote>
+     * Note: Other date functs are dateAge and dateAdj. Descriptions are in the methods
+     * in the Date class. Arguments to the functions <b>do not</b> need to be a Date type.
+     * If passed in a string in the proper format, it will still process the function.
+     *
+     * @param execute Boolean to determine whether or not to execute the statements
+     * @param stmt Function type to call
+     * @return The difference, age, or adjustment of the dates given.
+     * @throws Exception If an error occurs, program dies.
+     */
     private ResultValue dateStatement(boolean execute, String stmt) throws Exception
     {
         ResultValue date1 = new ResultValue("", Token.DATE);
@@ -198,8 +215,7 @@ public class Parser {
         if(! scanner.getNext().equals("("))
             errorWithContext("Function must have an opening paren! Usage: " + ct());
         scanner.getNext();
-        // Get the two dates
-
+        // Get the two dates. If they haven't been declared, grab them from their tokens
         date1.szValue = storage.get(this, scanner.currentToken.tokenStr);
         if(date1.szValue == null)
             date1.szValue = scanner.currentToken.tokenStr;
@@ -208,18 +224,20 @@ public class Parser {
             errorWithContext("Function must be separated by a ','! Usage: " + ct());
         scanner.getNext();
         date2.szValue = storage.get(this, scanner.currentToken.tokenStr);
-        if(date1.szValue == null)
+        if(date2.szValue == null)
             date2.szValue = scanner.currentToken.tokenStr;
+
+        // Check to see what function to call
         switch(stmt)
         {
             case "dateAdj":
-                returnDate = date.dateAdj(date1, date2);
+                returnDate = date.dateAdj(date1.szValue, date2.szValue);
                 break;
             case "dateAge":
-                returnDate = date.dateAge(date1, date2);
+                returnDate = date.dateAge(date1.szValue, date2.szValue);
                 break;
             case "dateDiff":
-                returnDate = date.dateDiff(date1, date2);
+                returnDate = date.dateDiff(date1.szValue, date2.szValue);
                 break;
             default:
                 errorWithContext("Invalid date function provided. Usage: " + stmt);

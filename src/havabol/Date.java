@@ -24,13 +24,12 @@ public class Date {
 
     /**
      * Construtor for Date class. Sets the parser class for error trapping purposes
-     * @param parser
+     * @param parser Parser passed in to utilize error method
      */
     public Date(Parser parser)
     {
         this.errParse = parser;
-        this.startDate = new ResultValue("", Token.DATE);
-        this.endDate = new ResultValue("", Token.DATE);
+        this.day = this.month = this.year = 0;
     }
 
     /**
@@ -65,10 +64,6 @@ public class Date {
      */
     public boolean validDate(ResultValue dateCheck) throws Exception
     {
-
-        if(dateCheck.szValue.length() != 10)
-            errParse.errorWithContext("Invalid format due to length. Usage: "
-                    + dateCheck.szValue);
         // String is the correct length. Grab out the day, month, and year
         setNumerics(dateCheck);
 
@@ -94,33 +89,40 @@ public class Date {
         return true;
     }
 
-    public ResultValue dateDiff(ResultValue date1, ResultValue date2) throws Exception
+    public ResultValue dateDiff(String date1, String date2) throws Exception
     {
-        if(! validDate(date1) || ! validDate(date2))
-            // Will never see this message
-            errParse.errorWithContext("Invalid date provided.");
+        setDates(date1, date2);
+        return null;
+    }
 
+    public ResultValue dateAdj(String date1, String date2) throws Exception
+    {
+        setDates(date1, date2);
 
         return null;
     }
 
-    public ResultValue dateAdj(ResultValue date1, ResultValue date2) throws Exception
+    public ResultValue dateAge(String date1, String date2) throws Exception
     {
-        if(! validDate(date1) || ! validDate(date2))
-            // Will never see this message
-            errParse.errorWithContext("Invalid date provided.");
-
+        setDates(date1, date2);
 
         return null;
     }
 
-    public ResultValue dateAge(ResultValue date1, ResultValue date2) throws Exception
+    /**
+     * Ensures that the dates passed in through functions are valid.
+     * @param date1 Start date to check
+     * @param date2 End date to check
+     * @throws Exception Kills the program if the dates are not valid
+     */
+    private void setDates(String date1, String date2) throws Exception
     {
-        if(! validDate(date1) || ! validDate(date2))
+        startDate = new ResultValue(date1, Token.DATE);
+        endDate = new ResultValue(date2, Token.DATE);
+        if(! validDate(startDate) || ! validDate(endDate))
             // Will never see this message
             errParse.errorWithContext("Invalid date provided.");
 
-        return null;
     }
 
     private void p(){ System.out.println("In date, Current Token: " + errParse.scanner.currentToken.tokenStr);}
