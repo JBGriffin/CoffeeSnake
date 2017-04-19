@@ -6,7 +6,8 @@ package havabol;
 public class Date {
     // Parser class to utilize error method
     private Parser errParse;
-    ResultValue currentDate;
+    ResultValue startDate;
+    ResultValue endDate;
 
     // Static array containing all months.
     // Starts at index 1 for readability
@@ -20,8 +21,6 @@ public class Date {
     private int month;
     private int year;
 
-    // Date to be used for comparisons
-    public Date workingDate;
 
     /**
      * Construtor for Date class. Sets the parser class for error trapping purposes
@@ -30,7 +29,8 @@ public class Date {
     public Date(Parser parser)
     {
         this.errParse = parser;
-        this.currentDate = null;
+        this.startDate = new ResultValue("", Token.DATE);
+        this.endDate = new ResultValue("", Token.DATE);
     }
 
     /**
@@ -96,18 +96,32 @@ public class Date {
 
     public ResultValue dateDiff(ResultValue date1, ResultValue date2) throws Exception
     {
+        if(! validDate(date1) || ! validDate(date2))
+            // Will never see this message
+            errParse.errorWithContext("Invalid date provided.");
+
+
         return null;
     }
 
     public ResultValue dateAdj(ResultValue date1, ResultValue date2) throws Exception
     {
+        if(! validDate(date1) || ! validDate(date2))
+            // Will never see this message
+            errParse.errorWithContext("Invalid date provided.");
+
+
         return null;
     }
 
     public ResultValue dateAge(ResultValue date1, ResultValue date2) throws Exception
     {
+        if(! validDate(date1) || ! validDate(date2))
+            // Will never see this message
+            errParse.errorWithContext("Invalid date provided.");
+
         return null;
     }
 
-
+    private void p(){ System.out.println("In date, Current Token: " + errParse.scanner.currentToken.tokenStr);}
 }

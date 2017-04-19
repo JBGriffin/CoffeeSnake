@@ -175,7 +175,8 @@ public class Parser {
                 returnValue = endStatement(execute);
                 return returnValue;
             case Token.DATE:
-                returnValue = dateStatement(execute);
+                returnValue = dateStatement(execute, null);
+                p(179);
                 return returnValue;
             //should not be possible (Throw Parser Exception)
             default:
@@ -187,10 +188,44 @@ public class Parser {
 
     }
 
-    private ResultValue dateStatement(boolean execute) throws Exception{
+    private ResultValue dateStatement(boolean execute, String stmt) throws Exception
+    {
+        ResultValue date1 = new ResultValue("", Token.DATE);
+        ResultValue date2 = new ResultValue("", Token.DATE);
+        ResultValue returnDate = new ResultValue("", Token.DATE);
+        // Move past the function name, and check for a left paren
+        // Then move past it
+        if(! scanner.getNext().equals("("))
+            errorWithContext("Function must have an opening paren! Usage: " + ct());
+        scanner.getNext();
+        // Get the two dates
 
+        date1.szValue = storage.get(this, scanner.currentToken.tokenStr);
+        if(date1.szValue == null)
+            date1.szValue = scanner.currentToken.tokenStr;
+        // Next token should be a ','. Check and move past it
+        if(! scanner.getNext().equals(","))
+            errorWithContext("Function must be separated by a ','! Usage: " + ct());
+        scanner.getNext();
+        date2.szValue = storage.get(this, scanner.currentToken.tokenStr);
+        if(date1.szValue == null)
+            date2.szValue = scanner.currentToken.tokenStr;
+        switch(stmt)
+        {
+            case "dateAdj":
+                returnDate = date.dateAdj(date1, date2);
+                break;
+            case "dateAge":
+                returnDate = date.dateAge(date1, date2);
+                break;
+            case "dateDiff":
+                returnDate = date.dateDiff(date1, date2);
+                break;
+            default:
+                errorWithContext("Invalid date function provided. Usage: " + stmt);
+        }
 
-        return null;
+        return returnDate;
     }
 
     /**
@@ -824,7 +859,7 @@ public class Parser {
         if (scanner.currentToken.subClassif == Token.BUILTIN) {
             //make sure symbol exists in global table
             if (((STFunction) this.symbolTable.getSymbol(scanner.currentToken.tokenStr)) != null) {
-                p(ct());
+                //p(ct());
                 //if it does, get it
                 STFunction stf = (STFunction) this.symbolTable.getSymbol(scanner.currentToken.tokenStr);
                 //find out which function is being called
@@ -979,27 +1014,27 @@ public class Parser {
                         scanner.getNext();
                         return new ResultValue(elemArray.length + "", Token.INTEGER);
                     case "dateAdj":
-                        p(981);
-                        ResultValue date1 = null;
-                        ResultValue date2 = null;
-                        p(ct());
-                        // Move past the function name, and check for a left paren
-                        // Then move past it
-                        scanner.getNext();
-                        if(! scanner.getNext().equals("("))
-                            errorWithContext("Function must have an opening paren! Usage: " + ct());
-                        scanner.getNext();
-                        // Get the two dates
-
-                        date1.szValue = storage.get(this, scanner.currentToken.tokenStr);
-                        // Next token should be a ','. Check and move past it
-                        if(! scanner.getNext().equals(","))
-                            errorWithContext("Function must be separated by a ','! Usage: " + ct());
-                        scanner.getNext();
-                        date2.szValue = storage.get(this, scanner.currentToken.tokenStr);
-
-                        rt = date.dateAdj(date1, date2);
-
+//                        ResultValue date1 = new ResultValue("", Token.DATE);
+//                        ResultValue date2 = new ResultValue("", Token.DATE);
+//                        // Move past the function name, and check for a left paren
+//                        // Then move past it
+//                        if(! scanner.getNext().equals("("))
+//                            errorWithContext("Function must have an opening paren! Usage: " + ct());
+//                        scanner.getNext();
+//                        // Get the two dates
+//
+//                        date1.szValue = storage.get(this, scanner.currentToken.tokenStr);
+//                        if(date1.szValue == null)
+//                            date1.szValue = scanner.currentToken.tokenStr;
+//                        // Next token should be a ','. Check and move past it
+//                        if(! scanner.getNext().equals(","))
+//                            errorWithContext("Function must be separated by a ','! Usage: " + ct());
+//                        scanner.getNext();
+//                        date2.szValue = storage.get(this, scanner.currentToken.tokenStr);
+//                        if(date1.szValue == null)
+//                            date2.szValue = scanner.currentToken.tokenStr;
+//                        rt = date.dateAdj(date1, date2);
+                          return dateStatement(execute, stf.symbol);
                 }
 
             }
@@ -1210,7 +1245,7 @@ public class Parser {
                     return new ResultValue(saveString, Token.STRING);
                 //System.out.println("Successfully put " + scanner.currentToken.tokenStr + " into " + firstToken.tokenStr);
                 case Token.DATE:
-                    p(ct());
+                    p(1213);
                 default:
 
                     Token newToken = scanner.currentToken;
