@@ -1,5 +1,9 @@
 package havabol;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 /**
  * Date class to be implemented in Havabol
  */
@@ -17,9 +21,10 @@ public class Date {
                , 31, 31, 30
                , 31, 30, 31 };
 
-    private int day;
-    private int month;
-    private int year;
+    public int day;
+    public int month;
+    public int year;
+    private Numeric numeric;
 
 
     /**
@@ -28,15 +33,24 @@ public class Date {
      */
     public Date(Parser parser)
     {
+        this.numeric = new Numeric(parser);
         this.errParse = parser;
         this.day = this.month = this.year = 0;
+
+    }
+
+    public Date(Parser parser, ResultValue setDate) throws Exception
+    {
+        this.errParse = parser;
+        setNumerics(setDate);
+        validDate(setDate);
     }
 
     /**
      * Sets the day, month, and year for the date for easier comparisons
      * @param dateValue Target value to convert
      */
-    private void setNumerics(ResultValue dateValue)
+    private void setNumerics(ResultValue dateValue) throws Exception
     {
         this.year = Integer.parseInt(dateValue.szValue.substring(0, 4));
         this.month = Integer.parseInt(dateValue.szValue.substring(5, 7));
@@ -89,24 +103,67 @@ public class Date {
         return true;
     }
 
+    private int daysCount(Date date)
+    {
+        int iCountDays;
+
+        if(date.month > 2)
+            date.month -= 3;
+        else
+        {
+            date.month += 9;
+            date.year -= 1;
+        }
+
+        iCountDays = 365 * date.year
+                + date.year / 4 - date.year /100 + date.year / 400
+                + (date.month * 306 + 5) / 10
+                + (date.day);
+
+        return iCountDays;
+    }
+
     public ResultValue dateDiff(String date1, String date2) throws Exception
     {
-        setDates(date1, date2);
-        return null;
+        Date d1 = new Date(errParse, new ResultValue(date1, Token.DATE));
+        Date d2 = new Date(errParse, new ResultValue(date2, Token.DATE));
+        int dayDifference = daysCount(d1) - daysCount(d2);
+
+        return new ResultValue(dayDifference + "", Token.INTEGER);
     }
 
     public ResultValue dateAdj(String date1, String date2) throws Exception
     {
-        setDates(date1, date2);
+        startDate = new ResultValue(date1, Token.DATE);
+        setNumerics(startDate);
 
-        return null;
+        ResultValue adjVal = new ResultValue(date2, Token.INTEGER);
+        adjVal = numeric.toInt(adjVal);
+        if(! validDate(startDate))
+        {
+            errParse.errorWithContext("Invalid date given. Usage: " + date1);
+        }
+        Calendar calendar = Calendar.getInstance();
+        DateFormat dateFormat = new SimpleDateFormat(startDate.szValue);
+
+        calendar.add(Calendar.DATE, Integer.parseInt(adjVal.szValue));
+
+        return new ResultValue(dateFormat.format(calendar.getTime()) + "", Token.STRING);
     }
 
     public ResultValue dateAge(String date1, String date2) throws Exception
     {
-        setDates(date1, date2);
+        Date d1 = new Date(errParse, new ResultValue(date1, Token.DATE));
+        Date d2 = new Date(errParse, new ResultValue(date2, Token.DATE));
+        int yearCount = daysCount(d1) - daysCount(d2);
 
-        return null;
+        if(yearCount < 0)
+            errParse.errorWithContext("Can't have a negative age! Dates given: "
+            + date1 + ", " + date2);
+
+        yearCount /= 4;
+
+        return new ResultValue(yearCount + "", Token.INTEGER);
     }
 
     /**

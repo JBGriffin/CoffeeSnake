@@ -1175,7 +1175,6 @@ public class Parser {
             if (scanner.currentToken.primClassif == Token.FUNCTION) {
                 int value = 0;
                 rt = function(execute);
-                p(rt.szValue);
                 value = (int) Float.parseFloat(rt.szValue);
                 this.storage.put(firstToken.tokenStr, rt.szValue + "");
                 return rt;
