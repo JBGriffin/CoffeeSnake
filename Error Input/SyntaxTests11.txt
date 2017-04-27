@@ -1,0 +1,10 @@
+Int i = 3;
+
+if T:
+    //do stuff
+    if F:
+        //stuff
+    endif;
+else
+    //do other stuff
+endif;

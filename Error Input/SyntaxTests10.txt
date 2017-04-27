@@ -1,0 +1,4 @@
+Int i = 3;
+
+if T:
+    //do stuff

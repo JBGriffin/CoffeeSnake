@@ -1,0 +1,3 @@
+String s = "Hello, World!";
+
+String c = LENGTH(s);

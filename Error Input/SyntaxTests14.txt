@@ -1,0 +1,2 @@
+String s = "1234";
+String x = s[5];
