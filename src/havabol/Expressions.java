@@ -308,8 +308,10 @@ public class Expressions {
                     || ">=".equals(parser.scanner.currentToken.tokenStr)
                     || "<=".equals(parser.scanner.currentToken.tokenStr)
                     || "==".equals(parser.scanner.currentToken.tokenStr)
-                    || "!=".equals(parser.scanner.currentToken.tokenStr)) {
-                break;
+                    || "!=".equals(parser.scanner.currentToken.tokenStr)
+                    || ":".equals(parser.scanner.currentToken.tokenStr)) {
+                return new ResultValue(sb.toString(), Token.STRING);
+                //break;
             }
 
             sb.append(stringToAppend);

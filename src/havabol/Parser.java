@@ -410,7 +410,7 @@ public class Parser {
             skipTo("if", ":");
             statements(false);
             if (!scanner.currentToken.tokenStr.equals("endif")
-                    || !scanner.nextToken.tokenStr.equals(";")) {
+                    || !scanner.nextToken.tokenStr.equals(";") || !scanner.nextToken.tokenStr.equals("else")) {
                 errorWithContext("Incorrect ending statement. Given: " + scanner.currentToken.tokenStr);
             }
         }
@@ -440,6 +440,9 @@ public class Parser {
             while (resultCond.szValue.equals("T")) {
                 toExecute = statements(true);
 
+                if (toExecute == null) {
+                    return;
+                }
                 //once found, re-eval expression
                 if (toExecute.szValue.equals("endwhile")) {
                     //p("TO EXECUTE FOUND ENDWHILE");
@@ -1570,6 +1573,7 @@ public class Parser {
             notSet = true;
         }
 
+        //p("In eval! " + ct());
         //meaning there was an ending to the comparison of an if or while
         if (comparison.equals(":")) {
             if (leftToken.subClassif == Token.BOOLEAN) {
@@ -1596,23 +1600,7 @@ public class Parser {
         //scanner.getNext();
         Token rightToken = scanner.currentToken;    // Solely for readability
         if (execute) {
-//            ResultValue resOp1 = new ResultValue(leftToken.tokenStr, leftToken.subClassif);
-//            ResultValue resOp2 = new ResultValue(rightToken.tokenStr, rightToken.subClassif);
-//            if ((resOp1.szValue = this.storage.get(this, leftToken.tokenStr)) == null) {
-//                resOp1.szValue = leftToken.tokenStr;
-//            }
-//            if ((resOp2.szValue = this.storage.get(this, rightToken.tokenStr)) == null) {
-//                resOp2.szValue = rightToken.tokenStr;
-//            }
-//            if (resOp1.type == Token.IDENTIFIER
-//                    && ((STIdentifiers) symbolTable.getSymbol(leftToken.tokenStr)).iParmType == Token.STRING) {
-//                resOp1.type = Token.STRING;
-//            }
-//            if (resOp2.type == Token.IDENTIFIER
-//                    && ((STIdentifiers) symbolTable.getSymbol(rightToken.tokenStr)).iParmType == Token.STRING) {
-//                resOp2.type = Token.STRING;
-//            }
-//            retVal = numeric.equalValue(resOp1, resOp2, comparison);
+
             ResultValue resOp1 = new ResultValue("", 0);
             ResultValue resOp2 = new ResultValue("", 0);
 
@@ -1620,8 +1608,8 @@ public class Parser {
             if (scanner.currentToken.subClassif == Token.STRING) {
                 resOp1 = localExpression.stringExpressions(execute);
             } else if (scanner.currentToken.subClassif == Token.IDENTIFIER) {
-                
                 if (((STIdentifiers) symbolTable.getSymbol(scanner.currentToken.tokenStr)).iStruct == Token.ARRAY_FIXED) {
+                    
                     String key = scanner.currentToken.tokenStr;
                     int index = 0;
                     scanner.getNext();
@@ -1630,7 +1618,9 @@ public class Parser {
                     resOp1.szValue = this.storage.getFromArray(key, index);
                     resOp1.type = ((STIdentifiers) symbolTable.getSymbol(key)).iDclType;
                 } else if (((STIdentifiers) symbolTable.getSymbol(scanner.currentToken.tokenStr)).iDclType == Token.STRING) {
+                    //p("HELLO");
                     resOp1 = localExpression.stringExpressions(execute);
+                    //p("Returned with ==== " + resOp1.szValue);
                 } else {
                     resOp1 = expressions(execute);
                 }
@@ -1642,6 +1632,7 @@ public class Parser {
             }
             // set the comparison operator and move past it
             comparison = scanner.currentToken.tokenStr;
+            //p(comparison + " ======= comparison");
             scanner.getNext();
             // Evaluate the right hand side
             if (scanner.currentToken.subClassif == Token.STRING) {
