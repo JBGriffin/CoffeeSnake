@@ -1,0 +1,5 @@
+Int i = 3;
+
+Int p = i * i * i;
+
+Float pi = 3.14.159;

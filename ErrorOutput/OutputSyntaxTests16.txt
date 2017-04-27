@@ -1,0 +1,10 @@
+Apr 27, 2017 1:18:12 PM havabol.HavaBol main
+SEVERE: null
+java.lang.NullPointerException
+	at havabol.Parser.whileStatement(Parser.java:444)
+	at havabol.Parser.flowStatement(Parser.java:294)
+	at havabol.Parser.controlStatement(Parser.java:171)
+	at havabol.Parser.statements(Parser.java:109)
+	at havabol.Parser.parse(Parser.java:72)
+	at havabol.HavaBol.main(HavaBol.java:39)
+

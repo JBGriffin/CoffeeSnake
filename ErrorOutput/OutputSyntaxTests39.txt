@@ -1,0 +1,4 @@
+p4Func.txt
+name= Anita length= 5
+name= Anita Byte length= 10
+concat name= Joe King length 8

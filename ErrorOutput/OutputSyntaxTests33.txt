@@ -1,0 +1,11 @@
+p4String.txt
+Apr 27, 2017 1:18:47 PM havabol.HavaBol main
+SEVERE: null
+java.lang.StringIndexOutOfBoundsException: String index out of range: 23
+	at java.lang.String.substring(String.java:1963)
+	at havabol.Parser.assignments(Parser.java:1079)
+	at havabol.Parser.operand(Parser.java:1023)
+	at havabol.Parser.statements(Parser.java:123)
+	at havabol.Parser.parse(Parser.java:72)
+	at havabol.HavaBol.main(HavaBol.java:39)
+

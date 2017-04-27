@@ -1,0 +1,10 @@
+Apr 27, 2017 1:18:45 PM havabol.HavaBol main
+SEVERE: null
+Line 1: Subclass is not an identifier. Usage: 3
+	at havabol.Parser.errorWithContext(Parser.java:84)
+	at havabol.Parser.declareStatement(Parser.java:233)
+	at havabol.Parser.controlStatement(Parser.java:167)
+	at havabol.Parser.statements(Parser.java:109)
+	at havabol.Parser.parse(Parser.java:72)
+	at havabol.HavaBol.main(HavaBol.java:39)
+

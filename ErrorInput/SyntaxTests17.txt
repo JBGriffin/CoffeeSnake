@@ -1,0 +1,7 @@
+Int i = 3;
+
+while i < 3:
+    i += 1;
+    if T:
+        print("hello");
+endwhile;

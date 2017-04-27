@@ -1,0 +1,9 @@
+print("p4Func.txt");
+String name = "Anita";
+print("name=", name, "length=", LENGTH(name));
+
+name = name # " " # "Byte";
+print("name=", name, "length=", LENGTH(name));
+
+name = "Joe";
+print("concat name=", name#' '#"King", "length" = , LENGTH(name # ' ' # "King"));

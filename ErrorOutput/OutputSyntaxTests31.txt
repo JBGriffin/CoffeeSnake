@@ -1,0 +1,15 @@
+Apr 27, 2017 1:18:46 PM havabol.HavaBol main
+SEVERE: null
+java.util.EmptyStackException
+	at java.util.Stack.peek(Stack.java:102)
+	at java.util.Stack.pop(Stack.java:84)
+	at havabol.Expressions.evalExpression(Expressions.java:174)
+	at havabol.Expressions.workExpressions(Expressions.java:80)
+	at havabol.Expressions.stringExpressions(Expressions.java:297)
+	at havabol.Parser.assignments(Parser.java:1193)
+	at havabol.Parser.declareStatement(Parser.java:269)
+	at havabol.Parser.controlStatement(Parser.java:167)
+	at havabol.Parser.statements(Parser.java:109)
+	at havabol.Parser.parse(Parser.java:72)
+	at havabol.HavaBol.main(HavaBol.java:39)
+

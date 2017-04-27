@@ -1,0 +1,17 @@
+Apr 27, 2017 1:17:50 PM havabol.HavaBol main
+SEVERE: null
+java.lang.NumberFormatException: For input string: "T"
+	at sun.misc.FloatingDecimal.readJavaFormatString(FloatingDecimal.java:2043)
+	at sun.misc.FloatingDecimal.parseDouble(FloatingDecimal.java:110)
+	at java.lang.Double.parseDouble(Double.java:538)
+	at havabol.Expressions.evalExpression(Expressions.java:153)
+	at havabol.Expressions.workExpressions(Expressions.java:92)
+	at havabol.Parser.expressions(Parser.java:1735)
+	at havabol.Parser.evaluateEquality(Parser.java:1641)
+	at havabol.Parser.ifStatement(Parser.java:357)
+	at havabol.Parser.flowStatement(Parser.java:290)
+	at havabol.Parser.controlStatement(Parser.java:171)
+	at havabol.Parser.statements(Parser.java:109)
+	at havabol.Parser.parse(Parser.java:72)
+	at havabol.HavaBol.main(HavaBol.java:39)
+

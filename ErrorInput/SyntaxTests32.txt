@@ -1,0 +1,8 @@
+Int i = 3;
+
+if T:
+    i = 4;
+else:
+    i = 7;
+
+print(i);

@@ -1,0 +1,8 @@
+if T:
+    print("I should work!");
+    if T:
+        print("I throw an error next!");
+    endif;
+else:
+    print("Oh no");
+endif;

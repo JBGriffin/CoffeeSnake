@@ -1,0 +1,9 @@
+Apr 27, 2017 1:18:48 PM havabol.HavaBol main
+SEVERE: null
+Line 1: Incorrect token given. Usage: strM
+	at havabol.Parser.errorWithContext(Parser.java:84)
+	at havabol.Parser.operand(Parser.java:1013)
+	at havabol.Parser.statements(Parser.java:123)
+	at havabol.Parser.parse(Parser.java:72)
+	at havabol.HavaBol.main(HavaBol.java:39)
+

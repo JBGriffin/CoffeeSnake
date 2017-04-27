@@ -1,0 +1,12 @@
+Apr 27, 2017 1:18:44 PM havabol.HavaBol main
+SEVERE: null
+Line 1 Unclosed quote found. Last quote opened at position 7, File: ../ErrorInput/SyntaxTests27.txt
+	at havabol.Scanner.error(Scanner.java:540)
+	at havabol.Scanner.buildStringLiteral(Scanner.java:410)
+	at havabol.Scanner.setNextToken(Scanner.java:266)
+	at havabol.Scanner.getNext(Scanner.java:451)
+	at havabol.Parser.function(Parser.java:839)
+	at havabol.Parser.statements(Parser.java:127)
+	at havabol.Parser.parse(Parser.java:72)
+	at havabol.HavaBol.main(HavaBol.java:39)
+

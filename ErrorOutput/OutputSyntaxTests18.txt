@@ -1,0 +1,11 @@
+Apr 27, 2017 1:18:13 PM havabol.HavaBol main
+SEVERE: null
+Line 3: Incorrect control variable given. Usage: p
+	at havabol.Parser.errorWithContext(Parser.java:84)
+	at havabol.Parser.forStatement(Parser.java:524)
+	at havabol.Parser.flowStatement(Parser.java:297)
+	at havabol.Parser.controlStatement(Parser.java:171)
+	at havabol.Parser.statements(Parser.java:109)
+	at havabol.Parser.parse(Parser.java:72)
+	at havabol.HavaBol.main(HavaBol.java:39)
+

@@ -1,0 +1,13 @@
+p4String.txt
+Replaced 'Pike' in slot 2 with 'p' giving Pipe
+Replaced 'dog house' in slot 0 with 'l' giving log house
+Replaced 'brace' in slot 4 with 'elet' giving bracelet
+Apr 27, 2017 1:18:47 PM havabol.HavaBol main
+SEVERE: null
+java.lang.StringIndexOutOfBoundsException: String index out of range: 47
+	at java.lang.String.charAt(String.java:658)
+	at havabol.Parser.function(Parser.java:871)
+	at havabol.Parser.statements(Parser.java:127)
+	at havabol.Parser.parse(Parser.java:72)
+	at havabol.HavaBol.main(HavaBol.java:39)
+

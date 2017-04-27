@@ -1,0 +1,12 @@
+Apr 27, 2017 1:18:43 PM havabol.HavaBol main
+SEVERE: null
+java.lang.ArrayIndexOutOfBoundsException: 10
+	at havabol.StorageManager.getFromArray(StorageManager.java:91)
+	at havabol.Expressions.stringExpressions(Expressions.java:298)
+	at havabol.Parser.assignments(Parser.java:1193)
+	at havabol.Parser.declareStatement(Parser.java:269)
+	at havabol.Parser.controlStatement(Parser.java:167)
+	at havabol.Parser.statements(Parser.java:109)
+	at havabol.Parser.parse(Parser.java:72)
+	at havabol.HavaBol.main(HavaBol.java:39)
+

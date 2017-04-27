@@ -1,0 +1,9 @@
+p4Func.txt
+Apr 27, 2017 1:18:49 PM havabol.HavaBol main
+SEVERE: null
+java.lang.NullPointerException
+	at havabol.Parser.function(Parser.java:864)
+	at havabol.Parser.statements(Parser.java:127)
+	at havabol.Parser.parse(Parser.java:72)
+	at havabol.HavaBol.main(HavaBol.java:39)
+

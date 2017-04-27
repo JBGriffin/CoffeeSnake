@@ -1,0 +1,4 @@
+strM = "oh yes";
+for oneStr ina strM:
+    print("\t", oneStr);
+endfor;
