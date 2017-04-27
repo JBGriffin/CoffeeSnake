@@ -1,0 +1,561 @@
+
+String name = "Anita";
+print("name=", name, "length=", LENGTH(name));
+
+name = name # " " # "Byte";
+print("name=", name, "length=", LENGTH(name));
+
+name = "Joe";
+print("concat name=", name#' '#"King", "length=", LENGTH(name#' '#"King"));
+
+Float gradeM[10] = 100, 99, 70.5;  // max elements of 10, but 
+                                   // only 3 populated
+print("gradeM has max elements of", MAXELEM(gradeM)
+    , " and", ELEM(gradeM), " are populated");
+
+Float temperatureM[] = 54, 60, 75, 89, 65, 49; // max elements of 6
+print("temperatureM has max elements of", MAXELEM(temperatureM)
+    , " and", ELEM(temperatureM), " are populated");
+
+String nameM[20];                  // max elements of 20, not populated
+print("nameM has max elements of", MAXELEM(nameM)
+    , " and", ELEM(nameM), " are populated");
+ 
+Int value = 5;
+Int arrayM[value * 5];         // max elements of 25
+print("arrayM has max elements of", MAXELEM(arrayM)
+    , " and", ELEM(arrayM), " are populated");
+
+Int weirdM[] = 10, "20", 30.5; // All of these are valid coercions to Int
+print("weirdM has max elements of", MAXELEM(weirdM)
+    , " and", ELEM(weirdM), " are populated");
+
+String name = "Joe";
+print("concat name=", name#' '#"King", "length=", LENGTH(name#' '#"King"));  
+
+name = "Lee";
+print("concat name=", name#' '#"King", "length=", LENGTH(name#' '#"King")); 
+print("1+LENGTH('Lee King')*2=", 1+LENGTH(name#' '#"King")*2);
+
+String str = "";
+print("str=", str, "SPACES(str)=", SPACES(str));
+str = ' ';
+print("str=", str, "SPACES(str)=", SPACES(str));
+print("str=", str, "LENGTH(SPACES(str))=", LENGTH(SPACES(str)));
+
+Int i;
+Float pi;
+String day;
+   day 
+   = 
+   "Sunday";
+String name;
+name = "Anita Goodgrade";
+String weird;
+weird = "\tTX\tTexas\n";
+String loc;
+loc = "TX";
+
+// numeric stuff
+print(">>> Checking datatype results based on left operand");
+pi = 3.14;
+Float area;
+Int radius2 = 64;
+Int radius;
+radius = 8;
+//radius2 = radius ^ 2;  // square the radius
+print("\t1. area all float");
+area = 180.45;
+print("\tradius="
+      ,  radius
+      ,  "radius2="
+      ,  radius2
+      ,  "area="
+      ,  area);
+Int irad2;
+irad2 = 8 * 2;
+print("\t2. area using int radius as left operand");
+area = 2 * pi;
+print("\tradius=", radius, "irad2=", irad2, "area=", area);
+Float circum;
+Float twoPi;
+print("\t3. circumference using twoPi as float * int");
+twoPi = 3.14 * 2;
+circum = 100;
+print("\tradius=", radius, "twoPi=", twoPi, "circum=", circum);
+print("\t4. circumference using twoPi as int * float");
+twoPi = 2;
+circum = 123;
+print("\tradius=", radius, "twoPi=", twoPi, "circum=", circum);
+
+// Simple if
+i = 0;
+print(">>> First If");
+if i == 0: // check for TX
+    print("correct");
+endif;
+print("\tDone with first if");
+
+print(">>> Second If");
+// if then else
+if i >= 5:
+    print("\t2nd if true, i >= 5, i =", i);
+else:
+    print("\t2nd if false, i >= 5, i =", i);
+endif;
+// while and if 
+print(">>> First while i < 5");    
+i = 1;
+while i < 5:
+    print("\ttop of while, i=", i);
+    if i < 3:
+        print("\twhile first if true i<3, i=", i);
+        i = i + 2;
+        if loc != "TX":
+             print("\t\twhile inner if true ... wrong!");
+        else:
+             print('\t\twhile inner if false, loc!=\'TX\', loc is', loc);
+        endif;
+    else:
+        print("\twhile first if false i<3, i=", i);
+        if loc=="TX":
+             print("\t\twhile 2nd inner if true loc=='TX', loc is", loc);
+             i = i + 1;
+        else:
+             print("\t\twhile 2nd inner if false ... wrong");
+             i = i + 10;
+        endif;
+        print("\twhile first if false after inner if");
+    endif;
+    print("\tbottom of while, i=", i);
+endwhile;
+print("\tAfter first while");
+
+// nested while loops
+print(">>> Second while i < 5 ... with nested while");
+i = 1;
+Int j;
+Bool bFlag;
+bFlag = T;
+while i < 5:
+    j = i;
+    print("\ttop of while, i=", i, "j=", j);
+    print("\t>>> Inner while j <= 3");
+    while  j <= 3:
+        print("\t\tinner while, j=", j);
+        j = j + 1;
+    endwhile;
+    bFlag = F;
+    print("\tbottom of while, i=", i, "j=", j);
+    i = i + 1;
+endwhile;
+print("\tAfter outer while");
+        
+
+
+
+
+// break
+
+
+print("p3Input.txt");
+Int i;
+Float pi;
+String day;
+   day 
+   = 
+   "Sunday";
+String name;
+name = "Anita Goodgrade";
+String weird;
+weird = "\tTX\tTexas\n";
+String loc;
+loc = "TX";
+
+// numeric stuff
+print(">>> Checking datatype results based on left operand");
+pi = 3.14;
+Float area;
+Float radius2;
+Int radius;
+radius = 8;
+radius2 = radius ^ 2;  // square the radius
+print("\t1. area all float");
+area = pi * radius2;
+print("\tradius="
+      ,  radius
+      ,  "radius2="
+      ,  radius2
+      ,  "area="
+      ,  area);
+Int irad2;
+irad2 = radius ^ 2;
+print("\t2. area using int radius as left operand");
+area = irad2 * pi;
+print("\tradius=", radius, "irad2=", irad2, "area=", area);
+Float circum;
+Float twoPi;
+print("\t3. circumference using twoPi as float * int");
+twoPi = pi * 2;
+circum = twoPi * radius;
+print("\tradius=", radius, "twoPi=", twoPi, "circum=", circum);
+print("\t4. circumference using twoPi as int * float");
+twoPi = 2 * pi;
+circum = twoPi * radius;
+print("\tradius=", radius, "twoPi=", twoPi, "circum=", circum);
+
+// Minus stuff
+
+Int A;
+Int B;
+Float D;
+A = 10;
+B = 6;
+D = 25;
+print(">> Minus test, A=", A, "B=", B, "D=", D);
+print("D-A=", D-A);
+print("-A=", -A);
+print("-D=", -D);
+A = -B;
+print("A=-B =", A);
+
+// Simple if
+i = 0;
+print(">>> First If");
+if loc == "TX": // check for TX
+    // It is TX
+    print("\tloc is", loc);
+    // it is ok to have this statement on multiple lines.  
+    // That is why we have a semicolon
+    i 
+       = 
+          i 
+          + 1;
+endif;
+print("\tDone with first if");
+
+print(">>> Second If");
+// if then else
+if i >= 5:
+    print("\t2nd if true, i >= 5, i =", i);
+else:
+    print("\t2nd if false, i >= 5, i =", i);
+endif;
+// while and if 
+print(">>> First while i < 5");    
+i = 1;
+while i < 5:
+    print("\ttop of while, i=", i);
+    if i < 3:
+        print("\twhile first if true i<3, i=", i);
+        i = i + 2;
+        if loc != "TX":
+             print("\t\twhile inner if true ... wrong!");
+        else:
+             print('\t\twhile inner if false, loc!=\'TX\', loc is', loc);
+        endif;
+    else:
+        print("\twhile first if false i<3, i=", i);
+        if loc=="TX":
+             print("\t\twhile 2nd inner if true loc=='TX', loc is", loc);
+             i = i + 1;
+        else:
+             print("\t\twhile 2nd inner if false ... wrong");
+             i = i + 10;
+        endif;
+        print("\twhile first if false after inner if");
+    endif;
+    print("\tbottom of while, i=", i);
+endwhile;
+print("\tAfter first while");
+
+// nested while loops
+print(">>> Second while i < 5 ... with nested while");
+i = 1;
+Int j;
+Bool bFlag;
+bFlag = T;
+while i < 5:
+    j = i;
+    print("\ttop of while, i=", i, "j=", j);
+    print("\t>>> Inner while j <= 3");
+    while  j <= 3:
+        print("\t\tinner while, j=", j);
+        j = j + 1;
+    endwhile;
+    bFlag = F;
+    print("\tbottom of while, i=", i, "j=", j);
+    i = i + 1;
+endwhile;
+print("\tAfter outer while");
+        
+
+
+// break
+
+
+
+// Expressions involving one operator
+print("p3SimpExpr.txt");
+Int two;
+two = 2;
+Int three ;
+three = 3;
+Int four ;
+four = 4;
+Int five ;
+five = 5;
+print ("variables: 2 * 3 =", two * three);
+print ("constants: 2 * 3 =", 2 * 3);
+
+// numeric comparisons
+Int x;
+x=three*4;
+if x > three:
+    print("right:", x, ">", 3);
+else:
+    print("wrong:", x, ">", 3, "is F");
+endif;
+if x >= 3.0:
+    print("right:", x, ">=", 3.0);
+else:
+    print("wrong:", x, ">=", 3.0, "is F");
+endif;
+
+// str comparisons
+String sA;
+sA="12";
+if sA > three:
+    print("wrong: string", sA, ">", 3, "'12' > 3 should be F");
+else:
+    print("right: string", sA, ">", 3, "is F");
+endif;
+
+
+// break
+
+
+
+// p4String.txt
+print("p4String.txt");
+String sA = "Pike";
+sA[2] = "p";
+print("Replaced 'Pike' in slot 2 with 'p' giving", sA);
+
+sA = "dog house";
+sA[0] = "l";
+print("Replaced 'dog house' in slot 0 with 'l' giving", sA);
+Int i = 2;
+String sB = "brace";
+sB[i*2] = "elet";
+print("Replaced 'brace' in slot", i*2, "with 'elet' giving"
+    , sB);
+
+String sC = "Maynard";
+print("sC=", sC, "falling apart is", sC[0], sC[24/2/3], sC[(2^4*3-6)/7]);
+
+
+
+
+// break
+
+
+
+
+// arrays, element assignment, for loops
+// do simple variables still work?
+print("p4Array.txt");
+Int iSimp = 50;
+print ("iSimp=", iSimp);
+
+print("Array C with elements printed using constant subscripts");
+Int iCM[10] = 10, 20, 30, 40, 50, 60;
+print("\tC", iCM[0], iCM[1], iCM[2]);
+
+print("Array B with expressions for subscripts");
+Int iBM[] = 10, 20, 30;
+iSimp = 0;
+print("\tB", iBM[iSimp], 10*iBM[iSimp+1], iBM[1+iSimp+1]);
+
+print("Array B with elements replaced");
+iSimp=1;
+iBM[iSimp] = 100;
+iBM[iSimp+1] = 200;
+print("\tB.2", iBM[0], iBM[iSimp], iBM[iSimp+1]);
+
+print("Array F with arrays of arrays");
+Int iFM[] = 10, 20, 30, 40, 50, 0, 1, 2, 3,4,5;
+iSimp = 1;
+print("F", iFM[iSimp-1], iFM[iFM[6]], iFM[(iSimp+2)-1]/10, iFM[iFM[(iSimp+2)-1]/10]
+    , iFM[2*4], iFM[2+iFM[2*4]-1]);
+// BM[iBM[0]-8]);
+print("iAM originally does not have any elements");
+Int iAM[10];
+print("iAm number of elements is", ELEM(iAM));
+iSimp = 1;
+iAM[iSimp] = 100; // not an error
+print("\tA", iAM[1]);
+
+// for loops
+print("for loop for val in iCM");
+for iVal in iCM:
+    print("\t", iVal);
+endfor;
+Int i;
+print("counting for loop");
+for i = 0 to ELEM(iCM):
+    print("\t", iCM[i]);
+endfor;
+
+print("counting for loop by 2, implicit variable k");
+for k = 0 to ELEM(iCM) by 2:
+    print("\t", iCM[k]);
+endfor;
+
+print("Unsorted array");
+Int iDM[20] = 60,30,20,10,5,50,70,25,35,45,15;
+Int iTemp;
+for iTemp in iDM:
+    print("\t", iTemp);
+endfor;
+
+print("Nested for loops, sorting the array");
+Bool bChange;
+Int j;
+for i=0 to ELEM(iDM)-1:
+    bChange = F;
+    for j=0 to ELEM(iDM)-i-1 by 1:
+        if iDM[j+1] < iDM[j]:
+           iTemp = iDM[j+1];
+           iDM[j+1] = iDM[j];
+           iDM[j] = iTemp;
+           bChange = T;
+        endif;
+    endfor;
+    if not bChange:
+        print("\tready to leave, i=", i);
+        // break;
+    endif;
+endfor; 
+print("sorted array");
+for i=0 to ELEM(iDM):
+    print("\t", iDM[i]);
+endfor;
+
+// Assign a value to the entire array
+print("Scalar assignment to an array");
+String strM[10];
+strM = "oh yes";
+for oneStr in strM:
+    print("\t", oneStr);
+endfor;
+// Copy the array
+Int iCopyAM[5];
+iCopyAM = iDM;  // copy the values to the array stop when we have filled it.
+print("copy of the sorted array, but with just 5 elements");
+for iTemp in iCopyAM:
+    print("\t", iTemp);
+endfor;
+
+// Copy the array
+Int iCopyBM[30];
+iCopyBM = iDM;  // copy the values to the array stop when we run out of values
+print("copy of the sorted array, but with just 11 elements not 30");
+for iTemp in iCopyBM:
+    print("\t", iTemp);
+endfor;
+
+
+// break
+
+
+// Expressions
+print("p4Expr.txt");
+Int two = 2;
+Int three = 3;
+Int four = 4;
+Int five = 5;
+print("constants: 3 + 4 * 5 =", 3+4*5);
+print("variables: 3 + 4 * 5 =", three+four*five);
+
+print("constants: 2 * 3 + 4 =", 2 * 3 + 4);
+print("mix: 2* 3 + 4 =", 2 * three + 4);
+
+print("12 / 4 * 3 = ", 12 / 4 * three);
+
+print("4 + (5 - 6) * 2 =", 4 + (5 - 6) * 2 );
+
+print("2 ^ 2 ^ 3 = ", 2 ^ 2 ^ 3);
+
+print("two + (12-4*2/4) - 1 =", two + (12-4*2/4) - 1);
+
+if three*four > four+five:
+    print("right:", three*four, ">", 4+5);
+else:
+    print("wrong:", three*four, ">", 4+5,  "should be T");
+endif;
+
+if "1" # "2" > 4+5:
+    print("wrong: string", "1" # "2", ">", 4+5, "should be F");
+else:
+    print("right: string", "1" # "2", ">", 4+5);
+endif;
+String strA = "Climb";
+String strB = "every";
+String strC;
+strC = strA # " " # strB # " mountain";
+print("strC is", strC);
+
+
+
+// break
+
+
+// Builtin function tests
+print("p4Func.txt");
+String name = "Anita";
+print("name=", name, "length=", LENGTH(name));
+
+name = name # " " # "Byte";
+print("name=", name, "length=", LENGTH(name));
+
+name = "Joe";
+print("concat name=", name#' '#"King", "length=", LENGTH(name#' '#"King"));
+
+Float gradeM[10] = 100, 99, 70.5;  // max elements of 10, but 
+                                   // only 3 populated
+print("gradeM has max elements of", MAXELEM(gradeM)
+    , " and", ELEM(gradeM), " are populated");
+
+Float temperatureM[] = 54, 60, 75, 89, 65, 49; // max elements of 6
+print("temperatureM has max elements of", MAXELEM(temperatureM)
+    , " and", ELEM(temperatureM), " are populated");
+
+String nameM[20];                  // max elements of 20, not populated
+print("nameM has max elements of", MAXELEM(nameM)
+    , " and", ELEM(nameM), " are populated");
+ 
+Int value = 5;
+Int arrayM[value * 5];         // max elements of 25
+print("arrayM has max elements of", MAXELEM(arrayM)
+    , " and", ELEM(arrayM), " are populated");
+
+Int weirdM[] = 10, "20", 30.5; // All of these are valid coercions to Int
+print("weirdM has max elements of", MAXELEM(weirdM)
+    , " and", ELEM(weirdM), " are populated");
+
+String name = "Joe";
+print("concat name=", name#' '#"King", "length=", LENGTH(name#' '#"King"));  
+
+name = "Lee";
+print("concat name=", name#' '#"King", "length=", LENGTH(name#' '#"King")); 
+print("1+LENGTH('Lee King')*2=", 1+LENGTH(name#' '#"King")*2);
+
+String str = "";
+print("str=", str, "SPACES(str)=", SPACES(str));
+str = ' ';
+print("str=", str, "SPACES(str)=", SPACES(str));
+print("str=", str, "LENGTH(SPACES(str))=", LENGTH(SPACES(str)));
+
+
+
