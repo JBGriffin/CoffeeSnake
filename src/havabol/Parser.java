@@ -1113,7 +1113,7 @@ public class Parser {
             if (((STIdentifiers) symbolTable.getSymbol(firstToken.tokenStr)).iDclType == Token.DATE) {
                 return setDate(execute);
             }
-            switch (scanner.currentToken.subClassif) {
+            switch (((STIdentifiers) symbolTable.getSymbol(firstToken.tokenStr)).iDclType) {
                 //save simple integer (Assign 3)
                 case Token.INTEGER:
 
