@@ -1,1 +1,4 @@
-Int i = 3
+strM = "oh yes";
+for oneStr ina strM:
+    print("\t", oneStr);
+endfor;
