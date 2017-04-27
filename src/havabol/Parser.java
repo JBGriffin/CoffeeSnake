@@ -1017,7 +1017,6 @@ public class Parser {
         ResultValue rt = null;
         //save off first token when method called
         Token firstToken = scanner.currentToken;
-
         //check to see if it is simple assignment
         if (";".equals(scanner.getNext())) {
 
@@ -1073,8 +1072,11 @@ public class Parser {
                 String[] newArray = this.localExpression.arrayExpressions(execute, firstToken.tokenStr);
                 this.storage.putArray(firstToken.tokenStr, newArray);
                 return new ResultValue(newArray[0], Token.ARRAY_FIXED);
-            }
-            switch (scanner.currentToken.subClassif) {
+            } 
+            //else if (((STIdentifiers) symbolTable.getSymbol(firstToken.tokenStr)).iDclType == Token.INTEGER){
+                
+            //}
+            switch (((STIdentifiers) symbolTable.getSymbol(firstToken.tokenStr)).iDclType) {
                 //save simple integer (Assign 3)
                 case Token.INTEGER:
 
